@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx'; // Import the xlsx library
 
 const Management = () => {
   const [username, setUsername] = useState('');
@@ -8,9 +9,10 @@ const Management = () => {
   const [facultyData, setFacultyData] = useState([]);
   const [courseData, setCourseData] = useState({});
 
-  const correctUsername = "admin";  // ✅ Preset credentials
+  const correctUsername = "admin";
   const correctPassword = "admin123";
 
+  // Handle login
   const handleLogin = (e) => {
     e.preventDefault();
     if (username === correctUsername && password === correctPassword) {
@@ -21,19 +23,24 @@ const Management = () => {
     }
   };
 
+  // Fetch faculty data and organize it by course
   const fetchData = async () => {
     try {
       const response = await axios.get('http://localhost:5000/faculty');
       setFacultyData(response.data);
 
-      // ✅ Build course-wise faculty data
       const courseMap = {};
       response.data.forEach(faculty => {
-        faculty.selectedCourses.forEach(course => {
+        faculty.selectedCourses.forEach((course, index) => {
           if (!courseMap[course.courseName]) {
             courseMap[course.courseName] = [];
           }
-          courseMap[course.courseName].push(faculty.name);
+          // Add facultyId along with name and choice
+          courseMap[course.courseName].push({
+            facultyName: faculty.name,
+            choice: `Choice ${index + 1}`,
+            facultyId: faculty.empId // Include the faculty ID here
+          });
         });
       });
       setCourseData(courseMap);
@@ -42,11 +49,55 @@ const Management = () => {
     }
   };
 
+  // Download faculty course selection as Excel
+  const handleDownloadFacultyExcel = () => {
+    const facultyExcelData = [];
+
+    facultyData.forEach(faculty => {
+      faculty.selectedCourses.forEach((course, index) => {
+        facultyExcelData.push({
+          "Faculty Name": faculty.name,
+          "Empld": faculty.empId,
+          "Course Name": course.courseName,
+          "Choice": `Choice ${index + 1}`
+        });
+      });
+      facultyExcelData.push({});
+    });
+
+    const ws = XLSX.utils.json_to_sheet(facultyExcelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Faculty Selection");
+    XLSX.writeFile(wb, "faculty_course_selection.xlsx");
+  };
+
+  // Download course selection as Excel
+  const handleDownloadCourseExcel = () => {
+    const courseExcelData = [];
+
+    Object.entries(courseData).forEach(([courseName, facultyList]) => {
+      facultyList.forEach(({ facultyName, choice, facultyId }) => {
+        courseExcelData.push({
+          "Course Name": courseName,
+          "EmpId": facultyId,  // facultyId should now have values
+          "Faculty Name": facultyName,
+          "Choice": choice
+        });
+      });
+      courseExcelData.push({})
+    });
+
+    const ws = XLSX.utils.json_to_sheet(courseExcelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Course Selection");
+    XLSX.writeFile(wb, "course_selection.xlsx");
+  };
+
   return (
     <div>
       <h1>Management Portal</h1>
 
-      {/* ✅ Login Form */}
+      {/* Login Form */}
       {!isAuthenticated ? (
         <form onSubmit={handleLogin}>
           <input 
@@ -67,7 +118,7 @@ const Management = () => {
         </form>
       ) : (
         <>
-          {/* ✅ Faculty-wise course selection */}
+          {/* Faculty Course Selection Table */}
           <h2>Faculty Course Selection</h2>
           <table border="1">
             <thead>
@@ -90,24 +141,32 @@ const Management = () => {
             </tbody>
           </table>
 
-          {/* ✅ Course-wise faculty selection */}
+          {/* Button to download Faculty Excel */}
+          <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
+
+          {/* Courses Selected by Faculty Table */}
           <h2>Courses Selected by Faculty</h2>
           <table border="1">
             <thead>
               <tr>
                 <th>Course Name</th>
                 <th>Selected by Faculty</th>
+                <th>Choice</th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(courseData).map(([courseName, facultyList]) => (
                 <tr key={courseName}>
                   <td>{courseName}</td>
-                  <td>{facultyList.join(", ")}</td>
+                  <td>{facultyList.map(item => item.facultyName).join(", ")}</td>
+                  <td>{facultyList.map(item => item.choice).join(", ")}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {/* Button to download Course Excel */}
+          <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
         </>
       )}
     </div>

@@ -1,21 +1,35 @@
-// backend/routes/facultyRoutes.js
 const express = require('express');
 const Faculty = require('../models/Faculty');
 const router = express.Router();
 
-// Register a new faculty
+// ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
   const { name, empId, preference, selectedCourses = [] } = req.body;
+
   try {
+    // ✅ Check if faculty already exists
+    const existingFaculty = await Faculty.findOne({ empId });
+    if (existingFaculty) {
+      return res.status(400).json({ message: 'You have already registered.' });
+    }
+
+    // ✅ Ensure required fields are present
+    if (!name || !empId || !preference) {
+      return res.status(400).json({ message: 'Name, Employee ID, and Preference are required.' });
+    }
+
+    // ✅ Create new faculty entry
     const faculty = new Faculty({ name, empId, preference, selectedCourses });
     await faculty.save();
-    res.status(201).json(faculty);
+    res.status(201).json({ message: 'Faculty registered successfully.', faculty });
+
   } catch (error) {
+    console.error("Error registering faculty:", error);
     res.status(500).json({ message: 'Error registering faculty', error });
   }
 });
 
-// Get all faculty records
+// ✅ Get all faculty records
 router.get('/', async (req, res) => {
   try {
     const faculties = await Faculty.find();
@@ -25,31 +39,43 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Submit selected courses for a faculty
+// ✅ Submit selected courses for a faculty
 router.post('/submit-courses', async (req, res) => {
-  let { empId, selectedCourses } = req.body;
+  let { empId, facultyName, preference, selectedCourses } = req.body;
 
   console.log("Received course submission request:", req.body);
 
+  // ✅ Validate required fields
+  if (!facultyName || !empId || !preference || !Array.isArray(selectedCourses)) {
+    console.error("Invalid data received:", req.body);
+    return res.status(400).json({ message: "Invalid request. Ensure name, empId, preference, and courses are provided correctly." });
+  }
+
   try {
-    const faculty = await Faculty.findOne({ empId });
+    let faculty = await Faculty.findOne({ empId });
 
     if (!faculty) {
-      console.error("Faculty not found for empId:", empId);
-      return res.status(404).json({ message: 'Faculty not found' });
+      console.log(`Faculty not found for empId: ${empId}, registering new faculty...`);
+
+      // ✅ Ensure all required fields exist
+      faculty = new Faculty({
+        name: facultyName,  // ✅ Fix: Correctly store facultyName in DB
+        empId,
+        preference,
+        selectedCourses
+      });
+
+      await faculty.save();
+      console.log("New faculty registered:", faculty);
+      return res.status(201).json({ message: "New faculty registered and courses saved", faculty });
     }
 
-    // Ensure selectedCourses is an array
-    if (!Array.isArray(selectedCourses)) {
-      console.error("Invalid selectedCourses format:", selectedCourses);
-      return res.status(400).json({ message: "Invalid data format for selectedCourses" });
-    }
-
-    faculty.selectedCourses = selectedCourses; // Store as an array of objects
+    // ✅ If faculty exists, update their selected courses
+    faculty.selectedCourses = selectedCourses;
     await faculty.save();
 
-    console.log("Courses saved successfully for:", empId);
-    res.status(200).json({ message: 'Courses saved successfully', faculty });
+    console.log("Courses updated successfully for:", empId);
+    res.status(200).json({ message: 'Courses updated successfully', faculty });
 
   } catch (error) {
     console.error("Error saving courses:", error);
@@ -57,21 +83,23 @@ router.post('/submit-courses', async (req, res) => {
   }
 });
 
-// Check if an employee ID is already registered
+// ✅ Check if an employee ID is already registered
 router.get('/check/:empId', async (req, res) => {
   const empId = parseInt(req.params.empId, 10);
-  
+
   try {
     const faculty = await Faculty.findOne({ empId });
+
     if (faculty) {
       return res.json({ exists: true });
     }
+
     res.json({ exists: false });
+
   } catch (error) {
+    console.error("Error checking faculty ID:", error);
     res.status(500).json({ message: 'Error checking faculty ID', error });
   }
 });
-
-
 
 module.exports = router;

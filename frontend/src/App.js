@@ -12,7 +12,7 @@ const App = () => {
 
   return (
     <Router>
-      <Navbar />  {/* ✅ Added Navbar */}
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home setEmpId={setEmpId} setFacultyName={setFacultyName} setPreference={setPreference} />} />
         <Route path="/course-selection" element={<CourseSelection empId={empId} facultyName={facultyName} preference={preference} />} />

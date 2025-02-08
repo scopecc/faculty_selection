@@ -2,6 +2,10 @@ const express = require('express');
 const Faculty = require('../models/Faculty');
 const router = express.Router();
 
+router.get('/test', (req, res) => {
+  res.json({ message: 'Faculty route works' });
+});
+
 // ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
   const { name, empId, preference, selectedCourses = [] } = req.body;

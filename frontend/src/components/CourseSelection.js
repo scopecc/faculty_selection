@@ -70,7 +70,7 @@ const CourseSelection = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/faculty/submit-courses', 
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
         { empId, facultyName, preference, selectedCourses },
         { headers: { 'Content-Type': 'application/json' } }
       );

@@ -9,6 +9,8 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+    console.log("Backend URL - ", process.env.REACT_APP_BACKEND_URL);
+    console.log("Data", facultyName, empIdInput, preference);
     e.preventDefault();
     const empId = parseInt(empIdInput, 10);
 
@@ -19,7 +21,7 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
 
     try {
       // ✅ Check if faculty already exists
-      const response = await axios.get(`http://localhost:5000/faculty/check/${empId}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`);
       if (response.data.exists) {
         alert("You have already registered and selected courses.");
         return;
@@ -41,6 +43,7 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
 
   return (
     <div>
+    <h4>Backend URL - {process.env.REACT_APP_BACKEND_URL}</h4>
       <h1>Faculty Registration</h1>
       <form onSubmit={handleSubmit}>
         <input

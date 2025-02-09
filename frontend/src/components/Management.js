@@ -36,7 +36,7 @@ const Management = () => {
   // Fetch faculty data and organize it by course
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/faculty');
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/faculty`);
       setFacultyData(response.data);
 
       const courseMap = {};

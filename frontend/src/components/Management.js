@@ -36,7 +36,7 @@ const Management = () => {
   // Fetch faculty data and organize it by course
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/faculty`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
       setFacultyData(response.data);
 
       const courseMap = {};
@@ -58,6 +58,11 @@ const Management = () => {
       console.error("Error fetching faculty data:", error);
     }
   };
+
+  useEffect(()=>{
+    console.log("mounted")
+    fetchData();
+  },[])
 
   // Download faculty course selection as Excel
   const handleDownloadFacultyExcel = () => {
@@ -105,40 +110,9 @@ const Management = () => {
 
   return (
     <div>
-      <h1>Management Portal</h1>
-
+      <h1>Management Portal - {process.env.REACT_APP_BACKEND_URL}</h1>
       {/* Login Form */}
-      {!isAuthenticated ? (
-        <div className="login-container">
-        <form onSubmit={handleLogin} className="login-form">
-          <input 
-            type="text" 
-            placeholder="Username" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)}
-            required 
-          />
-          <div className="password-container">
-          <input 
-            type={showPassword ? "text" : "password"}
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-          />
-          <button
-            type="button"
-            className="eye-button"
-            onClick={togglePasswordVisibility}
-          >
-            {showPassword ? "🙈" : "👁"}
-          </button>
-        </div>
-          <button type="submit">Login</button>
-        </form>
-        </div>
-      ) : (
-        <>
+      <>
           {/* Faculty Course Selection Table */}
           <div className="table-container">
           <h2>Faculty Course Selection</h2>
@@ -195,7 +169,6 @@ const Management = () => {
           <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
           </div>
         </>
-      )}
     </div>
   );
 };

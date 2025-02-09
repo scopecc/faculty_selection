@@ -36,7 +36,7 @@ const Management = () => {
   // Fetch faculty data and organize it by course
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://faculty-selection.onrender.com/faculty');
+      const response = await axios.get('http://faculty-selection.onrender.com/');
       setFacultyData(response.data);
 
       const courseMap = {};

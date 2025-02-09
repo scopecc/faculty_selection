@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';  // Import useNavigate
 import axios from 'axios';
+import './CourseSelection.css';
+
 
 const CourseSelection = () => {
   const location = useLocation();
@@ -98,14 +100,14 @@ const CourseSelection = () => {
   const theoryLabCoursesByDomain = groupByDomain(courses.filter(course => course.type === "Theory+Lab"));
 
   return (
-    <div>
+    <div className="course-selection-container">
       <h1>Course Selection</h1>
-      <p>Faculty Name: <strong>{facultyName || "N/A"}</strong></p>
-      <p>Preference: <strong>{preference || "N/A"}</strong></p>
-      <p>Employee ID: <strong>{empId || "N/A"}</strong></p>
+      <p className="faculty-details">Faculty Name: <strong>{facultyName || "N/A"}</strong></p>
+      <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
+      <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p><strong>You must select exactly {maxCourses} courses.</strong></p>
 
-      <div>
+      <div className="selected-courses">
         <h2>Selected Courses</h2>
         <ol>
           {selectedCourses.map(course => (
@@ -115,13 +117,14 @@ const CourseSelection = () => {
           ))}
         </ol>
       </div>
-      <div>
-        <h2>Theory Courses</h2>
+      
+        <h2 className="course-category">Theory Courses</h2>
+        <div className="course-list">
         {Object.keys(theoryCoursesByDomain).map(domain => (
           <div key={domain}>
             <h3>{domain}</h3>
             {theoryCoursesByDomain[domain].map(course => (
-              <label key={course.courseId} style={{ display: "block", marginBottom: "5px" }}>
+              <label key={course.courseId} >
                 <input
                   type="checkbox"
                   checked={selectedCourses.some(c => c.courseId === course.courseId)}
@@ -132,8 +135,10 @@ const CourseSelection = () => {
             ))}
           </div>
         ))}
+        </div>
 
-        <h2>Theory+Lab Courses</h2>
+        <h2 className="course-category">Theory+Lab Courses</h2>
+        <div className="course-list">
         {Object.keys(theoryLabCoursesByDomain).map(domain => (
           <div key={domain}>
             <h3>{domain}</h3>
@@ -151,7 +156,7 @@ const CourseSelection = () => {
         ))}
       </div>
 
-      <button onClick={handleSubmit}>Submit Courses</button>
+      <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
     </div>
   );
 };

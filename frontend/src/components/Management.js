@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import * as XLSX from 'xlsx'; // Import the xlsx library
+import * as XLSX from 'xlsx'; 
+import './Management.css'; // Import the CSS file
+
+
 
 const Management = () => {
   const [username, setUsername] = useState('');
@@ -11,6 +14,13 @@ const Management = () => {
 
   const correctUsername = "admin";
   const correctPassword = "admin123";
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
 
   // Handle login
   const handleLogin = (e) => {
@@ -99,7 +109,8 @@ const Management = () => {
 
       {/* Login Form */}
       {!isAuthenticated ? (
-        <form onSubmit={handleLogin}>
+        <div className="login-container">
+        <form onSubmit={handleLogin} className="login-form">
           <input 
             type="text" 
             placeholder="Username" 
@@ -107,18 +118,29 @@ const Management = () => {
             onChange={(e) => setUsername(e.target.value)}
             required 
           />
+          <div className="password-container">
           <input 
-            type="password" 
+            type={showPassword ? "text" : "password"}
             placeholder="Password" 
             value={password} 
             onChange={(e) => setPassword(e.target.value)}
             required 
           />
+          <button
+            type="button"
+            className="eye-button"
+            onClick={togglePasswordVisibility}
+          >
+            {showPassword ? "🙈" : "👁"}
+          </button>
+        </div>
           <button type="submit">Login</button>
         </form>
+        </div>
       ) : (
         <>
           {/* Faculty Course Selection Table */}
+          <div className="table-container">
           <h2>Faculty Course Selection</h2>
           <table border="1">
             <thead>
@@ -140,9 +162,13 @@ const Management = () => {
               ))}
             </tbody>
           </table>
+          
 
           {/* Button to download Faculty Excel */}
           <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
+          </div>
+
+          <div className="table-container">
 
           {/* Courses Selected by Faculty Table */}
           <h2>Courses Selected by Faculty</h2>
@@ -167,6 +193,7 @@ const Management = () => {
 
           {/* Button to download Course Excel */}
           <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
+          </div>
         </>
       )}
     </div>

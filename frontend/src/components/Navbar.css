@@ -1,0 +1,51 @@
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1E1E1E;
+  padding: 10px 12px;  /* Increased padding for better spacing */
+  color: white;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 60px;  /* Fixed height to prevent content cut-off */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Faculty Selection Title - Better Spacing */
+.navbar-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #F4A261;  /* Soft golden color */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;  /* Removes unwanted extra spacing */
+  padding: 5px 0; /* Ensures it stays visible */
+  flex-shrink: 0;  /* Prevents it from getting squished */
+}
+
+/* Navbar Links */
+.nav-links {
+  display: flex;
+  gap: 25px;  /* Increased gap for better spacing */
+  margin-right: 20px; /* Ensures links don't get cut off */
+}
+
+.nav-link {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  padding: 10px 18px;  /* Slightly increased padding for visibility */
+  border-radius: 5px;
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out, color 0.3s ease-in-out;
+  white-space: nowrap;  /* Prevents text wrapping */
+}
+
+/* Hover Effect */
+.nav-link:hover {
+  background-color: #F4A261;  /* Orange hover effect */
+  color: #1E1E1E;  /* Dark text on hover */
+  transform: scale(1.05);
+}

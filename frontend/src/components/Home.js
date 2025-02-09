@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './Home.css'; // Import the CSS file
+
 
 const Home = ({ setEmpId, setFacultyName, setPreference }) => {
   const [facultyName, setLocalFacultyName] = useState('');
@@ -42,10 +44,10 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
   };
 
   return (
-    <div>
+    <div className="home-container">
     <h4>Backend URL - {process.env.REACT_APP_BACKEND_URL}</h4>
       <h1>Faculty Registration</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="home-form">
         <input
           type="text"
           placeholder="Faculty Name"
@@ -61,6 +63,7 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
           required
         />
 
+        <div className="radio-group">
         <label>
           <input
             type="radio"
@@ -82,8 +85,9 @@ const Home = ({ setEmpId, setFacultyName, setPreference }) => {
           />
           Theory + Lab
         </label>
+        </div>
 
-        <button type="submit">Next</button>
+        <button type="submit">Sign In</button>
       </form>
     </div>
   );

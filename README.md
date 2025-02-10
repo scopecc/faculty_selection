@@ -5,14 +5,13 @@ A MERN stack application to streamline the faculty course selection process by c
 ## Features  
 
 - **Faculty Dashboard**: Allows faculty members to submit their course preferences.  
-- **Admin Panel**: Manages faculty requests, assigns courses based on constraints, and tracks availability.  
+- **Admin Panel**: Provides overall view of the course selections of all the faculties and analytics.  
 - **Automated Conflict Resolution**: Handles course conflicts based on predefined rules.  
 - **Authentication & Authorization**: Secure login for faculty and admins.  
-- **Dynamic Constraints**: Customizable constraints like faculty workload, prerequisites, and department requirements.  
 
 ## Tech Stack  
 
-- **Frontend**: React.js (with Tailwind CSS or Material UI)  
+- **Frontend**: React.js 
 - **Backend**: Node.js, Express.js  
 - **Database**: MongoDB (Mongoose ODM)  
 - **Authentication**: JWT-based authentication  
@@ -21,10 +20,7 @@ A MERN stack application to streamline the faculty course selection process by c
 
 ## API Endpoints  
 
-- `POST /api/auth/login` - Faculty/Admin login  
-- `GET /api/faculty/courses` - Fetch available courses  
-- `POST /api/faculty/submit-preferences` - Submit course preferences  
-- `GET /api/admin/assignments` - View faculty-course assignments  
+
 
 ## Future Enhancements  
 

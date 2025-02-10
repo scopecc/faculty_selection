@@ -112,7 +112,37 @@ const Management = () => {
     <div>
       <h1>Management Portal - {process.env.REACT_APP_BACKEND_URL}</h1>
       {/* Login Form */}
-      <>
+      {!isAuthenticated ? (
+        <div className="login-container">
+        <form onSubmit={handleLogin} className="login-form">
+          <input 
+            type="text" 
+            placeholder="Username" 
+            value={username} 
+            onChange={(e) => setUsername(e.target.value)}
+            required 
+          />
+          <div className="password-container">
+          <input 
+            type={showPassword ? "text" : "password"}
+            placeholder="Password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)}
+            required 
+          />
+          <button
+            type="button"
+            className="eye-button"
+            onClick={togglePasswordVisibility}
+          >
+            {showPassword ? "🙈" : "👁"}
+          </button>
+        </div>
+          <button type="submit">Login</button>
+        </form>
+        </div>
+      ) : (
+        <>
           {/* Faculty Course Selection Table */}
           <div className="table-container">
           <h2>Faculty Course Selection</h2>
@@ -169,6 +199,7 @@ const Management = () => {
           <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
           </div>
         </>
+        )}
     </div>
   );
 };

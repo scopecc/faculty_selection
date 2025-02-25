@@ -28,7 +28,7 @@ router.post("/insert-courses", async (req, res) => {
 });
 
 // ✅ Fetch domain constraints
-router.get("/domain-config", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const configs = await DomainConfig.find();
     res.json(configs);

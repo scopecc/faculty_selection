@@ -79,6 +79,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       <h4>Backend URL - {process.env.REACT_APP_BACKEND_URL}</h4>
       <h1>Faculty Registration</h1>
       <form onSubmit={handleSubmit} className="home-form">
+        {/* Faculty Email Input */}
         <input
           type="email"
           placeholder="Faculty Email ID"
@@ -86,10 +87,13 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           onChange={(e) => setLocalFacultyEmail(e.target.value)}
           required
         />
+        
+        {/* Send OTP Button */}
         <button type="button" onClick={sendOtp} disabled={otpSent}>
           {otpSent ? "OTP Sent" : "Send OTP"}
         </button>
 
+        {/* Show OTP Input only after OTP is Sent */}
         {otpSent && (
           <input
             type="text"
@@ -100,41 +104,44 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           />
         )}
 
-        <input
-          type="number"
-          placeholder="Employee ID"
-          value={empIdInput}
-          onChange={(e) => setEmpIdInput(e.target.value)}
-          required
-        />
-
-        <div className="radio-group">
-          <label>
+        {/* Show Employee ID & Preference only after OTP is Sent */}
+        {otpSent && (
+          <>
             <input
-              type="radio"
-              name="preference"
-              value="Theory"
-              onChange={(e) => setLocalPreference(e.target.value)}
+              type="number"
+              placeholder="Employee ID"
+              value={empIdInput}
+              onChange={(e) => setEmpIdInput(e.target.value)}
               required
             />
-            Theory
-          </label>
 
-          <label>
-            <input
-              type="radio"
-              name="preference"
-              value="Theory+Lab"
-              onChange={(e) => setLocalPreference(e.target.value)}
-              required
-            />
-            Theory + Lab
-          </label>
-        </div>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  name="preference"
+                  value="Theory"
+                  onChange={(e) => setLocalPreference(e.target.value)}
+                  required
+                />
+                Theory
+              </label>
 
-        <button type="submit" disabled={!otpSent}>
-          Sign In
-        </button>
+              <label>
+                <input
+                  type="radio"
+                  name="preference"
+                  value="Theory+Lab"
+                  onChange={(e) => setLocalPreference(e.target.value)}
+                  required
+                />
+                Theory + Lab
+              </label>
+            </div>
+
+            <button type="submit">Sign In</button>
+          </>
+        )}
       </form>
     </div>
   );

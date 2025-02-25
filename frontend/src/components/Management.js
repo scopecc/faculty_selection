@@ -17,37 +17,44 @@ const Management = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [domainConfigs, setDomainConfigs] = useState([]);
 
+  // Load courses.json from the public folder
   useEffect(() => {
-    fetchDomainConfig();
+    axios.get('/courses.json')
+      .then(response => {
+        const coursesData = response.data || [];
+
+        // Extract unique domain names
+        const uniqueDomains = [...new Set(coursesData.map(course => course.domain))];
+
+        // Initialize domainConfigs with default values
+        const initialConfigs = uniqueDomains.map(domain => ({
+          domain,
+          minCount: 0,
+          maxCount: 0
+        }));
+
+        setDomainConfigs(initialConfigs);
+      })
+      .catch(error => console.error("Error loading courses.json:", error));
   }, []);
 
-  const fetchDomainConfig = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`);
-      setDomainConfigs(response.data);
-    } catch (error) {
-      console.error("Error fetching domain constraints:", error);
-    }
-  };
-
-  const updateDomainConfig = async () => {
-    try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/save`, {
-        domainConfigs
-      });
-      alert("Domain constraints updated!");
-    } catch (error) {
-      console.error("Error updating constraints:", error);
-      alert("Failed to update constraints.");
-    }
-  };
-
+  // Handle user input for min/max
   const handleInputChange = (index, field, value) => {
     const updatedConfigs = [...domainConfigs];
     updatedConfigs[index][field] = Number(value);
     setDomainConfigs(updatedConfigs);
   };
 
+  // Save domain constraints to MongoDB
+  const saveDomainConfig = async () => {
+    try {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/save`, { domainConfigs });
+      alert("Domain constraints updated successfully!");
+    } catch (error) {
+      console.error("Error saving domain constraints:", error);
+      alert("Failed to update constraints.");
+    }
+  };
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -246,7 +253,7 @@ const Management = () => {
           />
         </div>
       ))}
-      <button onClick={updateDomainConfig}>Save Settings</button>
+      <button onClick={saveDomainConfig}>Save Settings</button>
     </div>
         
           {/* Faculty Course Selection Table */}

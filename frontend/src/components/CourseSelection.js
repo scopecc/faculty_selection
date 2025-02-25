@@ -1,24 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './CourseSelection.css';
 
-
 const CourseSelection = () => {
   const location = useLocation();
-  const navigate = useNavigate();  // Initialize useNavigate hook
-  const { empId, facultyName, preference } = location.state || {};
+  const navigate = useNavigate();
+  
+  // Get data from location state or fallback to localStorage
+  const storedEmpId = localStorage.getItem('empId');
+  const storedFacultyEmail = localStorage.getItem('facultyEmail');
+  const storedPreference = localStorage.getItem('preference');
 
+  const empId = location.state?.empId || storedEmpId;
+  const facultyEmail = location.state?.facultyEmail || storedFacultyEmail;
+  const preference = location.state?.preference || storedPreference;
+
+  const [facultyName, setFacultyName] = useState('');
   const [courses, setCourses] = useState([]);
   const [selectedCourses, setSelectedCourses] = useState([]);
 
+  const [ug, setUg] = useState('');
+  const [ugspecialization, setUgspecialization] = useState('');
+  const [pg, setPg] = useState('');
+  const [pgspecialization, setPgspecialization] = useState('');
+  const [researchDomain, setResearchDomain] = useState('');
+
+  // Fetch faculty name based on email
+  useEffect(() => {
+    if (facultyEmail) {
+      axios.get('faculties.json')
+        .then(response => {
+          const faculty = response.data.find(fac => fac.email === facultyEmail);
+          if (faculty) {
+            setFacultyName(faculty.name);
+          } else {
+            setFacultyName('Unknown Faculty');
+          }
+        })
+        .catch(error => console.error("Error fetching faculty data:", error));
+    }
+  }, [facultyEmail]);
+
+  // Fetch course data
   useEffect(() => {
     axios.get('courses.json')
       .then(response => setCourses(response.data))
       .catch(error => console.error("Error fetching courses:", error));
   }, []);
 
-  const maxCourses = empId <= 100 ? 6 : empId <= 200 ? 10 : 15;
+  const maxCourses = 7
 
   const handleCourseSelect = (course) => {
     setSelectedCourses(prev => {
@@ -59,8 +90,8 @@ const CourseSelection = () => {
     const theoryCount = selectedCourses.filter(c => c.type === "Theory").length;
     const theoryLabCount = selectedCourses.filter(c => c.type === "Theory+Lab").length;
 
-    const minTheory = empId <= 100 ? 4 : empId <= 200 ? 8 : 10;
-    const minTheoryLab = empId <= 100 ? 4 : empId <= 200 ? 8 : 10;
+    const minTheory = 5
+    const minTheoryLab = 5
 
     if (preference === "Theory" && theoryCount < minTheory) {
       alert(`You must select at least ${minTheory} Theory courses.`);
@@ -73,11 +104,15 @@ const CourseSelection = () => {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, facultyName, preference, selectedCourses },
+        { empId, facultyName, facultyEmail, preference, selectedCourses },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      await axios.post(`http://localhost:5000/faculty/storeugpg`, 
+        { empId, ug, ugspecialization, pg, pgspecialization, researchDomain },
         { headers: { 'Content-Type': 'application/json' } }
       );
       alert("Courses submitted successfully!");
-      navigate('/');  // Redirect to homepage after successful submission
+      navigate('/');  
     } catch (error) {
       console.error("Error submitting courses:", error);
       alert("Error submitting courses. Check console for details.");
@@ -95,7 +130,7 @@ const CourseSelection = () => {
     }, {});
   };
 
-  // Grouping courses by their domain type
+  // Grouping courses
   const theoryCoursesByDomain = groupByDomain(courses.filter(course => course.type === "Theory"));
   const theoryLabCoursesByDomain = groupByDomain(courses.filter(course => course.type === "Theory+Lab"));
 
@@ -103,9 +138,59 @@ const CourseSelection = () => {
     <div className="course-selection-container">
       <h1>Course Selection</h1>
       <p className="faculty-details">Faculty Name: <strong>{facultyName || "N/A"}</strong></p>
+      {/* <p className="faculty-details">Faculty Email: <strong>{facultyEmail || "N/A"}</strong></p> */}
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p><strong>You must select exactly {maxCourses} courses.</strong></p>
+
+      <div className="input-fields">
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <label>
+            UG:
+            <input
+              type="text"
+              value={ug}
+              onChange={(e) => setUg(e.target.value)}
+            />
+          </label>
+          <label>
+            UG specialization:
+            <input
+              type="text"
+              value={ugspecialization}
+              onChange={(e) => setUgspecialization(e.target.value)}
+            />
+          </label>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <label>
+            PG:
+            <input
+              type="text"
+              value={pg}
+              onChange={(e) => setPg(e.target.value)}
+            />
+          </label>
+          <label>
+            PG specialization:
+            <input
+              type="text"
+              value={pgspecialization}
+              onChange={(e) => setPgspecialization(e.target.value)}
+            />
+          </label>
+        </div>
+        
+        <label>
+          Research Domain:
+          <input
+            type="text"
+            value={researchDomain}
+            onChange={(e) => setResearchDomain(e.target.value)}
+          />
+        </label>
+      </div>
 
       <div className="selected-courses">
         <h2>Selected Courses</h2>
@@ -117,14 +202,14 @@ const CourseSelection = () => {
           ))}
         </ol>
       </div>
-      
-        <h2 className="course-category">Theory Courses</h2>
-        <div className="course-list">
+
+      <h2 className="course-category">Theory Courses</h2>
+      <div className="course-list">
         {Object.keys(theoryCoursesByDomain).map(domain => (
           <div key={domain}>
             <h3>{domain}</h3>
             {theoryCoursesByDomain[domain].map(course => (
-              <label key={course.courseId} >
+              <label key={course.courseId}>
                 <input
                   type="checkbox"
                   checked={selectedCourses.some(c => c.courseId === course.courseId)}
@@ -135,10 +220,10 @@ const CourseSelection = () => {
             ))}
           </div>
         ))}
-        </div>
+      </div>
 
-        <h2 className="course-category">Theory+Lab Courses</h2>
-        <div className="course-list">
+      <h2 className="course-category">Theory+Lab Courses</h2>
+      <div className="course-list">
         {Object.keys(theoryLabCoursesByDomain).map(domain => (
           <div key={domain}>
             <h3>{domain}</h3>

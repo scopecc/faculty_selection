@@ -106,4 +106,32 @@ router.get('/check/:empId', async (req, res) => {
   }
 });
 
+
+// store   pg:{ type: String },
+// ug:{ type: String},
+// pgspecialization:{ type: String},
+// ugspecialization:{ type: String },
+// researchdomain:{ type: String },
+
+router.post("/storeugpg", async (req, res) => {
+  const { empId, pg, ug, pgspecialization, ugspecialization, researchDomain } = req.body;
+  try {
+    let faculty = await Faculty.findOne({ empId });
+    if (!faculty) {
+      return res.status(400).json({ message: 'Faculty not found' });
+    }
+    faculty.pg = pg;
+    faculty.ug = ug;
+    faculty.pgspecialization = pgspecialization;
+    faculty.ugspecialization = ugspecialization;
+    faculty.researchdomain = researchDomain;
+    await faculty.save();
+    res.status(200).json({ message: 'Data saved successfully', faculty });
+  } catch (error) {
+    console.error("Error saving data:", error);
+    res.status(500).json({ message: 'Error saving data', error });
+  }
+});
+  
+
 module.exports = router;

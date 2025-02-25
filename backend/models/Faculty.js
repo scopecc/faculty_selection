@@ -9,7 +9,12 @@ const FacultySchema = new mongoose.Schema({
     courseName: { type: String, required: true },
     type: { type: String, required: true },
     domain: { type: String, required: true }
-  }]
+  }],
+  pg:{ type: String },
+  ug:{ type: String},
+  pgspecialization:{ type: String},
+  ugspecialization:{ type: String },
+  researchdomain:{ type: String },
 });
 
 const Faculty = mongoose.model('Faculty', FacultySchema);

@@ -153,6 +153,11 @@
       "empId": 50301,
       "name": "Dr. Rajkumar S",
       "email": "rajkumar.srinivasan@vit.ac.in"
+    },
+    {
+      "empId": 1003,
+      "name": "Aruna Kumar",
+      "email":"arundd2004@gmail.com"
     }
   ]
   

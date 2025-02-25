@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
-const OTP = require("../models/OTP"); // Import OTP model
-require("dotenv").config();
 
-// Configure email sender
+const otps = {}; // Temporary storage for OTPs
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,25 +12,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ Send OTP & Save to DB
+// ✅ Send OTP Route
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
+  otps[email] = otp;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Your OTP for Faculty Registration",
+    text: `Your OTP is: ${otp}`,
+  };
 
   try {
-    await OTP.findOneAndUpdate(
-      { email },
-      { otp, createdAt: new Date() },
-      { upsert: true, new: true }
-    );
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP for Faculty Registration",
-      text: `Your OTP is: ${otp}`,
-    };
-
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
@@ -39,13 +33,11 @@ router.post("/send-otp", async (req, res) => {
   }
 });
 
-// ✅ Verify OTP
-router.post("/verify-otp", async (req, res) => {
+// ✅ Verify OTP Route
+router.post("/verify-otp", (req, res) => {
   const { email, otp } = req.body;
-  const record = await OTP.findOne({ email });
-
-  if (record && record.otp === otp) {
-    await OTP.deleteOne({ email }); // Remove OTP after verification
+  if (otps[email] && otps[email] == otp) {
+    delete otps[email]; // Remove OTP after verification
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });

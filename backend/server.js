@@ -6,6 +6,16 @@ const connectDB = require('./config/db');  // ✅ Make sure this is correct
 
 // Connect to MongoDB
 connectDB();  // ✅ Ensure this function is being called properly
+const cors = require("cors");
+
+// ✅ Allow only requests from your frontend
+const corsOptions = {
+  origin: "https://faculty-selection.vercel.app", // Replace with your frontend URL
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+};
+
+app.use(cors(corsOptions));
 
 const app = express();
 app.use(cors());

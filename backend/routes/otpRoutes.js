@@ -1,9 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const otps = {}; // Temporary storage for OTPs
+// ✅ MongoDB OTP Schema
+const otpSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  otp: { type: String, required: true },
+  createdAt: { type: Date, expires: 300, default: Date.now }, // OTP expires in 5 minutes
+});
 
+const Otp = mongoose.model("Otp", otpSchema);
+
+// ✅ Configure Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -12,20 +22,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ Send OTP Route
+// ✅ Endpoint to send OTP
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
-  otps[email] = otp;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Your OTP for Faculty Registration",
-    text: `Your OTP is: ${otp}`,
-  };
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
+    // Delete any existing OTP for this email
+    await Otp.deleteOne({ email });
+
+    // Save new OTP to MongoDB
+    await Otp.create({ email, otp });
+
+    // Send OTP via email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP for Faculty Registration",
+      text: `Your OTP is: ${otp}`,
+    };
+
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
@@ -33,14 +49,23 @@ router.post("/send-otp", async (req, res) => {
   }
 });
 
-// ✅ Verify OTP Route
-router.post("/verify-otp", (req, res) => {
+// ✅ Endpoint to verify OTP
+router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
-  if (otps[email] && otps[email] == otp) {
-    delete otps[email]; // Remove OTP after verification
+
+  try {
+    const storedOtp = await Otp.findOne({ email });
+
+    if (!storedOtp || storedOtp.otp !== otp) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    // Delete OTP after successful verification
+    await Otp.deleteOne({ email });
+
     res.status(200).json({ message: "OTP verified successfully" });
-  } else {
-    res.status(400).json({ message: "Invalid OTP" });
+  } catch (error) {
+    res.status(500).json({ message: "Error verifying OTP", error });
   }
 });
 

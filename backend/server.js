@@ -32,8 +32,12 @@ const facultyRoutes = require('./routes/facultyRoutes');
 app.use('/faculty', facultyRoutes);
 const domainRoutes = require('./routes/domainRoutes');
 app.use('/domain-config', domainRoutes);
-const otpRoutes = require('./routes/otpRoutes');
-app.use('/otp', otpRoutes);  // ✅ Add this line
+
+
+
+const otpRoutes = require('./routes/otpRoutes');  
+app.use('/otp', otpRoutes); // ✅ Ensure this is included
+
 
 
 const PORT = process.env.PORT || 5000;

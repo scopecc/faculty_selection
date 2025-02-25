@@ -19,6 +19,9 @@ const facultyRoutes = require('./routes/facultyRoutes');
 app.use('/faculty', facultyRoutes);
 const domainRoutes = require('./routes/domainRoutes');
 app.use('/domain-config', domainRoutes);
+const otpRoutes = require('./routes/otpRoutes');
+app.use('/otp', otpRoutes);  // ✅ Add this line
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

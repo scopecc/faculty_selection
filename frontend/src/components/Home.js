@@ -1,83 +1,73 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Home.css'; // Import the CSS file
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./Home.css";
 
 const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
-  const [facultyEmail, setLocalFacultyEmail] = useState('');
-  const [empIdInput, setEmpIdInput] = useState('');
-  const [preference, setLocalPreference] = useState('');
+  const [facultyEmail, setLocalFacultyEmail] = useState("");
+  const [empIdInput, setEmpIdInput] = useState("");
+  const [preference, setLocalPreference] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [serverOtp, setServerOtp] = useState(null);
   const navigate = useNavigate();
 
-  // const handleSubmit = async (e) => {
-  //   console.log("Backend URL - ", process.env.REACT_APP_BACKEND_URL);
-  //   console.log("Data", facultyEmail, empIdInput, preference);
-  //   e.preventDefault();
-  //   const empId = parseInt(empIdInput, 10);
+  // ✅ Function to request OTP
+  const sendOtp = async () => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-otp`, {
+        email: facultyEmail,
+      });
+      setServerOtp(response.data.otp); // Store OTP received from backend
+      setOtpSent(true);
+      alert("OTP sent to your email!");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Try again.");
+    }
+  };
 
-  //   if (empId < 1 || empId > 308) {
-  //     alert("Employee ID must be between 1 and 308.");
-  //     return;
-  //   }
-
-    // try {
-    //   // ✅ Check if faculty already exists
-    //   const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`);
-    //   if (response.data.exists) {
-    //     alert("You have already registered and selected courses.");
-    //     return;
-    //   }
-
-    //   // ✅ Save global state
-    //   setEmpId(empId);
-    //   setFacultyEmail(facultyEmail);
-    //   setPreference(preference);
-
-    //   // ✅ Navigate to course selection and pass data
-    //   navigate('/course-selection', { state: { facultyEmail, empId, preference } });
-
-    // } catch (error) {
-    //   console.error("Error checking empId:", error);
-    //   alert("An error occurred. Please try again.");
-    // }
-  // };
-
+  // ✅ Function to handle OTP verification and registration
   const handleSubmit = async (e) => {
-    console.log(facultyEmail, empIdInput, preference);
-      e.preventDefault();
-      const empId = parseInt(empIdInput, 10);
-      // if (empId < 1 || empId > 308) {
-      //   alert("Employee ID must be between 1 and 308.");
-      //   return;
-      // }
-      try {
-        const response = await axios.get('/faculties.json');
-        const faculties = response.data;
-        const faculty = faculties.find(fac => fac.empId === empId && fac.email === facultyEmail);
-        if (faculty) {
-          console.log("Success");
-          // Save to local storage
-          localStorage.setItem('empId', empId);
-          localStorage.setItem('facultyEmail', facultyEmail);
-          localStorage.setItem('preference', preference);
+    e.preventDefault();
+    if (!otpSent) {
+      alert("Please verify your email first.");
+      return;
+    }
 
-          // ✅ Check if faculty already exists
-          const checkResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`);
-          if (checkResponse.data.exists) {
-        alert("You have already registered and selected courses.");
-        return;
-          }
-          // ✅ Navigate to course selection and pass data
-          navigate('/course-selection', { state: { facultyEmail, empId, preference } });
-        } else {
-          console.log("Failure");
-          alert("Wrong empId or email");
+    if (otp !== serverOtp) {
+      alert("Invalid OTP. Please try again.");
+      return;
+    }
+
+    const empId = parseInt(empIdInput, 10);
+    try {
+      const response = await axios.get("/faculties.json");
+      const faculties = response.data;
+      const faculty = faculties.find((fac) => fac.empId === empId && fac.email === facultyEmail);
+
+      if (faculty) {
+        localStorage.setItem("empId", empId);
+        localStorage.setItem("facultyEmail", facultyEmail);
+        localStorage.setItem("preference", preference);
+
+        const checkResponse = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`
+        );
+        if (checkResponse.data.exists) {
+          alert("You have already registered.");
+          return;
         }
-      } catch (error) {
-        console.error("Error checking faculty:", error);
-        alert("An error occurred. Please try again.");
+
+        navigate("/course-selection", { state: { facultyEmail, empId, preference } });
+      } else {
+        alert("Wrong Employee ID or Email");
       }
-  }
+    } catch (error) {
+      console.error("Error checking faculty:", error);
+      alert("An error occurred. Please try again.");
+    }
+  };
 
   return (
     <div className="home-container">
@@ -91,6 +81,20 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           onChange={(e) => setLocalFacultyEmail(e.target.value)}
           required
         />
+        <button type="button" onClick={sendOtp} disabled={otpSent}>
+          {otpSent ? "OTP Sent" : "Send OTP"}
+        </button>
+
+        {otpSent && (
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+          />
+        )}
+
         <input
           type="number"
           placeholder="Employee ID"
@@ -123,7 +127,9 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           </label>
         </div>
 
-        <button type="submit">Sign In</button>
+        <button type="submit" disabled={!otpSent}>
+          Sign In
+        </button>
       </form>
     </div>
   );

@@ -6,4 +6,4 @@ const otpSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now, expires: 300 }, // Auto-delete after 5 minutes
 });
 
-module.exports = mongoose.model("OTP", otpSchema);
+module.exports = mongoose.model("Otp", otpSchema); // ✅ Ensure consistent model name

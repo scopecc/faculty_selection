@@ -19,7 +19,7 @@ const Management = () => {
 
   // Load courses.json from the public folder
   useEffect(() => {
-    axios.get('/courses.json')
+    axios.get('courses.json')
       .then(response => {
         const coursesData = response.data || [];
 

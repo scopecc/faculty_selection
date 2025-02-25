@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
-const mongoose = require("mongoose");
 require("dotenv").config();
 
-const Otp = require("../models/OTP"); // ✅ Correct way
-
-
+// ✅ In-memory storage for OTPs
+const otpStorage = {};
 
 // ✅ Configure Nodemailer
 const transporter = nodemailer.createTransport({
@@ -17,19 +15,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ Endpoint to send OTP
+// ✅ Send OTP
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
-    // Delete any existing OTP for this email
-    await Otp.deleteOne({ email });
+    // ✅ Store OTP with expiry (5 mins)
+    otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
-    // Save new OTP to MongoDB
-    await Otp.create({ email, otp });
+    console.log(`🔹 [SEND OTP] OTP for ${email}: ${otp}`); // ✅ Debug log
 
-    // Send OTP via email
+    // ✅ Send email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -40,43 +37,42 @@ router.post("/send-otp", async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
+    console.error("❌ [SEND OTP] Error:", error);
     res.status(500).json({ message: "Failed to send OTP", error });
   }
 });
 
-// ✅ Endpoint to verify OTP
+// ✅ Verify OTP
 router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
+
   if (!email || !otp) {
     return res.status(400).json({ message: "Email and OTP are required" });
   }
 
-  try {
-    await Otp.findOneAndUpdate(
-      { email },
-      { otp, createdAt: new Date() },
-      { upsert: true, new: true }
-    );
-        console.log("Stored OTP:", storedOtp?.otp); 
-    console.log("User Entered OTP:", otp);
-    console.log("OTP Match:", storedOtp?.otp === otp);
+  // ✅ Fetch OTP from memory
+  const storedOtpData = otpStorage[email];
 
-    
+  console.log("🔹 [VERIFY OTP] Stored OTP:", storedOtpData?.otp);
+  console.log("🔹 [VERIFY OTP] User Entered OTP:", otp);
 
-    if (!storedOtp || storedOtp.otp.toString() !== otp.toString()) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
-    }
-    
-
-    // ✅ OTP Matched → Delete after verification
-    await Otp.deleteOne({ email });
-
-    res.status(200).json({ message: "OTP verified successfully" });
-  } catch (error) {
-    console.error("Error verifying OTP:", error); // ✅ Debug
-    res.status(500).json({ message: "Error verifying OTP", error });
+  if (!storedOtpData) {
+    return res.status(400).json({ message: "Invalid or expired OTP" });
   }
-});
 
+  if (Date.now() > storedOtpData.expiresAt) {
+    delete otpStorage[email]; // Remove expired OTP
+    return res.status(400).json({ message: "OTP expired" });
+  }
+
+  if (storedOtpData.otp !== otp) {
+    return res.status(400).json({ message: "Invalid OTP" });
+  }
+
+  // ✅ OTP matched → Remove from memory
+  delete otpStorage[email];
+
+  res.status(200).json({ message: "OTP verified successfully" });
+});
 
 module.exports = router;

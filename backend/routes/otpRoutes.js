@@ -52,14 +52,21 @@ router.post("/verify-otp", async (req, res) => {
   }
 
   try {
-    const storedOtp = await Otp.findOne({ email });
+    await Otp.findOneAndUpdate(
+      { email },
+      { otp, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+        console.log("Stored OTP:", storedOtp?.otp); 
+    console.log("User Entered OTP:", otp);
+    console.log("OTP Match:", storedOtp?.otp === otp);
 
-    console.log("Stored OTP:", storedOtp?.otp); // ✅ Debug
-    console.log("User Entered OTP:", otp); // ✅ Debug
+    
 
-    if (!storedOtp || storedOtp.otp !== otp) {
+    if (!storedOtp || storedOtp.otp.toString() !== otp.toString()) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
+    
 
     // ✅ OTP Matched → Delete after verification
     await Otp.deleteOne({ email });

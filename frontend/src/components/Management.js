@@ -15,6 +15,38 @@ const Management = () => {
   const correctUsername = "admin";
   const correctPassword = "admin123";
   const [showPassword, setShowPassword] = useState(false);
+  const [domainConfigs, setDomainConfigs] = useState([]);
+
+  useEffect(() => {
+    fetchDomainConfig();
+  }, []);
+
+  const fetchDomainConfig = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`);
+      setDomainConfigs(response.data);
+    } catch (error) {
+      console.error("Error fetching domain constraints:", error);
+    }
+  };
+
+  const updateDomainConfig = async () => {
+    try {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/save`, {
+        domainConfigs
+      });
+      alert("Domain constraints updated!");
+    } catch (error) {
+      console.error("Error updating constraints:", error);
+      alert("Failed to update constraints.");
+    }
+  };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedConfigs = [...domainConfigs];
+    updatedConfigs[index][field] = Number(value);
+    setDomainConfigs(updatedConfigs);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -195,6 +227,27 @@ const Management = () => {
         </div>
       ) : (
         <>
+        <div>
+      <h1>Domain Constraints</h1>
+      {domainConfigs.map((config, index) => (
+        <div key={index}>
+          <h3>{config.domain}</h3>
+          <label>Min:</label>
+          <input 
+            type="number" 
+            value={config.minCount}
+            onChange={(e) => handleInputChange(index, 'minCount', e.target.value)}
+          />
+          <label>Max:</label>
+          <input 
+            type="number" 
+            value={config.maxCount}
+            onChange={(e) => handleInputChange(index, 'maxCount', e.target.value)}
+          />
+        </div>
+      ))}
+      <button onClick={updateDomainConfig}>Save Settings</button>
+    </div>
         
           {/* Faculty Course Selection Table */}
           <div className="table-container">

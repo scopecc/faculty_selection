@@ -17,6 +17,8 @@ app.get("/", (req, res) => {
 
 const facultyRoutes = require('./routes/facultyRoutes');
 app.use('/faculty', facultyRoutes);
+const domainRoutes = require('./routes/domainRoutes');
+app.use('/domains', domainRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

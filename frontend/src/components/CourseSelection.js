@@ -25,6 +25,7 @@ const CourseSelection = () => {
   const [pg, setPg] = useState('');
   const [pgspecialization, setPgspecialization] = useState('');
   const [researchDomain, setResearchDomain] = useState('');
+  const [domainConstraints, setDomainConstraints] = useState({});
 
   // Fetch faculty name based on email
   useEffect(() => {
@@ -49,6 +50,18 @@ const CourseSelection = () => {
       .catch(error => console.error("Error fetching courses:", error));
   }, []);
 
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-configs`)
+      .then(response => {
+        const constraints = response.data.reduce((acc, config) => {
+          acc[config.domain] = { minCount: config.minCount, maxCount: config.maxCount };
+          return acc;
+        }, {});
+        setDomainConstraints(constraints);
+      })
+      .catch(error => console.error("Error fetching domain constraints:", error));
+  }, []);
+
   const maxCourses = 7
 
   const handleCourseSelect = (course) => {
@@ -57,20 +70,23 @@ const CourseSelection = () => {
         alert(`You can only select exactly ${maxCourses} courses.`);
         return prev;
       }
-
+  
+      // Get min/max constraints for the course's domain
+      const domainLimit = domainConstraints[course.domain] || { min: 0, max: 2 }; // Default to 0-2 if not found
       const domainCount = prev.filter(c => c.domain === course.domain).length;
-      if (domainCount >= 2 && !prev.some(c => c.courseId === course.courseId)) {
-        alert(`You can only select up to 2 courses from the ${course.domain} domain.`);
+  
+      if (domainCount >= domainLimit.max && !prev.some(c => c.courseId === course.courseId)) {
+        alert(`You can only select up to ${domainLimit.max} courses from the ${course.domain} domain.`);
         return prev;
       }
-
+  
       if (prev.some(c => c.courseId === course.courseId)) {
         return prev.filter(c => c.courseId !== course.courseId);
       }
+      
       return [...prev, course];
     });
   };
-
   const handleSubmit = async () => {
     if (!empId) {
       alert("Error: Employee ID is missing!");

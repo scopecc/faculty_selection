@@ -4,14 +4,9 @@ const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-// ✅ MongoDB OTP Schema
-const otpSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  otp: { type: String, required: true },
-  createdAt: { type: Date, expires: 300, default: Date.now }, // OTP expires in 5 minutes
-});
+const Otp = require("../models/OTP"); // ✅ Correct way
 
-const Otp = mongoose.model("Otp", otpSchema);
+
 
 // ✅ Configure Nodemailer
 const transporter = nodemailer.createTransport({

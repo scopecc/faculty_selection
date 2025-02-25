@@ -15,7 +15,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   // ✅ Function to request OTP
   const sendOtp = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/send-otp`, {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/send-otp`, {
         email: facultyEmail,
       });
       setServerOtp(response.data.otp); // Store OTP received from backend

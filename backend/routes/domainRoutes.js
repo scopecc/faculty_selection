@@ -39,7 +39,7 @@ router.get("/domain-config", async (req, res) => {
 });
 
 // ✅ Update domain constraints
-router.post("/domain-config/save", async (req, res) => {
+router.post("/save", async (req, res) => {
   try {
     const { domainConfigs } = req.body;
     for (const config of domainConfigs) {

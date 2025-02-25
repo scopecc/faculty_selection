@@ -47,21 +47,29 @@ router.post("/send-otp", async (req, res) => {
 // ✅ Endpoint to verify OTP
 router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required" });
+  }
 
   try {
     const storedOtp = await Otp.findOne({ email });
+
+    console.log("Stored OTP:", storedOtp?.otp); // ✅ Debug
+    console.log("User Entered OTP:", otp); // ✅ Debug
 
     if (!storedOtp || storedOtp.otp !== otp) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    // Delete OTP after successful verification
+    // ✅ OTP Matched → Delete after verification
     await Otp.deleteOne({ email });
 
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
+    console.error("Error verifying OTP:", error); // ✅ Debug
     res.status(500).json({ message: "Error verifying OTP", error });
   }
 });
+
 
 module.exports = router;

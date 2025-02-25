@@ -9,11 +9,14 @@ connectDB();  // ✅ Ensure this function is being called properly
 const cors = require("cors");
 
 // ✅ Allow only requests from your frontend
-const corsOptions = {
-  origin: "https://faculty-selection.vercel.app", // Replace with your frontend URL
+
+app.use(cors({
+  origin: "https://faculty-selection.vercel.app", // ✅ Allow requests from your frontend domain
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
-};
+  credentials: true
+}));
+
 
 app.use(cors(corsOptions));
 

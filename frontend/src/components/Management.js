@@ -12,8 +12,8 @@ const Management = () => {
   const [file, setFile] = useState(null);
   const [uploadedCourses, setUploadedCourses] = useState([]);
 
-  const correctUsername = "admin";
-  const correctPassword = "admin123";
+  const correctUsername = process.env.REACT_APP_ADMIN_USER_ID;
+  const correctPassword = process.env.REACT_APP_ADMIN_USER_PASSWORD;
   const [showPassword, setShowPassword] = useState(false);
   const [domainConfigs, setDomainConfigs] = useState([]);
 

@@ -166,7 +166,12 @@ const Management = () => {
           "Faculty Name": faculty.name,
           "Empld": faculty.empId,
           "Course Name": course.courseName,
-          "Choice": `Choice ${index + 1}`
+          "Choice": `Choice ${index + 1}`,
+          "UG": faculty.ug,
+          "UG SPL": faculty.ugspecialization,
+          "PG": faculty.pg,
+          "PG SPL": faculty.pgspecialization,
+          "RESEARCH DOMAIN": faculty.researchdomain
         });
       });
       facultyExcelData.push({});

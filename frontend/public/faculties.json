@@ -1,163 +1,628 @@
 [
-    {
-      "empId": 1002,
-      "name": "verappan",
-      "email": "smverappan@gmail.com"
-    },
-    {
+  {
+    "empId": 1002,
+    "name": "verappan",
+    "email": "smverappan@gmail.com"
+  },
+  {
       "empId": 50007,
       "name": "Dr. Sivagami M",
       "email": "msivagami@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50024,
       "name": "Dr. Pradeep Kumar T.S",
       "email": "tspradeepkumar@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50036,
       "name": "Dr. Nisha V.M",
       "email": "nishavm@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50049,
       "name": "Dr. Nithya Darisini P.S",
       "email": "psnithyadarisini@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50063,
       "name": "Dr. Sajidha S A",
       "email": "sajidha.sa@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50094,
       "name": "Dr. Jegannathan L",
       "email": "jeganathan.l@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50138,
       "name": "Dr. Vergin Raja Sarobin M",
       "email": "verginraja.m@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50154,
       "name": "Dr. Rukmani P",
       "email": "rukmani.p@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50159,
       "name": "Dr. Harini S",
       "email": "harini.s@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50160,
       "name": "Dr. Maheswari N",
       "email": "maheswari.n@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50161,
       "name": "Dr. Nayeemulla Khan",
       "email": "nayeemulla.khan@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50168,
       "name": "Dr. Pattabiraman V",
       "email": "pattabiraman.v@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50176,
       "name": "Dr. Graceline Jasmine S",
       "email": "graceline.jasmine@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50177,
       "name": "Dr. Thomas Abraham J V",
       "email": "thomasabraham.jv@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50178,
       "name": "Dr. Appalaraju Muralidhar",
       "email": "muralidhar.a@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50183,
       "name": "Dr. Ilakiyaselvan N",
       "email": "ilakiyaselvan.n@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50185,
       "name": "Dr. Sathyarajasekaran K",
       "email": "sathyarajasekaran.k@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50186,
       "name": "Dr. Parvathi R",
       "email": "parvathi.r@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50201,
       "name": "Dr. Umitty Srinivasa Rao",
       "email": "umitty.srinivasarao@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50237,
       "name": "Dr. Saleena B",
       "email": "saleena.b@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50239,
       "name": "Prof. Khadar Nawas K",
       "email": "khadarnawas.k@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50249,
       "name": "Dr. Prakash B",
       "email": "prakash.bala@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50250,
       "name": "Dr. Maheswari S",
       "email": "maheswari.s@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50266,
       "name": "Dr. Shridevi S",
       "email": "shridevi.s@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50270,
       "name": "Dr. Vijayalakshmi A",
       "email": "vijayalakshmi.av@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50276,
       "name": "Dr. B V A N S S Prabhakar Rao",
       "email": "prabhakarrao@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50289,
       "name": "Dr. Premalatha M",
       "email": "premalatha.m@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50299,
       "name": "Dr. Bharathi Raja S",
       "email": "bharathiraja.s@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50300,
       "name": "Dr. Viswanathan V",
       "email": "viswanathan.v@vit.ac.in"
-    },
-    {
+  },
+  {
       "empId": 50301,
       "name": "Dr. Rajkumar S",
       "email": "rajkumar.srinivasan@vit.ac.in"
-    },
-    {
-      "empId": 1003,
-      "name": "Aruna Kumar",
-      "email":"arundd2004@gmail.com"
-    }
-  ]
-  
+  },
+  {
+      "empId": 50303,
+      "name": "Dr. Malathi G",
+      "email": "malathi.g@vit.ac.in"
+  },
+  {
+      "empId": 50304,
+      "name": "Dr. Kumar R",
+      "email": "kumar.rangasamy@vit.ac.in"
+  },
+  {
+      "empId": 50307,
+      "name": "Dr. Priyaadharshini M",
+      "email": "priyaadharshini.m@vit.ac.in"
+  },
+  {
+      "empId": 50311,
+      "name": "Dr. Kanchana Devi V",
+      "email": "kanchanadevi@vit.ac.in"
+  },
+  {
+      "empId": 50315,
+      "name": "Dr. Jayaram B",
+      "email": "jayaram.b@vit.ac.in"
+  },
+  {
+      "empId": 50318,
+      "name": "Prof. Nivedita M",
+      "email": "nivedita.m@vit.ac.in"
+  },
+  {
+      "empId": 50319,
+      "name": "Dr. Bharadwaja Kumar",
+      "email": "bharadwaja.kumar@vit.ac.in"
+  },
+  {
+      "empId": 50322,
+      "name": "Dr. Jayasudha M",
+      "email": "jayasudha.m@vit.ac.in"
+  },
+  {
+      "empId": 50338,
+      "name": "Dr. Ganesan R",
+      "email": "ganesan.r@vit.ac.in"
+  },
+  {
+      "empId": 50352,
+      "name": "Dr. Jenila Livingston L M",
+      "email": "jenila.lm@vit.ac.in"
+  },
+  {
+      "empId": 50359,
+      "name": "Dr. Rekha D",
+      "email": "rekha.d@vit.ac.in"
+  },
+  {
+      "empId": 50370,
+      "name": "Dr. Rajesh Kumar",
+      "email": "rajesh.kumar@vit.ac.in"
+  },
+  {
+      "empId": 50378,
+      "name": "Dr. Umamaheswari E",
+      "email": "umamaheswari.e@vit.ac.in"
+  },
+  {
+      "empId": 50380,
+      "name": "Dr. Rajarajeswari S",
+      "email": "rajarajeswari.s@vit.ac.in"
+  },
+  {
+      "empId": 50384,
+      "name": "Dr. Neela Narayanan V",
+      "email": "neelanarayanan.v@vit.ac.in"
+  },
+  {
+      "empId": 50386,
+      "name": "Dr. Abdul Quadir Md",
+      "email": "abdulquadir.md@vit.ac.in"
+  },
+  {
+      "empId": 50388,
+      "name": "Dr. Christy Jackson J",
+      "email": "christyjackson.j@vit.ac.in"
+  },
+  {
+      "empId": 50389,
+      "name": "Dr. Tulasi Prasad Sariki",
+      "email": "tulasiprasad.sariki@vit.ac.in"
+  },
+  {
+      "empId": 50390,
+      "name": "Dr. Alok Chauhan",
+      "email": "alok.chauhan@vit.ac.in"
+  },
+  {
+    "empId": 50391,
+    "name": "Dr. Rabindra Kumar Singh",
+    "email": "rabindrakumar.singh@vit.ac.in"
+},
+{
+    "empId": 50392,
+    "name": "Dr. Syed Ibrahim S P",
+    "email": "syedibrahim.sp@vit.ac.in"
+},
+{
+    "empId": 50394,
+    "name": "Dr. Nachiyappan S",
+    "email": "nachiyappan.s@vit.ac.in"
+},
+{
+    "empId": 50396,
+    "name": "Dr. Pradeep K V",
+    "email": "pradeep.kv@vit.ac.in"
+},
+{
+    "empId": 50398,
+    "name": "Dr. Sivabalakrishnan M",
+    "email": "sivabalakrishnan.m@vit.ac.in"
+},
+{
+    "empId": 50400,
+    "name": "Dr. Gayathri R",
+    "email": "gayathri.r@vit.ac.in"
+},
+{
+    "empId": 50401,
+    "name": "Dr. Punitha K",
+    "email": "punitha.k@vit.ac.in"
+},
+{
+    "empId": 50403,
+    "name": "Dr. Rajesh M",
+    "email": "rajesh.m@vit.ac.in"
+},
+{
+    "empId": 50404,
+    "name": "Dr. Rajiv Vincent",
+    "email": "rajiv.vincent@vit.ac.in"
+},
+{
+    "empId": 50408,
+    "name": "Dr. Anusooya G",
+    "email": "anusooya.g@vit.ac.in"
+},
+{
+    "empId": 50410,
+    "name": "Dr. Sandhya P",
+    "email": "sandhya.p@vit.ac.in"
+},
+{
+    "empId": 50413,
+    "name": "Dr. Hema N",
+    "email": "hema.n@vit.ac.in"
+},
+{
+    "empId": 50417,
+    "name": "Dr. Prassanna J",
+    "email": "prassanna.j@vit.ac.in"
+},
+{
+    "empId": 50422,
+    "name": "Dr. Priyadarshini J",
+    "email": "priyadarshini.J@vit.ac.in"
+},
+{
+    "empId": 50430,
+    "name": "Dr. R. Prabhakaran",
+    "email": "prabha.karan@vit.ac.in"
+},
+{
+    "empId": 50432,
+    "name": "Dr. Shola Usha Rani",
+    "email": "sholausha.rani@vit.ac.in"
+},
+{
+    "empId": 50435,
+    "name": "Dr. Karmel A",
+    "email": "karmel.a@vit.ac.in"
+},
+{
+    "empId": 50438,
+    "name": "Dr. Suganya G",
+    "email": "suganya.g@vit.ac.in"
+},
+{
+    "empId": 50440,
+    "name": "Dr. Sridhar R",
+    "email": "sridhar@vit.ac.in"
+},
+{
+    "empId": 50443,
+    "name": "Dr. Nithyanandam P",
+    "email": "nithyanandam.p@vit.ac.in"
+},
+{
+    "empId": 50569,
+    "name": "Dr. Subbulakshmi T",
+    "email": "subbulakshmi.t@vit.ac.in"
+},
+{
+    "empId": 50577,
+    "name": "Dr. Renta Chintala Bhargavi",
+    "email": "bhargavi.r@vit.ac.in"
+},
+{
+    "empId": 50587,
+    "name": "Dr. Geetha S",
+    "email": "geetha.s@vit.ac.in"
+},
+{
+    "empId": 50590,
+    "name": "Dr. Asnath Victy Phamila Y",
+    "email": "asnathvicty.phamila@vit.ac.in"
+},
+{
+    "empId": 50616,
+    "name": "Dr. Janaki Meena M",
+    "email": "janakimeena.m@vit.ac.in"
+},
+  {
+      "empId": 50767,
+      "name": "Dr. Sweetlin Hemalatha C",
+      "email": "sweetlin.hemalatha@vit.ac.in"
+  },
+  {
+      "empId": 50879,
+      "name": "Dr. Rajalakshmi R",
+      "email": "rajalakshmi.r@vit.ac.in"
+  },
+  {
+      "empId": 50916,
+      "name": "Dr. Renuka Devi S",
+      "email": "renukadevi.s@vit.ac.in"
+  },
+  {
+      "empId": 50918,
+      "name": "Dr. Shyamala L",
+      "email": "shyamalal@vit.ac.in"
+  },
+  {
+      "empId": 50926,
+      "name": "Dr. Jayanthi R",
+      "email": "jayanthi.r@vit.ac.in"
+  },
+  {
+      "empId": 50930,
+      "name": "Dr. Anusha K",
+      "email": "anusha.k@vit.ac.in"
+  },
+  {
+      "empId": 51142,
+      "name": "Dr. Jani Anbarasi L",
+      "email": "janianbarasi.l@vit.ac.in"
+  },
+  {
+      "empId": 51325,
+      "name": "Dr. M. Prasad",
+      "email": "prasad.m@vit.ac.in"
+  },
+  {
+      "empId": 51327,
+      "name": "Dr. M. Braveen",
+      "email": "braveen.m@vit.ac.in"
+  },
+  {
+      "empId": 51328,
+      "name": "Dr. V. Muthumanikandan",
+      "email": "muthumanikandan.v@vit.ac.in"
+  },
+  {
+      "empId": 51329,
+      "name": "Dr. A. K Ilavarasi",
+      "email": "ilavarasi.ak@vit.ac.in"
+  },
+  {
+      "empId": 51339,
+      "name": "Dr. SK Ayesha",
+      "email": "ayesha.sk@vit.ac.in"
+  },
+  {
+      "empId": 51344,
+      "name": "Dr. Radhika Selvamani",
+      "email": "radhika.selvamani@vit.ac.in"
+  },
+  {
+      "empId": 51347,
+      "name": "Dr. Bhuvaneswari A",
+      "email": "bhuvaneswari.a@vit.ac.in"
+  },
+  {
+      "empId": 51457,
+      "name": "Dr. Manas Ranjan Prusty",
+      "email": "manas.ranjan@vit.ac.in"
+  },
+  {
+      "empId": 51458,
+      "name": "Dr. R Jothi",
+      "email": "jothi.r@vit.ac.in"
+  },
+  {
+      "empId": 51461,
+      "name": "Dr. Balasundaram A",
+      "email": "balasundaram.a@vit.ac.in"
+  },
+  {
+      "empId": 51651,
+      "name": "Dr. K Muthukumaran",
+      "email": "muthukumaran.k@vit.ac.in"
+  },
+  {
+      "empId": 51652,
+      "name": "Dr. S Venkatraman",
+      "email": "venkatraman.s@vit.ac.in"
+  },
+  {
+      "empId": 51653,
+      "name": "Dr. S Edward Jero",
+      "email": "edwardjero.s@vit.ac.in"
+  },
+  {
+      "empId": 51654,
+      "name": "Dr. Ashoka Rajan R",
+      "email": "ashokarajan.r@vit.ac.in"
+  },
+  {
+      "empId": 51656,
+      "name": "Dr. A Menaka Pushpa",
+      "email": "menakapushpa.a@vit.ac.in"
+  },
+  {
+      "empId": 51657,
+      "name": "Dr. Pavithra L K",
+      "email": "pavithra.lk@vit.ac.in"
+  },
+  {
+      "empId": 51658,
+      "name": "Dr. Parkavi K",
+      "email": "parkavi.k@vit.ac.in"
+  },
+  {
+      "empId": 51659,
+      "name": "Dr. Shivani Gupta",
+      "email": "shivani.gupta@vit.ac.in"
+  },
+  {
+      "empId": 51662,
+      "name": "Dr. X Anita",
+      "email": "anita.x@vit.ac.in"
+  },
+  {
+      "empId": 51663,
+      "name": "Dr. P Subbulakshmi",
+      "email": "subbulakshmi.p@vit.ac.in"
+  },
+  {
+      "empId": 51665,
+      "name": "Dr. Amrit Pal",
+      "email": "amrit.pal@vit.ac.in"
+  },
+  {
+      "empId": 51667,
+      "name": "Dr. Leninisha Shanmugam",
+      "email": "leninisha.shanmugam@vit.ac.in"
+  },
+  {
+      "empId": 51669,
+      "name": "Dr. A Swaminathan",
+      "email": "swaminathan.a@vit.ac.in"
+  },
+  {
+      "empId": 51672,
+      "name": "Dr. Rishikeshan C A",
+      "email": "rishikeshan.ca@vit.ac.in"
+  },
+  {
+      "empId": 51673,
+      "name": "Dr. Sandeep Kumar Satapathy",
+      "email": "sandeepkumar.s@vit.ac.in"
+  },
+  {
+      "empId": 51679,
+      "name": "Dr. Ganala Santoshi",
+      "email": "ganala.santoshi@vit.ac.in"
+  },
+  {
+      "empId": 51680,
+      "name": "Dr. V. Sakthivel",
+      "email": "sakthivel.v@vit.ac.in"
+  },
+  {
+      "empId": 51682,
+      "name": "Dr. Prakash P",
+      "email": "prakash.p@vit.ac.in"
+  },
+  {
+      "empId": 51743,
+      "name": "Dr. K P Vijayakumar",
+      "email": "vijayakumar.kp@vit.ac.in"
+  },
+  {
+      "empId": 51748,
+      "name": "Dr. K Pradeep",
+      "email": "pradeep.k@vit.ac.in"
+  },
+  {
+      "empId": 51754,
+      "name": "Dr. Radha R",
+      "email": "rradha@vit.ac.in"
+  },
+  {
+      "empId": 51946,
+      "name": "Dr. T Kalaipriyan",
+      "email": "kalaipriyan.t@vit.ac.in"
+  },
+  {
+      "empId": 51947,
+      "name": "Dr. Rajakumar Arul",
+      "email": "rajakumar.arul@vit.ac.in"
+  },
+  {
+      "empId": 51948,
+      "name": "Dr. Sudha A",
+      "email": "sudha.a@vit.ac.in"
+  },
+  {
+      "empId": 51949,
+      "name": "Dr. Suganeshwari G",
+      "email": "suganeshwari.g@vit.ac.in"
+  },
+  {
+      "empId": 51962,
+      "name": "Dr. Shruti Mishra",
+      "email": "shruti.mishra@vit.ac.in"
+  },
+  {
+      "empId": 52192,
+      "name": "Dr. Valarmathi Sudhakar",
+      "email": "valarmathi.sudhakar@vit.ac.in"
+  },
+  {
+      "empId": 52193,
+      "name": "Dr. N G Bhuvaneswari Amma",
+      "email": "bhuvaneswariamma.ng@vit.ac.in"
+  },
+  {
+      "empId": 52194,
+      "name": "Dr. Abishi Chowdhury",
+      "email": "abishi.chowdhury@vit.ac.in"
+  },
+  {
+      "empId": 52195,
+      "name": "Dr. Sheik Abdullah A",
+      "email": "sheikabdullah.a@vit.ac.in"
+  },
+  {
+      "empId": 52200,
+      "name": "Dr. Priyadarshini R",
+      "email": "priyadarshini.r@vit.ac.in"
+  },
+  {
+      "empId": 52204,
+      "name": "Dr. Manimegalai T",
+      "email": "manimegalai.t@vit.ac.in"
+  },
+  {
+      "empId": 52208,
+      "name": "Dr. Indra Priyadharshini S",
+      "email": "indra.priyadharshini@vit.ac.in"
+  }
+
+]

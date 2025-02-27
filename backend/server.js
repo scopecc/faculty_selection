@@ -18,6 +18,8 @@ connectDB();
 //   credentials: true
 // }));
 
+app.use(cors())
+
 // ✅ Middleware
 app.use(express.json());
 

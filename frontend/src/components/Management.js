@@ -72,6 +72,7 @@ const Management = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
+      console.log("Faculty Data:", response.data);
       setFacultyData(response.data);
 
       const courseMap = {};
@@ -266,6 +267,11 @@ const Management = () => {
                 <th>Employee ID</th>
                 <th>Preference</th>
                 <th>Selected Courses</th>
+                <th>UG</th>
+                <th>UG Specialization</th>
+                <th>PG</th>
+                <th>PG Specialization</th>
+                <th>Research Domain</th>
               </tr>
             </thead>
             <tbody>
@@ -275,6 +281,11 @@ const Management = () => {
                   <td>{faculty.empId}</td>
                   <td>{faculty.preference}</td>
                   <td>{faculty.selectedCourses.map(course => course.courseName).join(", ")}</td>
+                  <td>{faculty.ug || "N/A"}</td>
+                  <td>{faculty.ugspecialization || "N/A"}</td>
+                  <td>{faculty.pg || "N/A"}</td>
+                  <td>{faculty.pgspecialization || "N/A"}</td>
+                  <td>{faculty.researchdomain || "N/A"}</td>
                 </tr>
               ))}
             </tbody>

@@ -63,6 +63,7 @@ const CourseSelection = () => {
   }, []);
 
   const maxCourses = 7
+ 
 
   const handleCourseSelect = (course) => {
     setSelectedCourses(prev => {
@@ -92,6 +93,18 @@ const CourseSelection = () => {
       return;
     }
 
+    const theoryCount = selectedCourses.filter(c => c.type === "Theory").length;
+    const theoryLabCount = selectedCourses.filter(c => c.type === "Theory+Lab").length;
+
+    if (preference === "Theory" && theoryCount < 5) {
+      alert(`You must select at least 5 Theory courses.`);
+      return;
+    }
+    if (preference === "Theory+Lab" && theoryLabCount < 5) {
+      alert(`You must select at least 5 Theory+Lab courses.`);
+      return;
+    }
+
     const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
       acc[course.domain] = (acc[course.domain] || 0) + 1;
       return acc;
@@ -105,13 +118,22 @@ const CourseSelection = () => {
       }
     }
 
+    if(!pg || !pgspecialization || !ug || !ugspecialization || !researchDomain){
+      alert("Please fill all the fields");
+      return;
+    }
+
     try {
+      console.log("Submitting courses:", selectedCourses);
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
         { empId, facultyName, facultyEmail, preference, selectedCourses },
         { headers: { 'Content-Type': 'application/json' } }
       );
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
+        empId, ug, ugspecialization, pg, pgspecialization, researchDomain
+      },{ headers: { 'Content-Type': 'application/json' } })
       alert("Courses submitted successfully!");
-      navigate('/');
+      // navigate('/');
     } catch (error) {
       console.error("Error submitting courses:", error);
       alert("Error submitting courses. Check console for details.");
@@ -150,6 +172,7 @@ const CourseSelection = () => {
               type="text"
               value={ug}
               onChange={(e) => setUg(e.target.value)}
+              required
             />
           </label>
           <label>
@@ -158,6 +181,7 @@ const CourseSelection = () => {
               type="text"
               value={ugspecialization}
               onChange={(e) => setUgspecialization(e.target.value)}
+              required
             />
           </label>
         </div>
@@ -169,6 +193,7 @@ const CourseSelection = () => {
               type="text"
               value={pg}
               onChange={(e) => setPg(e.target.value)}
+              required
             />
           </label>
           <label>
@@ -177,6 +202,7 @@ const CourseSelection = () => {
               type="text"
               value={pgspecialization}
               onChange={(e) => setPgspecialization(e.target.value)}
+              required
             />
           </label>
         </div>
@@ -187,6 +213,7 @@ const CourseSelection = () => {
             type="text"
             value={researchDomain}
             onChange={(e) => setResearchDomain(e.target.value)}
+            required
           />
         </label>
       </div>

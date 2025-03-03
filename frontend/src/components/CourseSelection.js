@@ -56,7 +56,7 @@ useEffect(() => {
       if (Array.isArray(response.data) && response.data.length > 0) {
         const updatedCourses = response.data.map(course => ({
           ...course,
-          courseType: course.courseType?.trim().toLowerCase() || "undefined",  // ✅ Normalize
+          courseType: course.courseType?.trim().toLowerCase() || "undefined", // ✅ Normalize
         }));
         setCourses(updatedCourses);
       } else {
@@ -71,6 +71,7 @@ useEffect(() => {
   fetchCourses();
 }, []);
 
+
 const groupByDomain = (courses) => {
   return courses.reduce((acc, course) => {
     if (!acc[course.domain]) {
@@ -84,19 +85,25 @@ const groupByDomain = (courses) => {
 useEffect(() => {
   if (Array.isArray(courses) && courses.length > 0 && !isCoursesFetched) {
     console.log("Updating Theory Courses...");
-    console.log(courses);
 
-    const theoryCourses = courses.filter(course => course.courseType?.trim().toLowerCase() === "theory");
-    const theoryLabCourses = courses.filter(course => course.courseType?.trim().toLowerCase() === "theory+lab");
+    // ✅ Make sure `courseType` is normalized properly
+    const theoryCourses = courses.filter(course => 
+      course.courseType && course.courseType.trim().toLowerCase() === "theory"
+    );
+    
+    const theoryLabCourses = courses.filter(course => 
+      course.courseType && course.courseType.trim().toLowerCase() === "theory+lab"
+    );
 
-    
-    
+    console.log("📌 Filtered Theory Courses:", theoryCourses);
+    console.log("📌 Filtered Theory+Lab Courses:", theoryLabCourses);
 
     setTheoryCoursesByDomain(groupByDomain(theoryCourses));
     setTheoryLabCoursesByDomain(groupByDomain(theoryLabCourses));
     setIsCoursesFetched(true);
   }
-}, [courses]);
+}, [courses]); // ✅ Dependency on `courses`
+
 
 
   
@@ -145,8 +152,8 @@ useEffect(() => {
       return;
     }
 
-    const theoryCount = selectedCourses.filter(c => c.type === "Theory").length;
-    const theoryLabCount = selectedCourses.filter(c => c.type === "Theory+Lab").length;
+    const theoryCount = selectedCourses.filter(c => c.courseType === "theory").length;
+    const theoryLabCount = selectedCourses.filter(c => c.courseType === "theory+lab").length;
 
     if (preference === "Theory" && theoryCount < 5) {
       alert(`You must select at least 5 Theory courses.`);
@@ -270,7 +277,7 @@ useEffect(() => {
             <ol>
               {selectedCourses.map(course => (
                 <li key={course.courseId}>
-                  {course.courseName} ({course.type}) ({course.courseId}) - <strong>{course.domain}</strong>
+                  {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
                 </li>
               ))}
             </ol>
@@ -288,7 +295,7 @@ useEffect(() => {
                       checked={selectedCourses.some(c => c.courseId === course.courseId)}
                       onChange={() => handleCourseSelect(course)}
                     />
-                    {course.courseName} ({course.type}) ({course.courseId})
+                    {course.courseName} ({course.courseType}) ({course.courseId})
                   </label>
                 ))}
               </div>
@@ -307,7 +314,7 @@ useEffect(() => {
                       checked={selectedCourses.some(c => c.courseId === course.courseId)}
                       onChange={() => handleCourseSelect(course)}
                     />
-                    {course.courseName} ({course.type}) ({course.courseId})
+                    {course.courseName} ({course.courseType}) ({course.courseId})
                   </label>
                 ))}
               </div>

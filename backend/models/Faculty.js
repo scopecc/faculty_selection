@@ -7,7 +7,7 @@ const FacultySchema = new mongoose.Schema({
   selectedCourses: [{
     courseId: { type: String, required: true },
     courseName: { type: String, required: true },
-    type: { type: String, required: true },
+    courseType: { type: String, required: true },
     domain: { type: String, required: true }
   }],
   pg:{ type: String },

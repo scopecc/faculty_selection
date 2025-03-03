@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
 });
 
 // ✅ Submit selected courses for a faculty
+// ✅ Submit selected courses for a faculty
 router.post('/submit-courses', async (req, res) => {
   let { empId, facultyName, preference, selectedCourses } = req.body;
 
@@ -55,22 +56,27 @@ router.post('/submit-courses', async (req, res) => {
     return res.status(400).json({ message: "Invalid request. Ensure name, empId, preference, and courses are provided correctly." });
   }
 
+  // ✅ Ensure `courseType` exists in each selected course
+  selectedCourses = selectedCourses.map(course => ({
+    ...course,
+    courseType: course.courseType?.trim() || "Undefined" // ✅ Prevent missing `courseType`
+  }));
+
   try {
     let faculty = await Faculty.findOne({ empId });
 
     if (!faculty) {
       console.log(`Faculty not found for empId: ${empId}, registering new faculty...`);
 
-      // ✅ Ensure all required fields exist
       faculty = new Faculty({
-        name: facultyName,  // ✅ Fix: Correctly store facultyName in DB
+        name: facultyName,
         empId,
         preference,
         selectedCourses
       });
 
       await faculty.save();
-      console.log("New faculty registered:", faculty);
+      console.log("✅ New faculty registered:", faculty);
       return res.status(201).json({ message: "New faculty registered and courses saved", faculty });
     }
 
@@ -78,18 +84,19 @@ router.post('/submit-courses', async (req, res) => {
     faculty.selectedCourses = selectedCourses;
     await faculty.save();
 
-    console.log("Courses updated successfully for:", empId);
+    console.log("✅ Courses updated successfully for:", empId);
     res.status(200).json({ message: 'Courses updated successfully', faculty });
 
   } catch (error) {
-    console.error("Error saving courses:", error);
+    console.error("❌ Error saving courses:", error);
     res.status(500).json({ message: 'Error saving courses', error });
   }
 });
 
+
 // ✅ Check if an employee ID is already registered
 router.get('/check/:empId', async (req, res) => {
-  const empId = parseInt(req.params.empId, 10);
+  const empId = req.params.empId; // ✅ Keep it as a string
 
   try {
     const faculty = await Faculty.findOne({ empId });
@@ -101,10 +108,11 @@ router.get('/check/:empId', async (req, res) => {
     res.json({ exists: false });
 
   } catch (error) {
-    console.error("Error checking faculty ID:", error);
+    console.error("❌ Error checking faculty ID:", error);
     res.status(500).json({ message: 'Error checking faculty ID', error });
   }
 });
+
 
 
 // store   pg:{ type: String },

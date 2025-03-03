@@ -25,11 +25,15 @@ const Management = () => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/domains`)
       .then(response => {
         const domainConfigs = response.data || [];
-  
+        const formattedConfigs = domainConfigs.map(domain => ({
+          domain, // Keep domain name
+          minCount: 0, // Default value
+          maxCount: 5  // Default value
+        }));
         // ✅ Ensure domains are extracted correctly
         console.log("📌 Domains from MongoDB:", domainConfigs);
-  
-        setDomainConfigs(domainConfigs);
+        console.log("📌 Fetched Domain Configs:", formattedConfigs);
+        setDomainConfigs(formattedConfigs);
       })
       .catch(error => console.error("❌ Error fetching domain configs from MongoDB:", error));
   }, []);

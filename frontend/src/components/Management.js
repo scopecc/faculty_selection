@@ -113,7 +113,7 @@ const Management = () => {
     }
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
@@ -121,14 +121,14 @@ const Management = () => {
 
       // ✅ Convert Excel data to JSON format
       const parsedData = XLSX.utils.sheet_to_json(sheet);
-      console.log(parsedData);
+      
       // ✅ Store courses in a map to avoid duplicates
       const coursesMap = {};
 
       parsedData.forEach((row) => {
         const courseId = row["Course ID"];
         const courseName = row["Course Name"];
-        const type = row["Course Type"]; 
+        const courseType = row["Course Type"]; 
         const domain = row["Domain"];
 
         if (!courseId || !courseName) return; // Skip invalid rows
@@ -137,7 +137,7 @@ const Management = () => {
           coursesMap[courseId] = {
             courseId,
             courseName,
-            type,
+            courseType,
             domain,
           };
         }
@@ -149,6 +149,22 @@ const Management = () => {
       localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
       setUploadedCourses(formattedCourses);
 
+      try {
+        // ✅ Send courses data to backend API
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/courses/upload-courses`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formattedCourses),
+        });
+
+        if (!response.ok) throw new Error("Failed to upload courses");
+
+        alert("✅ Courses uploaded to MongoDB successfully!");
+      } catch (error) {
+        console.error("❌ Error uploading courses:", error);
+        alert("Error uploading courses. Try again.");
+      }
+
       // ✅ Download courses.json automatically
       const jsonString = JSON.stringify(formattedCourses, null, 2);
       const blob = new Blob([jsonString], { type: "application/json" });
@@ -159,11 +175,12 @@ const Management = () => {
       link.click();
       document.body.removeChild(link);
       
-      alert("Courses uploaded and downloaded successfully!");
+      alert("Courses JSON downloaded successfully!");
     };
 
     reader.readAsArrayBuffer(file);
-  };
+};
+
 
   // Download faculty course selection as Excel
   const handleDownloadFacultyExcel = () => {

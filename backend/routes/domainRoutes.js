@@ -56,4 +56,16 @@ router.post("/save", async (req, res) => {
   }
 });
 
+router.get("/domains", async (req, res) => {
+  try {
+    const domains = await Course.distinct("domain"); // ✅ Get unique domains from MongoDB
+    console.log("✅ Fetched Domains:", domains);
+    
+    res.json(domains); // ✅ Return the unique domain list
+  } catch (error) {
+    console.error("❌ Error fetching domains:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;

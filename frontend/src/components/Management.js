@@ -22,7 +22,7 @@ const Management = () => {
 
   // Load courses.json from the public folder
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/domains`)
       .then(response => {
         const domainConfigs = response.data || [];
   

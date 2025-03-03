@@ -45,7 +45,7 @@ const CourseSelection = () => {
 
   // Fetch course data
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses/get-courses`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`)
       .then(response => setCourses(response.data))
       .catch(error => console.error("Error fetching courses from MongoDB:", error));
   }, []);

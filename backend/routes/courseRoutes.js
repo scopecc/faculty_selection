@@ -23,7 +23,7 @@ router.post("/upload-courses", async (req, res) => {
   }
 });
 
-router.get("/get-courses", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
       const courses = await Course.find();
       res.json(courses);
@@ -32,6 +32,6 @@ router.get("/get-courses", async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-  
+   
 
 module.exports = router;

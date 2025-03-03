@@ -9,13 +9,16 @@ const Management = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [facultyData, setFacultyData] = useState([]);
   const [courseData, setCourseData] = useState({});
-  const [file, setFile] = useState(null);
   const [uploadedCourses, setUploadedCourses] = useState([]);
-
+  const [showFacultyTable, setShowFacultyTable] = useState(true);
+  const [showCourseTable, setShowCourseTable] = useState(true);
   const correctUsername = process.env.REACT_APP_ADMIN_USER_ID;
   const correctPassword = process.env.REACT_APP_ADMIN_USER_PASSWORD;
   const [showPassword, setShowPassword] = useState(false);
   const [domainConfigs, setDomainConfigs] = useState([]);
+  const [file, setFile] = useState(null);
+  const [courses, setCourses] = useState([]);
+
 
   // Load courses.json from the public folder
   useEffect(() => {
@@ -116,41 +119,47 @@ const Management = () => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
 
-      // ✅ Convert Excel/CSV data to JSON format
+      // ✅ Convert Excel data to JSON format
       const parsedData = XLSX.utils.sheet_to_json(sheet);
-
-      // ✅ Store courses in a map to group same names
+      console.log(parsedData);
+      // ✅ Store courses in a map to avoid duplicates
       const coursesMap = {};
 
       parsedData.forEach((row) => {
-        const courseName = row["Course Name"];
         const courseId = row["Course ID"];
-        const type = row["Course Type"]; // "Theory" or "Theory+Lab"
+        const courseName = row["Course Name"];
+        const type = row["Course Type"]; 
         const domain = row["Domain"];
 
-        if (!coursesMap[courseName]) {
-          coursesMap[courseName] = {
+        if (!courseId || !courseName) return; // Skip invalid rows
+
+        if (!coursesMap[courseId]) {
+          coursesMap[courseId] = {
+            courseId,
             courseName,
             type,
             domain,
-            courseIds: new Set(),
           };
         }
-
-        // ✅ Avoid duplicate course IDs
-        coursesMap[courseName].courseIds.add(courseId);
       });
 
       // ✅ Convert map to array & store in localStorage
-      const formattedCourses = Object.values(coursesMap).map(course => ({
-        ...course,
-        courseIds: Array.from(course.courseIds).join(" ; "), // Format Course IDs
-      }));
+      const formattedCourses = Object.values(coursesMap);
 
       localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
       setUploadedCourses(formattedCourses);
 
-      alert("Courses uploaded successfully!");
+      // ✅ Download courses.json automatically
+      const jsonString = JSON.stringify(formattedCourses, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "courses.json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert("Courses uploaded and downloaded successfully!");
     };
 
     reader.readAsArrayBuffer(file);
@@ -261,8 +270,32 @@ const Management = () => {
       ))}
       <button onClick={saveDomainConfig}>Save Settings</button>
     </div>
+
+    <div>
+      <h1>Upload Course Data (Excel to JSON)</h1>
+      <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Generate Courses JSON</button>
+
+      {/* Display Processed Courses */}
+      
+      {courses.length > 0 && (
+        <div>
+          <h2>Extracted Course Data:</h2>
+          <pre>{JSON.stringify(courses, null, 2)}</pre>
+        </div>
+      )}
+    </div>
         
           {/* Faculty Course Selection Table */}
+          <>
+          <button onClick={() => setShowFacultyTable(!showFacultyTable)}>
+          {showFacultyTable ? "Hide Faculty Table" : "Show Faculty Table"}
+        </button>
+          <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
+          
+
+          {showFacultyTable && (
+            <>
           <div className="table-container">
           <h2>Faculty Course Selection</h2>
           <table border="1">
@@ -298,9 +331,17 @@ const Management = () => {
           
 
           {/* Button to download Faculty Excel */}
-          <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
           </div>
-
+          </>
+          )}
+        </>
+        <br></br>
+        <button onClick={() => setShowCourseTable(!showCourseTable)}>
+          {showCourseTable ? "Hide Course Table" : "Show Course Table"}
+        </button>
+        <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
+        {showCourseTable && (
+            <>
           <div className="table-container">
 
           {/* Courses Selected by Faculty Table */}
@@ -325,9 +366,12 @@ const Management = () => {
           </table>
 
           {/* Button to download Course Excel */}
-          <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
           </div>
+
+          </>
+          )}
         </>
+        
         )}
     </div>
   );

@@ -4,6 +4,7 @@ import axios from "axios";
 import "./Home.css";
 
 const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
+  const [facultyEmpid, setLocalFacultyEmpid] = useState("");
   const [facultyEmail, setLocalFacultyEmail] = useState("");
   const [empIdInput, setEmpIdInput] = useState("");
   const [preference, setLocalPreference] = useState("");
@@ -14,6 +15,20 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
 
   // ✅ Function to request OTP
   const sendOtp = async () => {
+    const empId = facultyEmpid;
+    console.log(empId);
+    const response = await axios.get("/faculties.json");
+    const faculties = response.data;
+    const faculty = faculties.find((fac) => fac.empId == facultyEmpid);
+
+if (!faculty) {
+  alert("Faculty not found. Please check the Employee ID.");
+  return; // Stop execution if faculty is not found
+}
+console.log(faculty);
+const facultyEmail = faculty.email; // Now it is safe to access
+setLocalFacultyEmail(facultyEmail); // Save email in state
+
     try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/send-otp`, {
         email: facultyEmail,
@@ -35,6 +50,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       alert("Please verify your email first.");
       return;
     }
+    
   
     try {
       console.log("🔹 Sending OTP for verification:", otp);
@@ -46,12 +62,11 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       console.log("✅ OTP Verified:", verifyResponse.data);
   
       // Proceed with faculty check
-      const empId = parseInt(empIdInput, 10);
-      const response = await axios.get("/faculties.json");
-      const faculties = response.data;
-      const faculty = faculties.find((fac) => fac.empId === empId && fac.email === facultyEmail);
-  
-      if (faculty) {
+      const empId = facultyEmpid;
+       
+      
+      
+      if (facultyEmail && facultyEmpid) {
         localStorage.setItem("empId", empId);
         localStorage.setItem("facultyEmail", facultyEmail);
         localStorage.setItem("preference", preference);
@@ -81,10 +96,10 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       <form onSubmit={handleSubmit} className="home-form">
         {/* Faculty Email Input */}
         <input
-          type="email"
-          placeholder="Faculty Email ID"
-          value={facultyEmail}
-          onChange={(e) => setLocalFacultyEmail(e.target.value)}
+          type="number"
+          placeholder="Faculty Employee ID"
+          value={facultyEmpid}
+          onChange={(e) => setLocalFacultyEmpid(e.target.value)}
           required
         />
         
@@ -107,13 +122,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
         {/* Show Employee ID & Preference only after OTP is Sent */}
         {otpSent && (
           <>
-            <input
-              type="number"
-              placeholder="Employee ID"
-              value={empIdInput}
-              onChange={(e) => setEmpIdInput(e.target.value)}
-              required
-            />
+            
 
             <div className="radio-group">
               <label>

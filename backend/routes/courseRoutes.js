@@ -16,7 +16,7 @@ router.post("/upload-courses", async (req, res) => {
       ...course,
       courseType: course.courseType?.trim() || "Undefined",
     }));
-
+    await Course.deleteMany({});
     // Insert into MongoDB
     await Course.insertMany(formattedCourses, { ordered: false }).catch(err => {
       console.error("Duplicate courses detected:", err.message);

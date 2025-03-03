@@ -171,7 +171,6 @@ const Management = () => {
       link.href = URL.createObjectURL(blob);
       
       document.body.appendChild(link);
-      link.click();
       document.body.removeChild(link);
       
       

@@ -161,7 +161,7 @@ const Management = () => {
         alert("✅ Courses uploaded to MongoDB successfully!");
       } catch (error) {
         console.error("❌ Error uploading courses:", error);
-        alert("Error uploading courses. Try again.");
+        alert("Error uploading courses. Incorrect format. Try again.");
       }
 
       // ✅ Download courses.json automatically

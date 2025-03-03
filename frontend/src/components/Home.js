@@ -28,9 +28,13 @@ const facultyEmail = faculty.email; // Now it is safe to access
 setLocalFacultyEmail(facultyEmail); // Save email in state
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/send-otp`, {
-        email: facultyEmail,
-      });
+      const checkResponse = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`
+      );
+      if (checkResponse.data.exists) {
+        alert("You have already registered.");
+        return;
+      }
       setOtpSent(true);
       alert("OTP sent to your email!");
     } catch (error) {

@@ -7,25 +7,41 @@ const DomainConfig = require("../models/DomainConfig");
 // ✅ Insert courses.json data (One-time operation)
 router.post("/insert-courses", async (req, res) => {
   try {
-    const courses = req.body; // JSON data sent from frontend
-    await Course.insertMany(courses);
-    
-    // Extract unique domains & set default min/max counts
-    const uniqueDomains = [...new Set(courses.map(course => course.domain))];
+    const courses = req.body;
 
-    const domainConfigs = uniqueDomains.map(domain => ({
+    // ✅ Ensure courses array is valid
+    if (!Array.isArray(courses) || courses.length === 0) {
+      return res.status(400).json({ error: "Invalid courses data" });
+    }
+
+    // ✅ Insert new courses (Ignore duplicates)
+    await Course.insertMany(courses, { ordered: false }).catch((err) => {
+      console.warn("⚠️ Some duplicate courses were skipped:", err.message);
+    });
+
+    // ✅ Fetch unique domains from MongoDB (Avoid duplicates)
+    const uniqueDomains = await Course.distinct("domain");
+
+    // ✅ Prepare default domain constraints
+    const domainConfigs = uniqueDomains.map((domain) => ({
       domain,
-      minCount: 1,  // Default min count
-      maxCount: 5   // Default max count
+      minCount: 1,
+      maxCount: 5,
     }));
 
-    await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch(err => {}); // Ignore duplicates
-    res.json({ message: "Courses inserted successfully!" });
+    // ✅ Insert domain constraints (Ignore duplicates)
+    await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch((err) => {
+      console.warn("⚠️ Some domain constraints already exist:", err.message);
+    });
+
+    res.json({ message: "✅ Courses & domain constraints inserted successfully!" });
+
   } catch (error) {
-    console.error("Error inserting courses:", error);
+    console.error("❌ Error inserting courses:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // ✅ Fetch domain constraints
 router.get("/", async (req, res) => {

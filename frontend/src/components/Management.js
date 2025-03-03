@@ -22,23 +22,16 @@ const Management = () => {
 
   // Load courses.json from the public folder
   useEffect(() => {
-    axios.get('courses.json')
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`)
       .then(response => {
-        const coursesData = response.data || [];
-
-        // Extract unique domain names
-        const uniqueDomains = [...new Set(coursesData.map(course => course.domain))];
-
-        // Initialize domainConfigs with default values
-        const initialConfigs = uniqueDomains.map(domain => ({
-          domain,
-          minCount: 0,
-          maxCount: 0
-        }));
-
-        setDomainConfigs(initialConfigs);
+        const domainConfigs = response.data || [];
+  
+        // ✅ Ensure domains are extracted correctly
+        console.log("📌 Domains from MongoDB:", domainConfigs);
+  
+        setDomainConfigs(domainConfigs);
       })
-      .catch(error => console.error("Error loading courses.json:", error));
+      .catch(error => console.error("❌ Error fetching domain configs from MongoDB:", error));
   }, []);
 
   // Handle user input for min/max

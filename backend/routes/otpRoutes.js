@@ -24,7 +24,6 @@ router.post("/send-otp", async (req, res) => {
     // ✅ Store OTP with expiry (5 mins)
     otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
-    console.log(`🔹 [SEND OTP] OTP for ${email}: ${otp}`); // ✅ Debug log
 
     // ✅ Send email
     const mailOptions = {
@@ -53,8 +52,7 @@ router.post("/verify-otp", async (req, res) => {
   // ✅ Fetch OTP from memory
   const storedOtpData = otpStorage[email];
 
-  console.log("🔹 [VERIFY OTP] Stored OTP:", storedOtpData?.otp);
-  console.log("🔹 [VERIFY OTP] User Entered OTP:", otp);
+
 
   if (!storedOtpData) {
     return res.status(400).json({ message: "Invalid or expired OTP" });

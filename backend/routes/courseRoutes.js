@@ -11,8 +11,14 @@ router.post("/upload-courses", async (req, res) => {
       return res.status(400).json({ message: "Invalid course data" });
     }
 
-    // Insert courses into MongoDB, ignoring duplicates
-    await Course.insertMany(courses, { ordered: false }).catch(err => {
+    // ✅ Ensure each course has `courseType`
+    const formattedCourses = courses.map(course => ({
+      ...course,
+      courseType: course.courseType?.trim() || "Undefined",
+    }));
+
+    // Insert into MongoDB
+    await Course.insertMany(formattedCourses, { ordered: false }).catch(err => {
       console.error("Duplicate courses detected:", err.message);
     });
 

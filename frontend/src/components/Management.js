@@ -128,10 +128,10 @@ const Management = () => {
       parsedData.forEach((row) => {
         const courseId = row["Course ID"];
         const courseName = row["Course Name"];
-        const courseType = row["Course Type"]; 
+        const courseType = row["Course Type"]?.trim();
         const domain = row["Domain"];
 
-        if (!courseId || !courseName) return; // Skip invalid rows
+        if (!courseId || !courseName || !courseType) return;
 
         if (!coursesMap[courseId]) {
           coursesMap[courseId] = {
@@ -143,9 +143,11 @@ const Management = () => {
         }
       });
 
+      
+
       // ✅ Convert map to array & store in localStorage
       const formattedCourses = Object.values(coursesMap);
-
+      console.log("📌 Debug: Formatted Courses:", formattedCourses);
       localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
       setUploadedCourses(formattedCourses);
 

@@ -16,7 +16,6 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   // ✅ Function to request OTP
   const sendOtp = async () => {
     const empId = facultyEmpid;
-    console.log(empId);
     const response = await axios.get("/faculties.json");
     const faculties = response.data;
     const faculty = faculties.find((fac) => fac.empId == facultyEmpid);
@@ -25,7 +24,6 @@ if (!faculty) {
   alert("Faculty not found. Please check the Employee ID.");
   return; // Stop execution if faculty is not found
 }
-console.log(faculty);
 const facultyEmail = faculty.email; // Now it is safe to access
 setLocalFacultyEmail(facultyEmail); // Save email in state
 
@@ -33,7 +31,6 @@ setLocalFacultyEmail(facultyEmail); // Save email in state
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/send-otp`, {
         email: facultyEmail,
       });
-      console.log("✅ OTP sent successfully!");
       setOtpSent(true);
       alert("OTP sent to your email!");
     } catch (error) {
@@ -53,13 +50,11 @@ setLocalFacultyEmail(facultyEmail); // Save email in state
     
   
     try {
-      console.log("🔹 Sending OTP for verification:", otp);
       const verifyResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/verify-otp`, {
         email: facultyEmail,
         otp: otp, // ✅ Send entered OTP to backend
       });
   
-      console.log("✅ OTP Verified:", verifyResponse.data);
   
       // Proceed with faculty check
       const empId = facultyEmpid;

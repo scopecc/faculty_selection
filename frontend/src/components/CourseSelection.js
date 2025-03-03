@@ -17,7 +17,6 @@ const CourseSelection = () => {
   const preference = location.state?.preference || storedPreference;
 
   const [facultyName, setFacultyName] = useState('');
-  const [courses, setCourses] = useState([]);
   const [selectedCourses, setSelectedCourses] = useState([]);
 
   const [ug, setUg] = useState('');
@@ -43,13 +42,67 @@ const CourseSelection = () => {
     }
   }, [facultyEmail]);
 
-  // Fetch course data
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`)
-      .then(response => setCourses(response.data))
-      .catch(error => console.error("Error fetching courses from MongoDB:", error));
-  }, []);
 
+const [theoryCoursesByDomain, setTheoryCoursesByDomain] = useState({});
+const [theoryLabCoursesByDomain, setTheoryLabCoursesByDomain] = useState({});
+const [courses, setCourses] = useState([]);
+const [isCoursesFetched, setIsCoursesFetched] = useState(false);
+
+// Fetch course data
+useEffect(() => {
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`);
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const updatedCourses = response.data.map(course => ({
+          ...course,
+          courseType: course.courseType?.trim().toLowerCase() || "undefined",  // ✅ Normalize
+        }));
+        setCourses(updatedCourses);
+      } else {
+        setCourses([]);
+      }
+    } catch (error) {
+      console.error("Error fetching courses from MongoDB:", error);
+      setCourses([]);
+    }
+  };
+
+  fetchCourses();
+}, []);
+
+const groupByDomain = (courses) => {
+  return courses.reduce((acc, course) => {
+    if (!acc[course.domain]) {
+      acc[course.domain] = [];
+    }
+    acc[course.domain].push(course);
+    return acc;
+  }, {});
+};
+
+useEffect(() => {
+  if (Array.isArray(courses) && courses.length > 0 && !isCoursesFetched) {
+    console.log("Updating Theory Courses...");
+    console.log(courses);
+
+    const theoryCourses = courses.filter(course => course.courseType?.trim().toLowerCase() === "theory");
+    const theoryLabCourses = courses.filter(course => course.courseType?.trim().toLowerCase() === "theory+lab");
+
+    
+    
+
+    setTheoryCoursesByDomain(groupByDomain(theoryCourses));
+    setTheoryLabCoursesByDomain(groupByDomain(theoryLabCourses));
+    setIsCoursesFetched(true);
+  }
+}, [courses]);
+
+
+  
+  
+  
+  
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`)
       .then(response => {
@@ -63,7 +116,6 @@ const CourseSelection = () => {
   }, []);
 
   const maxCourses = 7
- 
 
   const handleCourseSelect = (course) => {
     setSelectedCourses(prev => {
@@ -141,29 +193,22 @@ const CourseSelection = () => {
   };
 
   // Helper function to group courses by domain
-  const groupByDomain = (courses) => {
-    return courses.reduce((acc, course) => {
-      if (!acc[course.domain]) {
-        acc[course.domain] = [];
-      }
-      acc[course.domain].push(course);
-      return acc;
-    }, {});
-  };
 
+  
   // Grouping courses
-  const theoryCoursesByDomain = groupByDomain(courses.filter(course => course.type === "Theory"));
-  const theoryLabCoursesByDomain = groupByDomain(courses.filter(course => course.type === "Theory+Lab"));
+
+  
+
+  
 
   return (
     <div className="course-selection-container">
       <h1>Course Selection</h1>
       <p className="faculty-details">Faculty Name: <strong>{facultyName || "N/A"}</strong></p>
-      {/* <p className="faculty-details">Faculty Email: <strong>{facultyEmail || "N/A"}</strong></p> */}
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p><strong>You must select exactly {maxCourses} courses.</strong></p>
-
+  
       <div className="input-fields">
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <label>
@@ -185,7 +230,7 @@ const CourseSelection = () => {
             />
           </label>
         </div>
-
+  
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <label>
             PG:
@@ -217,59 +262,66 @@ const CourseSelection = () => {
           />
         </label>
       </div>
-
-      <div className="selected-courses">
-        <h2>Selected Courses</h2>
-        <ol>
-          {selectedCourses.map(course => (
-            <li key={course.courseId}>
-              {course.courseName} ({course.type}) ({course.courseId}) - <strong>{course.domain}</strong>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <h2>Theory Courses</h2>
-      <div className="course-list">
-        {Object.keys(theoryCoursesByDomain).map(domain => (
-          <div key={domain}>
-            <h3>{domain} (Min: {domainConstraints[domain]?.minCount || 0}, Max: {domainConstraints[domain]?.maxCount || 2})</h3>
-            {theoryCoursesByDomain[domain].map(course => (
-              <label key={course.courseId}>
-                <input
-                  type="checkbox"
-                  checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                  onChange={() => handleCourseSelect(course)}
-                />
-                {course.courseName} ({course.type}) ({course.courseId})
-              </label>
+  
+      {Array.isArray(courses) && courses.length > 0 ? (
+        <>
+          <div className="selected-courses">
+            <h2>Selected Courses</h2>
+            <ol>
+              {selectedCourses.map(course => (
+                <li key={course.courseId}>
+                  {course.courseName} ({course.type}) ({course.courseId}) - <strong>{course.domain}</strong>
+                </li>
+              ))}
+            </ol>
+          </div>
+  
+          <h2>Theory Courses</h2>
+          <div className="course-list">
+            {Object.keys(theoryCoursesByDomain).map(domain => (
+              <div key={domain}>
+                <h3>{domain} (Min: {domainConstraints[domain]?.minCount || 0}, Max: {domainConstraints[domain]?.maxCount || 2})</h3>
+                {theoryCoursesByDomain[domain].map(course => (
+                  <label key={course.courseId}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                      onChange={() => handleCourseSelect(course)}
+                    />
+                    {course.courseName} ({course.type}) ({course.courseId})
+                  </label>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
-      </div>
-
-      <h2>Theory+Lab Courses</h2>
-      <div className="course-list">
-        {Object.keys(theoryLabCoursesByDomain).map(domain => (
-          <div key={domain}>
-            <h3>{domain} (Min: {domainConstraints[domain]?.minCount || 0}, Max: {domainConstraints[domain]?.maxCount || 2})</h3>
-            {theoryLabCoursesByDomain[domain].map(course => (
-              <label key={course.courseId}>
-                <input
-                  type="checkbox"
-                  checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                  onChange={() => handleCourseSelect(course)}
-                />
-                {course.courseName} ({course.type}) ({course.courseId})
-              </label>
+  
+          <h2>Theory+Lab Courses</h2>
+          <div className="course-list">
+            {Object.keys(theoryLabCoursesByDomain).map(domain => (
+              <div key={domain}>
+                <h3>{domain} (Min: {domainConstraints[domain]?.minCount || 0}, Max: {domainConstraints[domain]?.maxCount || 2})</h3>
+                {theoryLabCoursesByDomain[domain].map(course => (
+                  <label key={course.courseId}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                      onChange={() => handleCourseSelect(course)}
+                    />
+                    {course.courseName} ({course.type}) ({course.courseId})
+                  </label>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
-      </div>
-
+        </>
+      ) : (
+        <p>Loading courses...</p>
+      )}
+      
       <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
     </div>
   );
+  
 };
 
 export default CourseSelection;

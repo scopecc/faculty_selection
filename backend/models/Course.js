@@ -5,7 +5,7 @@ const CourseSchema = new mongoose.Schema({
     courseName: String,
     courseId: String,
     domain: String,
-    type: String, // Theory or Theory+Lab
+    courseType: { type: String, required: true, default: "Undefined" }  
   });
   
   module.exports = mongoose.model('Course', CourseSchema);

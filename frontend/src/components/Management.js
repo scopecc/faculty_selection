@@ -31,8 +31,6 @@ const Management = () => {
           maxCount: 5  // Default value
         }));
         // ✅ Ensure domains are extracted correctly
-        console.log("📌 Domains from MongoDB:", domainConfigs);
-        console.log("📌 Fetched Domain Configs:", formattedConfigs);
         setDomainConfigs(formattedConfigs);
       })
       .catch(error => console.error("❌ Error fetching domain configs from MongoDB:", error));
@@ -72,7 +70,6 @@ const Management = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
-      console.log("Faculty Data:", response.data);
       setFacultyData(response.data);
 
       const courseMap = {};
@@ -144,7 +141,6 @@ const Management = () => {
 
       // ✅ Convert map to array & store in localStorage
       const formattedCourses = Object.values(coursesMap);
-      console.log("📌 Debug: Formatted Courses:", formattedCourses);
       localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
       setUploadedCourses(formattedCourses);
 

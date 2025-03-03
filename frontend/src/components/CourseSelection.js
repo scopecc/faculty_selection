@@ -84,7 +84,6 @@ const groupByDomain = (courses) => {
 
 useEffect(() => {
   if (Array.isArray(courses) && courses.length > 0 && !isCoursesFetched) {
-    console.log("Updating Theory Courses...");
 
     // ✅ Make sure `courseType` is normalized properly
     const theoryCourses = courses.filter(course => 
@@ -95,8 +94,6 @@ useEffect(() => {
       course.courseType && course.courseType.trim().toLowerCase() === "theory+lab"
     );
 
-    console.log("📌 Filtered Theory Courses:", theoryCourses);
-    console.log("📌 Filtered Theory+Lab Courses:", theoryLabCourses);
 
     setTheoryCoursesByDomain(groupByDomain(theoryCourses));
     setTheoryLabCoursesByDomain(groupByDomain(theoryLabCourses));
@@ -183,7 +180,6 @@ useEffect(() => {
     }
 
     try {
-      console.log("Submitting courses:", selectedCourses);
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
         { empId, facultyName, facultyEmail, preference, selectedCourses },
         { headers: { 'Content-Type': 'application/json' } }

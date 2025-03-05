@@ -75,3 +75,10 @@
   background-color: #0D47A1;
   transform: scale(0.98);
 }
+
+.otp-sent-message {
+  font-size: 14px;
+  color: green;
+  margin-top: 5px;
+  text-align: left;
+}

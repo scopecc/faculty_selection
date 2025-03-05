@@ -226,8 +226,8 @@ const Management = () => {
   };
 
   return (
-    <div>
-      <h1>Management Portal - {process.env.REACT_APP_BACKEND_URL}</h1>
+    <div style={{ padding: "0px 100px" }}>
+      <h1>Management Portal </h1>
       {/* Login Form */}
       {!isAuthenticated ? (
         <div className="login-container">
@@ -261,7 +261,7 @@ const Management = () => {
       ) : (
         <>
         <div>
-      <h1>Domain Constraints</h1>
+      <h2>Domain Constraints</h2>
       {domainConfigs.map((config, index) => (
         <div key={index}>
           <h3>{config.domain}</h3>
@@ -271,6 +271,7 @@ const Management = () => {
             value={config.minCount}
             onChange={(e) => handleInputChange(index, 'minCount', e.target.value)}
           />
+          {"                "}
           <label>Max:</label>
           <input 
             type="number" 
@@ -283,7 +284,7 @@ const Management = () => {
     </div>
 
     <div>
-      <h1>Upload Course Data (Excel to JSON)</h1>
+      <h2>Upload Course Data (Excel to JSON)</h2>
       <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
       <button onClick={handleUpload}>Generate Courses JSON</button>
 
@@ -301,7 +302,8 @@ const Management = () => {
           <>
           <button onClick={() => setShowFacultyTable(!showFacultyTable)}>
           {showFacultyTable ? "Hide Faculty Table" : "Show Faculty Table"}
-        </button>
+          </button>
+          {"                "}
           <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
           
 
@@ -350,6 +352,7 @@ const Management = () => {
         <button onClick={() => setShowCourseTable(!showCourseTable)}>
           {showCourseTable ? "Hide Course Table" : "Show Course Table"}
         </button>
+        {"                "}
         <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
         {showCourseTable && (
             <>

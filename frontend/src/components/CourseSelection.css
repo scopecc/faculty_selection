@@ -1,99 +1,123 @@
-/* Course Selection Page */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #28a745;
+  --background-color: #f9f9f9;
+  --text-color: #333;
+  --subtext-color: #555;
+  --border-color: #ccc;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --spacing: 20px;
+  --border-radius: 8px;
+}
+
 .course-selection-container {
-    max-width: 1200px;
-    margin: 50px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  /* Heading styles */
-  .course-selection-container h1 {
-    color: #007bff;
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  /* Faculty Details */
-  .faculty-details {
-    font-size: 16px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    border-left: 5px solid #007bff;
-  }
-  
-  /* Selected Courses Section */
-  .selected-courses {
-    text-align: left;
-    background-color: #e9ecef;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .selected-courses ol {
-    padding-left: 20px;
-  }
-  
-  .selected-courses li {
-    margin-bottom: 5px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  /* Course Category Titles */
-  .course-category {
-    font-size: 26px;
-    font-weight: bold;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    color: #0056b3;
-    text-align: left;
-  }
-  
-  /* Course Selection List */
-  .course-list label {
-    display: block;
-    background-color: #f8f9fa;
-    padding: 5px;
-    border-radius: 5px;
-    margin: 5px 0;
-    transition: background 0.3s ease;
-    cursor: pointer;
-    text-align: left;
-  }
-  
-  .course-list label:hover {
-    background-color: #dce5f7;
-  }
-  
-  /* Checkboxes */
-  .course-list input[type="checkbox"] {
-    margin-right: 0px;
-    transform: scale(1.2);
-  }
-  
-  /* Submit Button */
-  .submit-button {
-    background-color: #28a745;
-    color: white;
-    font-size: 18px;
-    padding: 12px;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 250px;
-    margin-top: 20px;
-    transition: background 0.3s;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .submit-button:hover {
-    background-color: #218838;
-  }
-  
+  margin: 0 auto;
+  padding: var(--spacing);
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 10px var(--shadow-color);
+}
+
+h1 {
+  text-align: center;
+  color: var(--text-color);
+}
+
+.faculty-details {
+  font-size: 1.1em;
+  color: var(--subtext-color);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.input-fields {
+  margin-bottom: var(--spacing);
+}
+
+.input-fields label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.input-fields input {
+  width: calc(50% - 20px);
+  padding: 8px;
+  margin: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.course-list {
+  margin-bottom: var(--spacing);
+}
+
+.course-list h3 {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.course-list label {
+  display: block;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.course-list label:hover {
+  background-color: #f1f1f1;
+}
+
+.course-list input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.selected-courses {
+  margin: auto; 
+  width: 80%;
+  margin-top: var(--spacing);
+}
+
+.selected-courses h2 {
+  color: var(--text-color);
+}
+
+.selected-courses ol {
+  padding-left: 20px;
+}
+
+.selected-courses li {
+  margin-bottom: 10px;
+  background-color: #e9ecef;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.submit-button {
+  margin: auto;
+  width: 30%;
+  padding: 10px;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.2em;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}
+
+.submit-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}

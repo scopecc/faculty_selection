@@ -22,16 +22,16 @@ const Management = () => {
 
   // Load courses.json from the public folder
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/domains`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/`)
       .then(response => {
-        const domainConfigs = response.data || [];
-        const formattedConfigs = domainConfigs.map(domain => ({
-          domain, // Keep domain name
-          minCount: 0, // Default value
-          maxCount: 5  // Default value
-        }));
+        const domainConfigs = response.data.map((dataPoint)=>{
+          const domain = dataPoint.domain;
+          const minCount = dataPoint.minCount;
+          const maxCount = dataPoint.maxCount;
+          return {domain, minCount, maxCount};
+        }) || [];
         // ✅ Ensure domains are extracted correctly
-        setDomainConfigs(formattedConfigs);
+        setDomainConfigs(domainConfigs);
       })
       .catch(error => console.error("❌ Error fetching domain configs from MongoDB:", error));
   }, []);
@@ -92,7 +92,6 @@ const Management = () => {
   };
 
   useEffect(() => {
-    console.log("Management Page Mounted");
     fetchData();
   }, []);
 
@@ -175,7 +174,6 @@ const Management = () => {
     reader.readAsArrayBuffer(file);
 };
 
-
   // Download faculty course selection as Excel
   const handleDownloadFacultyExcel = () => {
     const facultyExcelData = [];
@@ -228,6 +226,7 @@ const Management = () => {
   return (
     <div style={{ padding: "0px 100px" }}>
       <h1>Management Portal </h1>
+
       {/* Login Form */}
       {!isAuthenticated ? (
         <div className="login-container">
@@ -268,14 +267,14 @@ const Management = () => {
           <label>Min:</label>
           <input 
             type="number" 
-            value={config.minCount}
+            defaultValue={config.minCount}
             onChange={(e) => handleInputChange(index, 'minCount', e.target.value)}
           />
           {"                "}
           <label>Max:</label>
           <input 
-            type="number" 
-            value={config.maxCount}
+            type="number"
+            defaultValue={config.maxCount}
             onChange={(e) => handleInputChange(index, 'maxCount', e.target.value)}
           />
         </div>

@@ -31,6 +31,19 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     setLocalFacultyEmail(facultyEmail); // Save email in state
 
     try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${facultyEmpid}`);
+      if (response.data.exists) {
+        alert("You have already registered.");
+        return;
+      }
+    } catch (error) {
+      console.error("Error Checking DB:", error);
+      alert("Failed to check DB. Try again.");
+    } finally {
+      setLoading(false);
+    }
+
+    try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/send-otp`, {
         email: facultyEmail,
       });

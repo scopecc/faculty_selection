@@ -15,8 +15,8 @@ router.post("/insert-courses", async (req, res) => {
 
     const domainConfigs = uniqueDomains.map(domain => ({
       domain,
-      minCount: 1,  // Default min count
-      maxCount: 5   // Default max count
+      minCount: 0,  // Default min count
+      maxCount: 2   // Default max count
     }));
 
     await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch(err => {}); // Ignore duplicates

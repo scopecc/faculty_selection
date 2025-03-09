@@ -272,65 +272,70 @@ useEffect(() => {
 
       <hr />
   
-      <div style={{width:"70%",margin:"auto"}}>
-        {Array.isArray(courses) && courses.length > 0 ? (
-          <div>
-            <h2>Theory+Lab Courses</h2>
-            <div className="course-list">
-              {Object.keys(theoryLabCoursesByDomain).map(domain => (
-                <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
-                  {theoryLabCoursesByDomain[domain].map(course => (
-                    <label key={course.courseId}>
-                      <input
-                        type="checkbox"
-                        checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                        onChange={() => handleCourseSelect(course)}
-                      />
-                      {course.courseName} ({course.courseType}) ({course.courseId})
-                    </label>
-                  ))}
-                </Accordion>
-              ))}
+      <div className="selection-view" style={{display:"flex", gap:"30px"}}>
+        <div style={{width:"60%"}}>
+          {Array.isArray(courses) && courses.length > 0 ? (
+            <div>
+              <h2>Theory+Lab Courses</h2>
+              <div className="course-list">
+                {Object.keys(theoryLabCoursesByDomain).map(domain => (
+                  <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
+                    {theoryLabCoursesByDomain[domain].map(course => (
+                      <label key={course.courseId}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                          onChange={() => handleCourseSelect(course)}
+                        />
+                        {course.courseName} ({course.courseType}) ({course.courseId})
+                      </label>
+                    ))}
+                  </Accordion>
+                ))}
+              </div>
+      
+              <h2>Theory Courses</h2>
+              <div className="course-list">
+                {Object.keys(theoryCoursesByDomain).map(domain => (
+                  <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
+                    {theoryCoursesByDomain[domain].map(course => (
+                      <label key={course.courseId}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                          onChange={() => handleCourseSelect(course)}
+                        />
+                        {course.courseName} ({course.courseType}) ({course.courseId})
+                      </label>
+                    ))}
+                  </Accordion>
+                ))}
+              </div>
             </div>
-    
-            <h2>Theory Courses</h2>
-            <div className="course-list">
-              {Object.keys(theoryCoursesByDomain).map(domain => (
-                <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
-                  {theoryCoursesByDomain[domain].map(course => (
-                    <label key={course.courseId}>
-                      <input
-                        type="checkbox"
-                        checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                        onChange={() => handleCourseSelect(course)}
-                      />
-                      {course.courseName} ({course.courseType}) ({course.courseId})
-                    </label>
-                  ))}
-                </Accordion>
-              ))}
+          ) : (
+            <p>Loading courses...</p>
+          )}
+        </div>
+        <div style={{width:"40%",position:"sticky",top:"30px",backgroundColor:"#D2E3FC",padding:"30px"}} className="selected-courses">
+          <div style={{display:"flex",minHeight:"70vh",flexDirection:"column",justifyContent:"space-between",alignItems:"between"}}>
+            <div>
+              <h2>Selected Courses</h2>
+              <ol>
+                {selectedCourses.map(course => (
+                  <li key={course.courseId}>
+                    {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
+                  </li>
+                ))}
+              </ol>
             </div>
+            <div style={{ textAlign: "center" }}>
+              <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
+            </div>  
           </div>
-        ) : (
-          <p>Loading courses...</p>
-        )}
-      </div>
-
-
-      <div className="selected-courses">
-        <h2>Selected Courses</h2>
-        <ol>
-          {selectedCourses.map(course => (
-            <li key={course.courseId}>
-              {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
-            </li>
-          ))}
-        </ol>
+        </div>
       </div>
       
-      <div style={{ textAlign: "center" }}>
-        <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
-      </div>
+
     </div>
   );  
 };

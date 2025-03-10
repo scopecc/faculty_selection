@@ -41,6 +41,8 @@ app.use('/otp', otpRoutes); // ✅ Correct API path
 const courseRoutes = require('./routes/courseRoutes');  // ✅ Add courseRoutes
 app.use('/courses', courseRoutes);
 
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/admin', adminRoutes);
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;

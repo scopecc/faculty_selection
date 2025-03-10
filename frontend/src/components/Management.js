@@ -18,7 +18,15 @@ const Management = () => {
   const [domainConfigs, setDomainConfigs] = useState([]);
   const [file, setFile] = useState(null);
   const [courses, setCourses] = useState([]);
-
+  // New states for forgot password and reset password
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetUsername, setResetUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
 
   // Load courses.json from the public folder
   useEffect(() => {
@@ -57,13 +65,26 @@ const Management = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username === correctUsername && password === correctPassword) {
-      setIsAuthenticated(true);
-      fetchData();
-    } else {
-      alert("Incorrect username or password.");
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/login`, {
+        username,
+        password
+      });
+      if (response.data.message === "Login successful") {
+        setIsAuthenticated(true);
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      if (error.response) {
+        alert(error.response.data.message || "Incorrect username or password.");
+      } else if (error.request) {
+        alert("No response from server. Please check your connection.");
+      } else {
+        alert("Error setting up the request. Please try again.");
+      }
     }
   };
 
@@ -223,6 +244,62 @@ const Management = () => {
     XLSX.writeFile(wb, "course_selection.xlsx");
   };
 
+  // Handle forgot password
+  const handleForgotPassword = async () => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/forgot-password`, {
+        username: resetUsername
+      });
+      setResetMessage('Your credentials have been sent to your email.');
+      setResetError('');
+      setShowForgotPassword(false);
+      setResetUsername('');
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      if (error.response) {
+        setResetError(error.response.data.message || 'Username not found. Please try again.');
+      } else if (error.request) {
+        setResetError('No response from server. Please check your connection.');
+      } else {
+        setResetError('Error setting up the request. Please try again.');
+      }
+      setResetMessage('');
+    }
+  };
+
+  // Handle reset password
+  const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
+      setResetError('New passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/reset-password`, {
+        username: resetUsername,
+        oldPassword: oldPassword,
+        newPassword: newPassword
+      });
+      setResetMessage('Password has been reset successfully. Please login with your new password.');
+      setResetError('');
+      setShowResetModal(false);
+      setResetUsername('');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Reset password error:', error);
+      if (error.response) {
+        setResetError(error.response.data.message || 'Failed to reset password. Please try again.');
+      } else if (error.request) {
+        setResetError('No response from server. Please check your connection.');
+      } else {
+        setResetError('Error setting up the request. Please try again.');
+      }
+      setResetMessage('');
+    }
+  };
+
   return (
     <div style={{ padding: "0px 100px" }}>
       <h1>Management Portal </h1>
@@ -230,32 +307,119 @@ const Management = () => {
       {/* Login Form */}
       {!isAuthenticated ? (
         <div className="login-container">
-        <form onSubmit={handleLogin} className="login-form">
-          <input 
-            type="text" 
-            placeholder="Username" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)}
-            required 
-          />
-          <div className="password-container">
-          <input 
-            type={showPassword ? "text" : "password"}
-            placeholder="Password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
-            required 
-          />
-          <button
-            type="button"
-            className="eye-button"
-            onClick={togglePasswordVisibility}
-          >
-            {showPassword ? "🙈" : "👁"}
-          </button>
-        </div>
-          <button type="submit">Login</button>
-        </form>
+          <form onSubmit={handleLogin} className="login-form">
+            <input 
+              type="text" 
+              placeholder="Username" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)}
+              required 
+            />
+            <div className="password-container">
+              <input 
+                type={showPassword ? "text" : "password"}
+                placeholder="Password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
+              <button
+                type="button"
+                className="eye-button"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? "🙈" : "👁"}
+              </button>
+            </div>
+            <div className="form-links">
+              <button type="submit" className="login-button">Login</button>
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="forgot-password-link"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Forgot Password?
+                </button>
+                <button 
+                  type="button" 
+                  className="reset-password-link"
+                  onClick={() => setShowResetModal(true)}
+                >
+                  Reset Password
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Forgot Password Modal */}
+          {showForgotPassword && (
+            <div className="modal">
+              <div className="modal-content">
+                <h2>Forgot Password</h2>
+                <input
+                  type="text"
+                  placeholder="Enter your username"
+                  value={resetUsername}
+                  onChange={(e) => setResetUsername(e.target.value)}
+                />
+                {resetError && <p className="error">{resetError}</p>}
+                {resetMessage && <p className="success">{resetMessage}</p>}
+                <button onClick={handleForgotPassword}>Send Credentials</button>
+                <button onClick={() => {
+                  setShowForgotPassword(false);
+                  setResetUsername('');
+                  setResetError('');
+                  setResetMessage('');
+                }}>Cancel</button>
+              </div>
+            </div>
+          )}
+
+          {/* Reset Password Modal */}
+          {showResetModal && (
+            <div className="modal">
+              <div className="modal-content">
+                <h2>Reset Password</h2>
+                <input
+                  type="text"
+                  placeholder="Enter username"
+                  value={resetUsername}
+                  onChange={(e) => setResetUsername(e.target.value)}
+                />
+                <input
+                  type="password"
+                  placeholder="Enter old password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                />
+                <input
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                {resetError && <p className="error">{resetError}</p>}
+                {resetMessage && <p className="success">{resetMessage}</p>}
+                <button onClick={handleResetPassword}>Reset Password</button>
+                <button onClick={() => {
+                  setShowResetModal(false);
+                  setResetUsername('');
+                  setOldPassword('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                  setResetError('');
+                  setResetMessage('');
+                }}>Cancel</button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <>

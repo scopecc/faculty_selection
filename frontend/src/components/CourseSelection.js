@@ -162,6 +162,10 @@ useEffect(() => {
       alert(`You must select at least 5 Theory courses.`);
       return;
     }
+    if(preference === "Theory" && theoryLabCount < 2){
+      alert(`You must select at least 2 Theory+Lab courses.`);
+      return;
+    }
     if (preference === "Theory+Lab" && theoryLabCount < 5) {
       alert(`You must select at least 5 Theory+Lab courses.`);
       return;
@@ -209,12 +213,13 @@ useEffect(() => {
       <p className="faculty-details" style={{fontSize:"45px"}}>Welcome,<strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
-      <p className="faculty-details" style={{color:"red"}}><strong>You must select exactly {maxCourses} courses.<br></br><br></br> The order of choices will be based on the sequence you select courses.</strong></p>
+      <p className="faculty-details" style={{color:"red"}}><strong>1. You must select exactly {maxCourses} courses.<br></br><br></br>2. The order of choices will be based on the sequence you select courses.<br></br><br></br>3. If you are more preferred to choose Theory only course, choose 5 Theory only courses and 2 Theory+Lab courses.
+      <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory +Lab courses      </strong></p>
   
       <div className="input-fields" style={{ padding: "20px" }}>
         <div style={{ display: "flex", width: "100%" }}>
           <label style={{ width: "50%" }}>
-            UG:
+            Your UG:
             <input
               type="text"
               value={ug}
@@ -237,7 +242,7 @@ useEffect(() => {
   
         <div style={{ display: "flex", width: "100%" }}>
           <label style={{ width: "50%" }}>
-            PG:
+            Your PG:
             <input
               type="text"
               value={pg}

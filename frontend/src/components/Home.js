@@ -34,6 +34,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${facultyEmpid}`);
       if (response.data.exists) {
         alert("You have already registered.");
+        navigate(`/faculty/${empId}`);
         return;
       }
     } catch (error) {

@@ -102,7 +102,7 @@ router.get('/check/:empId', async (req, res) => {
     const faculty = await Faculty.findOne({ empId });
 
     if (faculty) {
-      return res.json({ exists: true });
+      return res.json({ exists: true, faculty });
     }
 
     res.json({ exists: false });
@@ -112,6 +112,26 @@ router.get('/check/:empId', async (req, res) => {
     res.status(500).json({ message: 'Error checking faculty ID', error });
   }
 });
+
+// ✅ Delete a faculty entry by empId
+router.delete('/delete/:empId', async (req, res) => {
+  const { empId } = req.params;
+
+  try {
+    const faculty = await Faculty.findOneAndDelete({ empId });
+
+    if (!faculty) {
+      return res.status(404).json({ message: "Faculty not found" });
+    }
+
+    res.json({ message: "Faculty deleted successfully" });
+
+  } catch (error) {
+    console.error("❌ Error deleting faculty:", error);
+    res.status(500).json({ message: "Error deleting faculty", error });
+  }
+});
+
 
 
 

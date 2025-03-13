@@ -51,15 +51,15 @@ const FacultyDetails = () => {
   if (loading) return <p>Loading faculty details...</p>;
 
   return (
-    <div className="faculty-details">
+    <div className="faculty-details-print">
       <h2>Faculty Details</h2>
       <p><strong>Name:</strong> {faculty.name}</p>
       <p><strong>Employee ID:</strong> {faculty.empId}</p>
       <p><strong>Preference:</strong> {faculty.preference}</p>
-      <p><strong>UG:</strong> {faculty.ug || "N/A"}</p>
-      <p><strong>UG Specialization:</strong> {faculty.ugspecialization || "N/A"}</p>
-      <p><strong>PG:</strong> {faculty.pg || "N/A"}</p>
-      <p><strong>PG Specialization:</strong> {faculty.pgspecialization || "N/A"}</p>
+      <p><strong>UG:</strong> {faculty.ug || "N/A"} &nbsp;&nbsp;&nbsp;
+      <strong>UG Specialization:</strong> {faculty.ugspecialization || "N/A"}</p>
+      <p><strong>PG:</strong> {faculty.pg || "N/A"} &nbsp;&nbsp;&nbsp;
+      <strong>PG Specialization:</strong> {faculty.pgspecialization || "N/A"}</p>
       <p><strong>Research Domain:</strong> {faculty.researchdomain || "N/A"}</p>
 
       <h3>Selected Courses</h3>

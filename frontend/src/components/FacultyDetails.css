@@ -1,14 +1,15 @@
-.faculty-details {
-    max-width: 600px;
+.faculty-details-print {
+    max-width: 1000px;
     margin: auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
   }
   
-  h2, h3 {
+  h2{
     text-align: center;
   }
   
@@ -29,4 +30,4 @@
     background-color: #dc3545;
     color: white;
   }
-  
+    

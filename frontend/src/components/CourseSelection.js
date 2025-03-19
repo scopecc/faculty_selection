@@ -26,7 +26,7 @@ const CourseSelection = () => {
 
   const empId = location.state?.empId || storedEmpId;
   const facultyEmail = location.state?.facultyEmail || storedFacultyEmail;
-  const preference = location.state?.preference || storedPreference;
+  // const preference = location.state?.preference || storedPreference;
 
   const [facultyName, setFacultyName] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
@@ -38,6 +38,12 @@ const CourseSelection = () => {
   const [researchDomain, setResearchDomain] = useState('');
   const [domainConstraints, setDomainConstraints] = useState({});
 
+  const [preference, setLocalPreference] = useState("");
+
+
+  useEffect(()=>{
+    localStorage.setItem("preference",preference)
+  },[preference])
   // Fetch faculty name based on email
   useEffect(() => {
     if (facultyEmail) {
@@ -184,7 +190,7 @@ useEffect(() => {
       }
     }
 
-    if(!pg || !pgspecialization || !ug || !ugspecialization || !researchDomain){
+    if( !pgspecialization || !ugspecialization || !researchDomain){
       alert("Please fill all the fields");
       return;
     }
@@ -217,64 +223,92 @@ useEffect(() => {
       <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory+Lab courses      </strong></p>
   
       <div style={{margin:"auto", textAlign:"center"}}>
-      <div className="input-fields" style={{ padding: "20px"}}>
-        <div style={{ display: "flex", width: "100%" }}>
-          {/*<label style={{ width: "50%" }}>
-            Your UG Degree:
-            <input
-              type="text"
-              value={ug}
-              onChange={(e) => setUg(e.target.value)}
-              required
-              style={{ width: "100%" }}
-            />
-          </label>*/}
+        <div className="input-fields" style={{ padding: "20px", display:"flex"}}>
+          <div style={{ display: "flex", width: "100%" }}>
+            {/*<label style={{ width: "50%" }}>
+              Your UG Degree:
+              <input
+                type="text"
+                value={ug}
+                onChange={(e) => setUg(e.target.value)}
+                required
+                style={{ width: "100%" }}
+              />
+            </label>*/}
+            <label style={{ width: "100%" }}>
+              UG specialization:
+              <input
+                type="text"
+                value={ugspecialization}
+                onChange={(e) => setUgspecialization(e.target.value)}
+                required
+                style={{ width: "100%" }}
+              />
+            </label>
+          </div>
+    
+          <div style={{ display: "flex", width: "100%" }}>
+            {/*<label style={{ width: "50%" }}>
+              Your PG Degree:
+              <input
+                type="text"
+                value={pg}
+                onChange={(e) => setPg(e.target.value)}
+                required
+                style={{ width: "100%" }}
+              />
+            </label>*/}
+            <label style={{ width: "100%" }}>
+              PG specialization:
+              <input
+                type="text"
+                value={pgspecialization}
+                onChange={(e) => setPgspecialization(e.target.value)}
+                required
+                style={{ width: "100%" }}
+              />
+            </label>
+          </div>
+          
           <label style={{ width: "100%" }}>
-            UG specialization:
+            Research Domain:
             <input
               type="text"
-              value={ugspecialization}
-              onChange={(e) => setUgspecialization(e.target.value)}
+              value={researchDomain}
+              onChange={(e) => setResearchDomain(e.target.value)}
               required
               style={{ width: "100%" }}
             />
           </label>
-        </div>
-  
-        <div style={{ display: "flex", width: "100%" }}>
-          {/*<label style={{ width: "50%" }}>
-            Your PG Degree:
-            <input
-              type="text"
-              value={pg}
-              onChange={(e) => setPg(e.target.value)}
-              required
-              style={{ width: "100%" }}
-            />
-          </label>*/}
-          <label style={{ width: "100%" }}>
-            PG specialization:
-            <input
-              type="text"
-              value={pgspecialization}
-              onChange={(e) => setPgspecialization(e.target.value)}
-              required
-              style={{ width: "100%" }}
-            />
-          </label>
-        </div>
-        
-        <label style={{ width: "100%" }}>
-          Research Domain:
+        </div> 
+      </div>
+
+      <p style={{textAlign:"center"}}>
+        1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
+        2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>
+
+      <div style={{width:"100%", display:"flex", gap:"20px" , justifyContent:"center"}}>
+        <label style={{display:"flex",alignItems:"center",width:"105px"}}>
           <input
-            type="text"
-            value={researchDomain}
-            onChange={(e) => setResearchDomain(e.target.value)}
+            type="radio"
+            name="preference"
+            value="Theory"
+            onChange={(e) => setLocalPreference(e.target.value)}
             required
-            style={{ width: "100%" }}
           />
+          Theory
         </label>
-      </div> 
+
+        <label style={{display:"flex",alignItems:"center",width:"105px"}}>
+          <input
+            type="radio"
+            name="preference"
+            value="Theory+Lab"
+            onChange={(e) => setLocalPreference(e.target.value)}
+            required
+          />
+          Theory + Lab
+        </label>
       </div>
 
       <hr />

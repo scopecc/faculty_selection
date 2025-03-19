@@ -7,7 +7,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   const [facultyEmpid, setLocalFacultyEmpid] = useState("");
   const [facultyEmail, setLocalFacultyEmail] = useState("");
   const [empIdInput, setEmpIdInput] = useState("");
-  const [preference, setLocalPreference] = useState("");
+  // const [preference, setLocalPreference] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [serverOtp, setServerOtp] = useState(null);
@@ -78,7 +78,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       if (facultyEmail && facultyEmpid) {
         localStorage.setItem("empId", empId);
         localStorage.setItem("facultyEmail", facultyEmail);
-        localStorage.setItem("preference", preference);
+        // localStorage.setItem("preference", preference);
 
         const checkResponse = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`
@@ -88,7 +88,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           return;
         }
 
-        navigate("/course-selection", { state: { facultyEmail, empId, preference } });
+        navigate("/course-selection", { state: { facultyEmail, empId } });
       } else {
         alert("Wrong Employee ID or Email");
       }
@@ -123,20 +123,23 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
 
         {/* Show OTP Input only after OTP is Sent */}
         {otpSent && (
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            required
-          />
+          <div> 
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+            />
+            <button style={{width:"250px"}} type="submit">Sign In</button>
+          </div>
         )}
 
-        {otpSent && <p>1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
-          2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>}
+        {/* {otpSent && <p>1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
+          2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>} */}
 
         {/* Show Employee ID & Preference only after OTP is Sent */}
-        {otpSent && (
+        {/* {otpSent && (
           <>
             <div className="radio-group">
               <label>
@@ -162,9 +165,8 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
               </label>
             </div>
 
-            <button type="submit">Sign In</button>
           </>
-        )}
+        )} */}
       </form>
     </div>
   );

@@ -206,9 +206,9 @@ const Management = () => {
           "Empld": faculty.empId,
           "Course Name": course.courseName,
           "Choice": `Choice ${index + 1}`,
-          "UG": faculty.ug,
+          // "UG": faculty.ug,
           "UG SPL": faculty.ugspecialization,
-          "PG": faculty.pg,
+          // "PG": faculty.pg,
           "PG SPL": faculty.pgspecialization,
           "RESEARCH DOMAIN": faculty.researchdomain
         });
@@ -481,9 +481,9 @@ const Management = () => {
                 <th>Employee ID</th>
                 <th>Preference</th>
                 <th>Selected Courses</th>
-                <th>UG</th>
+                {/*<th>UG</th>*/}
                 <th>UG Specialization</th>
-                <th>PG</th>
+                {/*<th>PG</th>*/}
                 <th>PG Specialization</th>
                 <th>Research Domain</th>
               </tr>
@@ -495,9 +495,9 @@ const Management = () => {
                   <td>{faculty.empId}</td>
                   <td>{faculty.preference}</td>
                   <td>{faculty.selectedCourses.map(course => course.courseName).join(", ")}</td>
-                  <td>{faculty.ug || "N/A"}</td>
+                  {/*<td>{faculty.ug || "N/A"}</td>*/}
                   <td>{faculty.ugspecialization || "N/A"}</td>
-                  <td>{faculty.pg || "N/A"}</td>
+                  {/*<td>{faculty.pg || "N/A"}</td>*/}
                   <td>{faculty.pgspecialization || "N/A"}</td>
                   <td>{faculty.researchdomain || "N/A"}</td>
                 </tr>

@@ -216,9 +216,10 @@ useEffect(() => {
       <p className="faculty-details" style={{color:"red"}}><strong>1. You must select exactly {maxCourses} courses.<br></br><br></br>2. The selected courses will be displayed in the order in which you select the courses.<br></br><br></br>3. If you are more preferred to choose Theory only course, choose 5 Theory only courses and 2 Theory+Lab courses.
       <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory+Lab courses      </strong></p>
   
-      <div className="input-fields" style={{ padding: "20px" }}>
+      <div style={{margin:"auto", textAlign:"center"}}>
+      <div className="input-fields" style={{ padding: "20px"}}>
         <div style={{ display: "flex", width: "100%" }}>
-          <label style={{ width: "50%" }}>
+          {/*<label style={{ width: "50%" }}>
             Your UG Degree:
             <input
               type="text"
@@ -227,8 +228,8 @@ useEffect(() => {
               required
               style={{ width: "100%" }}
             />
-          </label>
-          <label style={{ width: "50%" }}>
+          </label>*/}
+          <label style={{ width: "100%" }}>
             UG specialization:
             <input
               type="text"
@@ -241,7 +242,7 @@ useEffect(() => {
         </div>
   
         <div style={{ display: "flex", width: "100%" }}>
-          <label style={{ width: "50%" }}>
+          {/*<label style={{ width: "50%" }}>
             Your PG Degree:
             <input
               type="text"
@@ -250,8 +251,8 @@ useEffect(() => {
               required
               style={{ width: "100%" }}
             />
-          </label>
-          <label style={{ width: "50%" }}>
+          </label>*/}
+          <label style={{ width: "100%" }}>
             PG specialization:
             <input
               type="text"
@@ -273,6 +274,7 @@ useEffect(() => {
             style={{ width: "100%" }}
           />
         </label>
+      </div> 
       </div>
 
       <hr />

@@ -40,6 +40,19 @@ const CourseSelection = () => {
 
   const [preference, setLocalPreference] = useState("");
 
+  const moveCourseUp = (index) => {
+    if (index === 0) return;
+    const updatedCourses = [...selectedCourses];
+    [updatedCourses[index - 1], updatedCourses[index]] = [updatedCourses[index], updatedCourses[index - 1]];
+    setSelectedCourses(updatedCourses);
+  };
+  
+  const moveCourseDown = (index) => {
+    if (index === selectedCourses.length - 1) return;
+    const updatedCourses = [...selectedCourses];
+    [updatedCourses[index + 1], updatedCourses[index]] = [updatedCourses[index], updatedCourses[index + 1]];
+    setSelectedCourses(updatedCourses);
+  };
 
   useEffect(()=>{
     localStorage.setItem("preference",preference)
@@ -368,11 +381,42 @@ useEffect(() => {
             <div>
               <h2>Selected Courses</h2>
               <ol>
-                {selectedCourses.map(course => (
-                  <li key={course.courseId}>
-                    {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
-                  </li>
-                ))}
+                {selectedCourses.map((course,index) => (
+                  <li 
+                  key={course.courseId} 
+                  style={{ 
+                    display: "flex", 
+                    justifyContent: "space-between", 
+                    alignItems: "center", 
+                    background: "#f5f5f5", 
+                    padding: "10px", 
+                    marginBottom: "10px", 
+                    borderRadius: "5px" 
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: "500"}}>{index + 1})&nbsp;&nbsp;
+          {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
+        </div>
+                  </div>
+                  <span style={{ display: "flex" }}>
+                    <button 
+                      onClick={() => moveCourseUp(index)} 
+                      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "16px",padding: "0" }}
+                      title="Move Up"
+                    >
+                      ⬆️
+                    </button>
+                    <button 
+                      onClick={() => moveCourseDown(index)} 
+                      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "16px",padding: "0" }}
+                      title="Move Down"
+                    >
+                      ⬇️
+                    </button>
+                  </span>
+                </li>
+              ))}
               </ol>
             </div>
             <div style={{ textAlign: "center" }}>

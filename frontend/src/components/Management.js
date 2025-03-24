@@ -27,6 +27,27 @@ const Management = () => {
   const [resetMessage, setResetMessage] = useState('');
   const [resetError, setResetError] = useState('');
   const [oldPassword, setOldPassword] = useState('');
+  const [registrationStatus, setRegistrationStatus] = useState("Loading");
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
+      .then(response => {
+        setRegistrationStatus(response.data.status);
+      })
+      .catch(error => console.error("Error fetching registration status:", error));
+  }, []);
+
+  const toggleRegistration = async () => {
+    const newStatus = registrationStatus === "OPEN" ? "CLOSED" : "OPEN";
+    try {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { status: newStatus });
+      setRegistrationStatus(newStatus);
+      alert(`Registration has been ${newStatus === "OPEN" ? "opened" : "closed"}!`);
+    } catch (error) {
+      console.error("Error toggling registration status:", error);
+      alert("Failed to toggle registration status.");
+    }
+  };
 
   // Load courses.json from the public folder
   useEffect(() => {
@@ -113,7 +134,12 @@ const Management = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    setTimeout(() => {
+      if (isAuthenticated) {
+        fetchData();
+      }
+    }
+    , 15000);
   }, []);
 
   const handleFileChange = (event) => {
@@ -199,7 +225,16 @@ const Management = () => {
   const handleDownloadFacultyExcel = () => {
     const facultyExcelData = [];
 
-    facultyData.forEach(faculty => {
+    const sortedfacultyData = [...facultyData].sort((a, b) => {
+      const idA = a.empId;
+      const idB = b.empId;
+
+      if (typeof idA === 'number' && typeof idB === 'number') {
+        return idA - idB;
+      }
+    });
+
+    sortedfacultyData.forEach(faculty => {
       faculty.selectedCourses.forEach((course, index) => {
         facultyExcelData.push({
           "Faculty Name": faculty.name,
@@ -424,6 +459,9 @@ const Management = () => {
       ) : (
         <>
         <div>
+        <button onClick={toggleRegistration} style={{ marginBottom: "20px" }}>
+          {registrationStatus === "Loading" ? "Loading..." : registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
+        </button>
       <h2>Domain Constraints</h2>
       {domainConfigs.map((config, index) => (
         <div key={index}>

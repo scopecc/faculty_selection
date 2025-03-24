@@ -458,10 +458,10 @@ const Management = () => {
         </div>
       ) : (
         <>
-        <div>
+        <div><center>
         <button onClick={toggleRegistration} style={{ marginBottom: "20px" }}>
           {registrationStatus === "Loading" ? "Loading..." : registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
-        </button>
+        </button></center>
       <h2>Domain Constraints</h2>
       {domainConfigs.map((config, index) => (
         <div key={index}>

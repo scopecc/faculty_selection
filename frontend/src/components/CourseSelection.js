@@ -283,6 +283,12 @@ useEffect(() => {
         </div> 
       </div>
 
+      <p style={{textAlign:"center",color:"blue"}}>
+        Course Code starts with BCSE - B.Tech Courses<br></br>
+        Course Code starts with MCSE - M.Tech Courses<br></br>
+        Course Code starts with ISWE and SWE - Integrated M.Tech Courses<br></br>
+        Course Code starts with USCS - B.Sc Courses<br></br></p>
+        
       <p style={{textAlign:"center"}}>
         1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
         2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>

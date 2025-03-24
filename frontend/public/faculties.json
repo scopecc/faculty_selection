@@ -5,6 +5,16 @@
       "email": "msivagami@vit.ac.in"
     },
     {
+      "empId": 1000,
+      "name": "Test mail",
+      "email": "scopecc.wat@vit.ac.in"
+    },
+    {
+      "empId": 50007,
+      "name": "Dr. Sivagami M",
+      "email": "msivagami@vit.ac.in"
+    },
+    {
       "empId": 50024,
       "name": "Dr. Pradeep Kumar T.S",
       "email": "tspradeepkumar@vit.ac.in"

@@ -144,14 +144,14 @@ router.delete('/delete/:empId', async (req, res) => {
 // researchdomain:{ type: String },
 
 router.post("/storeugpg", async (req, res) => {
-  const { empId, pg, ug, pgspecialization, ugspecialization, researchDomain } = req.body;
+  const { empId, pgspecialization, ugspecialization, researchDomain } = req.body;
   try {
     let faculty = await Faculty.findOne({ empId });
     if (!faculty) {
       return res.status(400).json({ message: 'Faculty not found' });
     }
-    faculty.pg = pg;
-    faculty.ug = ug;
+    // faculty.pg = pg;
+    // faculty.ug = ug;
     faculty.pgspecialization = pgspecialization;
     faculty.ugspecialization = ugspecialization;
     faculty.researchdomain = researchDomain;

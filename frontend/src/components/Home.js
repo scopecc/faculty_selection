@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Home.css";
@@ -13,6 +13,16 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   const [serverOtp, setServerOtp] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [registrationStatus, setRegistrationStatus] = useState("Loading");
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
+      .then(response => {
+        setRegistrationStatus(response.data.status);
+      })
+      .catch(error => console.error("Error fetching registration status:", error));
+  }, []);
 
   // ✅ Function to request OTP
   const sendOtp = async () => {
@@ -101,73 +111,86 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   return (
     <div className="home-container">
       <h1>Faculty Registration</h1><br></br><br></br>
-      <form onSubmit={handleSubmit} className="home-form">
-        {/* Faculty Email Input */}
-        <input
-          type="number"
-          placeholder="Faculty Employee ID"
-          value={facultyEmpid}
-          onChange={(e) => setLocalFacultyEmpid(e.target.value)}
-          required
-        />
-        
-        {/* Send OTP Button */}
-        {!otpSent && (
-          <button type="button" onClick={sendOtp} disabled={loading}>
-            {loading ? "Sending OTP..." : "Send OTP"}
-          </button>
-        )}
+      {registrationStatus == "Loading"
+        ?
+        <div>
+          Loading...
+        </div>
+        :
+        registrationStatus == "OPEN" 
+          ?
+            <form onSubmit={handleSubmit} className="home-form">
+              {/* Faculty Email Input */}
+              <input
+                type="number"
+                placeholder="Faculty Employee ID"
+                value={facultyEmpid}
+                onChange={(e) => setLocalFacultyEmpid(e.target.value)}
+                required
+              />
+              
+              {/* Send OTP Button */}
+              {!otpSent && (
+                <button type="button" onClick={sendOtp} disabled={loading}>
+                  {loading ? "Sending OTP..." : "Send OTP"}
+                </button>
+              )}
 
-        {/* Show OTP Sent Text */}
-        {otpSent && <p>OTP has been sent to your email.</p>}
+              {/* Show OTP Sent Text */}
+              {otpSent && <p>OTP has been sent to your email.</p>}
 
-        {/* Show OTP Input only after OTP is Sent */}
-        {otpSent && (
-          <div> 
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              required
-            />
-            <button style={{width:"250px"}} type="submit">Sign In</button>
-          </div>
-        )}
+              {/* Show OTP Input only after OTP is Sent */}
+              {otpSent && (
+                <div> 
+                  <input
+                    type="text"
+                    placeholder="Enter OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                  />
+                  <button style={{width:"250px"}} type="submit">Sign In</button>
+                </div>
+              )}
 
-        {/* {otpSent && <p>1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
-          2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>} */}
+              {/* {otpSent && <p>1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
+                2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>} */}
 
-        {/* Show Employee ID & Preference only after OTP is Sent */}
-        {/* {otpSent && (
-          <>
-            <div className="radio-group">
-              <label>
-                <input
-                  type="radio"
-                  name="preference"
-                  value="Theory"
-                  onChange={(e) => setLocalPreference(e.target.value)}
-                  required
-                />
-                Theory
-              </label>
+              {/* Show Employee ID & Preference only after OTP is Sent */}
+              {/* {otpSent && (
+                <>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="preference"
+                        value="Theory"
+                        onChange={(e) => setLocalPreference(e.target.value)}
+                        required
+                      />
+                      Theory
+                    </label>
 
-              <label>
-                <input
-                  type="radio"
-                  name="preference"
-                  value="Theory+Lab"
-                  onChange={(e) => setLocalPreference(e.target.value)}
-                  required
-                />
-                Theory + Lab
-              </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="preference"
+                        value="Theory+Lab"
+                        onChange={(e) => setLocalPreference(e.target.value)}
+                        required
+                      />
+                      Theory + Lab
+                    </label>
+                  </div>
+
+                </>
+              )} */}
+            </form> 
+          :
+            <div>
+              Registration Closed
             </div>
-
-          </>
-        )} */}
-      </form>
+      }
     </div>
   );
 };

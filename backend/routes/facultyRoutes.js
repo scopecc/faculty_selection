@@ -72,7 +72,8 @@ router.post('/submit-courses', async (req, res) => {
         name: facultyName,
         empId,
         preference,
-        selectedCourses
+        selectedCourses,
+        submittedAt: new Date()
       });
 
       await faculty.save();
@@ -82,6 +83,7 @@ router.post('/submit-courses', async (req, res) => {
 
     // ✅ If faculty exists, update their selected courses
     faculty.selectedCourses = selectedCourses;
+    faculty.submittedAt = new Date(); 
     await faculty.save();
 
     console.log("✅ Courses updated successfully for:", empId);

@@ -260,7 +260,7 @@ const Management = () => {
   // Download course selection as Excel
   const handleDownloadCourseExcel = () => {
     const courseExcelData = [];
-
+    
     Object.entries(courseData).forEach(([courseName, facultyList]) => {
       facultyList.forEach(({ facultyName, choice, facultyId }) => {
         courseExcelData.push({
@@ -524,6 +524,7 @@ const Management = () => {
                 {/*<th>PG</th>*/}
                 <th>PG Specialization</th>
                 <th>Research Domain</th>
+                <th>Submission Time</th>
               </tr>
             </thead>
             <tbody>
@@ -538,6 +539,7 @@ const Management = () => {
                   {/*<td>{faculty.pg || "N/A"}</td>*/}
                   <td>{faculty.pgspecialization || "N/A"}</td>
                   <td>{faculty.researchdomain || "N/A"}</td>
+                  <td>{faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'}</td>
                 </tr>
               ))}
             </tbody>
@@ -570,13 +572,24 @@ const Management = () => {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(courseData).map(([courseName, facultyList]) => (
-                <tr key={courseName}>
-                  <td>{courseName}</td>
-                  <td>{facultyList.map(item => item.facultyName).join(", ")}</td>
-                  <td>{facultyList.map(item => item.choice).join(", ")}</td>
-                </tr>
-              ))}
+            {Object.entries(courseData).map(([courseName, facultyList]) => (
+              <tr key={courseName}>
+                <td>{courseName}</td>
+                <td>
+                  {facultyList.length > 0
+                    ? facultyList.map(item => item.facultyName).join(", ")
+                    : <span style={{ color: "red", fontStyle: "italic" }}>No faculty has chosen this course</span>
+                  }
+                </td>
+                <td>
+                  {facultyList.length > 0
+                    ? facultyList.map(item => item.choice).join(", ")
+                    : "-"
+                  }
+                </td>
+              </tr>
+            ))}
+
             </tbody>
           </table>
 

@@ -126,7 +126,7 @@ const Management = () => {
             facultyId: faculty.empId
           });
         });
-      });
+      }); 
       setCourseData(courseMap);
     } catch (error) {
       console.error("Error fetching faculty data:", error);
@@ -245,7 +245,8 @@ const Management = () => {
           "UG SPL": faculty.ugspecialization,
           // "PG": faculty.pg,
           "PG SPL": faculty.pgspecialization,
-          "RESEARCH DOMAIN": faculty.researchdomain
+          "RESEARCH DOMAIN": faculty.researchdomain,
+          "Submission Time": faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'
         });
       });
       facultyExcelData.push({});

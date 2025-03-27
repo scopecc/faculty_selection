@@ -236,9 +236,11 @@ const Management = () => {
       }
     });
 
+    let sno = 1;
     sortedfacultyData.forEach(faculty => {
       faculty.selectedCourses.forEach((course, index) => {
         facultyExcelData.push({
+          "S.No": sno,
           "Faculty Name": faculty.name,
           "Empld": faculty.empId,
           "Course Name": course.courseName,
@@ -252,6 +254,7 @@ const Management = () => {
         });
       });
       facultyExcelData.push({});
+      sno++;
     });
 
     const ws = XLSX.utils.json_to_sheet(facultyExcelData);
@@ -514,10 +517,11 @@ const Management = () => {
           {showFacultyTable && (
             <>
           <div className="table-container">
-          <h2>Faculty Course Selection</h2>
+          <h2>Faculty Course Selection ({facultyData.length} entries)</h2>
           <table border="1">
             <thead>
               <tr>
+                <th>S.No</th>
                 <th>Faculty Name</th>
                 <th>Employee ID</th>
                 <th>Preference</th>
@@ -531,8 +535,9 @@ const Management = () => {
               </tr>
             </thead>
             <tbody>
-              {facultyData.map(faculty => (
+              {facultyData.map((faculty,index) => (
                 <tr key={faculty.empId}>
+                  <td>{index + 1}</td> 
                   <td>{faculty.name}</td>
                   <td>{faculty.empId}</td>
                   <td>{faculty.preference}</td>

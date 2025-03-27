@@ -111,6 +111,7 @@ const Management = () => {
 
   const fetchData = async () => {
     try {
+      console.log("fetching data")
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
       setFacultyData(response.data);
 
@@ -134,13 +135,14 @@ const Management = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (isAuthenticated) {
+    if (isAuthenticated) {
+      const intervalId = setInterval(() => {
         fetchData();
-      }
+      }, 5000);
+  
+      return () => clearInterval(intervalId); // Cleanup on unmount
     }
-    , 15000);
-  }, []);
+  }, [isAuthenticated]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);

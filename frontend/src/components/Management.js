@@ -29,6 +29,10 @@ const Management = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [registrationStatus, setRegistrationStatus] = useState("Loading");
 
+  const [missingFacultyData, setMissingFacultyData] = useState([]);
+  const [showMissingFacultyTable, setShowMissingFacultyTable] = useState(false);
+
+
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
       .then(response => {
@@ -114,6 +118,7 @@ const Management = () => {
       console.log("fetching data")
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
       setFacultyData(response.data);
+      loadMissingFacultyData(response.data);
 
       const courseMap = {};
       response.data.forEach(faculty => {
@@ -143,6 +148,31 @@ const Management = () => {
       return () => clearInterval(intervalId); // Cleanup on unmount
     }
   }, [isAuthenticated]);
+
+  const loadMissingFacultyData = async (facultyDataFromBackend) => {
+    try {
+      const response = await fetch("/faculties.json");
+      const facultyJson = await response.json();
+
+      // Filter faculties who haven't selected any courses (i.e., their `selectedCourses` is empty)
+      const missingFaculties = facultyJson.filter(faculty => {
+        const isRegisteredInBackend = facultyDataFromBackend.some(fac => fac.empId === faculty.empId);
+        return !isRegisteredInBackend;
+      });
+
+      setMissingFacultyData(missingFaculties);
+    } catch (error) {
+      console.error("Error loading faculties.json:", error);
+    }
+  };
+
+  const toggleFacultyTable = () => {
+    setShowFacultyTable(!showFacultyTable);
+  };
+
+  const toggleMissingFacultyTable = () => {
+    setShowMissingFacultyTable(!showMissingFacultyTable);
+  };
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -560,6 +590,43 @@ const Management = () => {
           )}
         </>
         <br></br>
+
+        {/* Toggle Missing Faculty Table */}
+        <button onClick={toggleMissingFacultyTable}>
+            {showMissingFacultyTable ? "Hide Missing Faculty Table" : "Show Missing Faculty Table"}
+          </button><br></br>
+
+          {/* Missing Faculty Table */}
+          {showMissingFacultyTable && (
+            <div className="table-container">
+              <h2>Missing Faculty Data  ({missingFacultyData.length -3 } Not Entered)</h2>
+              <table border="1">
+                <thead>
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Faculty Name</th>
+                    <th>Employee ID</th>
+                    <th>Course Preference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {missingFacultyData.length > 0 ? (
+                    missingFacultyData.map((faculty, index) => (
+                      <tr key={faculty.empId}>
+                        <td>{index+1}</td>
+                        <td>{faculty.name}</td>
+                        <td>{faculty.empId}</td>
+                        <td>{faculty.coursePreference || "N/A"}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr><td colSpan="3">No missing faculty data found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
         <button onClick={() => setShowCourseTable(!showCourseTable)}>
           {showCourseTable ? "Hide Course Table" : "Show Course Table"}
         </button>

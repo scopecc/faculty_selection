@@ -31,6 +31,7 @@ const Management = () => {
 
   const [missingFacultyData, setMissingFacultyData] = useState([]);
   const [showMissingFacultyTable, setShowMissingFacultyTable] = useState(false);
+  const [totalFacultiesCount, setTotalFacultiesCount] = useState(0);
 
 
   useEffect(() => {
@@ -118,7 +119,7 @@ const Management = () => {
       console.log("fetching data")
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
       setFacultyData(response.data);
-      loadMissingFacultyData(response.data);
+      await loadMissingFacultyData(response.data);
 
       const courseMap = {};
       response.data.forEach(faculty => {
@@ -153,6 +154,7 @@ const Management = () => {
     try {
       const response = await fetch("/faculties.json");
       const facultyJson = await response.json();
+      setTotalFacultiesCount(facultyJson.length);
 
       // Filter faculties who haven't selected any courses (i.e., their `selectedCourses` is empty)
       const missingFaculties = facultyJson.filter(faculty => {
@@ -547,7 +549,7 @@ const Management = () => {
           {showFacultyTable && (
             <>
           <div className="table-container">
-          <h2>Faculty Course Selection ({facultyData.length} entries)</h2>
+          <h2>Faculty Course Selection ({facultyData.length} entries  / {totalFacultiesCount - 3} )</h2>
           <table border="1">
             <thead>
               <tr>

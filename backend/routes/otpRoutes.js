@@ -1,19 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const nodemailer = require("nodemailer");
+const emailService = require("../utils/emailService");
 require("dotenv").config();
 
 // ✅ In-memory storage for OTPs
 const otpStorage = {};
-
-// ✅ Configure Nodemailer
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // ✅ Send OTP
 router.post("/send-otp", async (req, res) => {
@@ -24,20 +15,19 @@ router.post("/send-otp", async (req, res) => {
     // ✅ Store OTP with expiry (5 mins)
     otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
+    // ✅ Send email using email service
+    const result = await emailService.sendOTP(email, otp);
 
-    // ✅ Send email
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your OTP for Faculty Registration",
-      text: `Your OTP is: ${otp}`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "OTP sent successfully" });
+    if (result.success) {
+      res.status(200).json({ message: "OTP sent successfully" });
+    } else {
+      throw new Error(result.error);
+    }
   } catch (error) {
     console.error("❌ [SEND OTP] Error:", error);
-    res.status(500).json({ message: "Failed to send OTP", error });
+    res
+      .status(500)
+      .json({ message: "Failed to send OTP", error: error.message });
   }
 });
 
@@ -51,8 +41,6 @@ router.post("/verify-otp", async (req, res) => {
 
   // ✅ Fetch OTP from memory
   const storedOtpData = otpStorage[email];
-
-
 
   if (!storedOtpData) {
     return res.status(400).json({ message: "Invalid or expired OTP" });

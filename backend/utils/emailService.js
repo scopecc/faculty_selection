@@ -9,7 +9,7 @@ class EmailService {
   createTransporter() {
     // SendGrid configuration (recommended for production)
     if (process.env.SENDGRID_API_KEY) {
-      return nodemailer.createTransporter({
+      return nodemailer.createTransport({
         service: "sendgrid",
         auth: {
           user: "apikey",
@@ -23,7 +23,7 @@ class EmailService {
 
     // MailerSend configuration (if using MailerSend SMTP)
     if (process.env.MAILERSEND_SMTP_HOST) {
-      return nodemailer.createTransporter({
+      return nodemailer.createTransport({
         host: process.env.MAILERSEND_SMTP_HOST,
         port: process.env.MAILERSEND_SMTP_PORT || 587,
         secure: false,
@@ -46,7 +46,7 @@ class EmailService {
     }
 
     // Gmail or custom SMTP configuration
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       service: process.env.EMAIL_SERVICE || "gmail",
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT || 587,

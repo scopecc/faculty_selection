@@ -92,7 +92,7 @@ async function testEmailConfig() {
     };
   }
 
-  const transporter = nodemailer.createTransporter(transporterConfig);
+  const transporter = nodemailer.createTransport(transporterConfig);
 
   try {
     console.log("🔌 Testing SMTP connection...");

@@ -78,28 +78,39 @@ const [theoryCoursesByDomain, setTheoryCoursesByDomain] = useState({});
 const [theoryLabCoursesByDomain, setTheoryLabCoursesByDomain] = useState({});
 const [courses, setCourses] = useState([]);
 const [isCoursesFetched, setIsCoursesFetched] = useState(false);
+const [courseRegCounts, setCourseRegCounts] = useState({});
 
-// Fetch course data
+// Fetch course data and registration counts
 useEffect(() => {
-  const fetchCourses = async () => {
+  const fetchCoursesAndCounts = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`);
+      let updatedCourses = [];
       if (Array.isArray(response.data) && response.data.length > 0) {
-        const updatedCourses = response.data.map(course => ({
+        updatedCourses = response.data.map(course => ({
           ...course,
-          courseType: course.courseType?.trim().toLowerCase() || "undefined", // ✅ Normalize
+          courseType: course.courseType?.trim().toLowerCase() || "undefined",
         }));
         setCourses(updatedCourses);
       } else {
         setCourses([]);
       }
+      // Fetch registration counts for all courses
+      const regRes = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
+      const regCounts = {};
+      regRes.data.forEach(fac => {
+        (fac.selectedCourses || []).forEach(c => {
+          regCounts[c.courseId] = (regCounts[c.courseId] || 0) + 1;
+        });
+      });
+      setCourseRegCounts(regCounts);
     } catch (error) {
-      console.error("Error fetching courses from MongoDB:", error);
+      console.error("Error fetching courses or registration counts:", error);
       setCourses([]);
+      setCourseRegCounts({});
     }
   };
-
-  fetchCourses();
+  fetchCoursesAndCounts();
 }, []);
 
 
@@ -344,16 +355,22 @@ useEffect(() => {
               <div className="course-list">
                 {Object.keys(theoryLabCoursesByDomain).map(domain => (
                   <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
-                    {theoryLabCoursesByDomain[domain].map(course => (
-                      <label key={course.courseId}>
-                        <input
-                          type="checkbox"
-                          checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                          onChange={() => handleCourseSelect(course)}
-                        />
-                        {course.courseName} ({course.courseType}) ({course.courseId})
-                      </label>
-                    ))}
+                    {theoryLabCoursesByDomain[domain].map(course => {
+                      const regCount = courseRegCounts[course.courseId] || 0;
+                      const isFull = course.maxRegistrations > 0 && regCount >= course.maxRegistrations;
+                      return (
+                        <label key={course.courseId} style={isFull ? { color: '#aaa', textDecoration: 'line-through' } : {}}>
+                          <input
+                            type="checkbox"
+                            checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                            onChange={() => handleCourseSelect(course)}
+                            disabled={isFull && !selectedCourses.some(c => c.courseId === course.courseId)}
+                          />
+                          {course.courseName} ({course.courseType}) ({course.courseId})
+                          {isFull && !selectedCourses.some(c => c.courseId === course.courseId) && <span style={{color:'red',marginLeft:'5px'}}>(Full)</span>}
+                        </label>
+                      );
+                    })}
                   </Accordion>
                 ))}
               </div>
@@ -362,16 +379,22 @@ useEffect(() => {
               <div className="course-list">
                 {Object.keys(theoryCoursesByDomain).map(domain => (
                   <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
-                    {theoryCoursesByDomain[domain].map(course => (
-                      <label key={course.courseId}>
-                        <input
-                          type="checkbox"
-                          checked={selectedCourses.some(c => c.courseId === course.courseId)}
-                          onChange={() => handleCourseSelect(course)}
-                        />
-                        {course.courseName} ({course.courseType}) ({course.courseId})
-                      </label>
-                    ))}
+                    {theoryCoursesByDomain[domain].map(course => {
+                      const regCount = courseRegCounts[course.courseId] || 0;
+                      const isFull = course.maxRegistrations > 0 && regCount >= course.maxRegistrations;
+                      return (
+                        <label key={course.courseId} style={isFull ? { color: '#aaa', textDecoration: 'line-through' } : {}}>
+                          <input
+                            type="checkbox"
+                            checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                            onChange={() => handleCourseSelect(course)}
+                            disabled={isFull && !selectedCourses.some(c => c.courseId === course.courseId)}
+                          />
+                          {course.courseName} ({course.courseType}) ({course.courseId})
+                          {isFull && !selectedCourses.some(c => c.courseId === course.courseId) && <span style={{color:'red',marginLeft:'5px'}}>(Full)</span>}
+                        </label>
+                      );
+                    })}
                   </Accordion>
                 ))}
               </div>

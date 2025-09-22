@@ -9,6 +9,7 @@ router.get('/test', (req, res) => {
 // ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
   const { name, empId, preference, selectedCourses = [] } = req.body;
+  const Course = require('../models/Course');
 
   try {
     // ✅ Check if faculty already exists
@@ -20,6 +21,22 @@ router.post('/register', async (req, res) => {
     // ✅ Ensure required fields are present
     if (!name || !empId || !preference) {
       return res.status(400).json({ message: 'Name, Employee ID, and Preference are required.' });
+    }
+
+
+    // Check maxRegistrations for each selected course
+    for (const course of selectedCourses) {
+      const courseDoc = await Course.findOne({ courseId: course.courseId });
+      if (!courseDoc) {
+        return res.status(400).json({ message: `Course not found: ${course.courseName}` });
+      }
+      if (courseDoc.maxRegistrations > 0) {
+        // Count current registrations for this course
+        const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId });
+        if (count >= courseDoc.maxRegistrations) {
+          return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
+        }
+      }
     }
 
     // ✅ Create new faculty entry
@@ -63,7 +80,27 @@ router.post('/submit-courses', async (req, res) => {
   }));
 
   try {
+    const Course = require('../models/Course');
     let faculty = await Faculty.findOne({ empId });
+
+    // Check maxRegistrations for each selected course
+    for (const course of selectedCourses) {
+      const courseDoc = await Course.findOne({ courseId: course.courseId });
+      if (!courseDoc) {
+        return res.status(400).json({ message: `Course not found: ${course.courseName}` });
+      }
+      if (courseDoc.maxRegistrations > 0) {
+        // If faculty is already registered for this course, allow update
+        const alreadyRegistered = faculty && faculty.selectedCourses.some(c => c.courseId === course.courseId);
+        if (!alreadyRegistered) {
+          // Count current registrations for this course
+          const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId });
+          if (count >= courseDoc.maxRegistrations) {
+            return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
+          }
+        }
+      }
+    }
 
     if (!faculty) {
       console.log(`Faculty not found for empId: ${empId}, registering new faculty...`);

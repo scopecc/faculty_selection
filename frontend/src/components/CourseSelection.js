@@ -217,10 +217,14 @@ useEffect(() => {
         empId, ug, ugspecialization, pg, pgspecialization, researchDomain
       },{ headers: { 'Content-Type': 'application/json' } })
       alert("Courses submitted successfully!");
-       navigate('/');
+      navigate('/');
     } catch (error) {
       console.error("Error submitting courses:", error);
-      alert("Error submitting courses. Check console for details.");
+      if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
+        alert(error.response.data.message);
+      } else {
+        alert("Error submitting courses. Check console for details.");
+      }
     }
   };
 

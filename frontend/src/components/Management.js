@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; 
 import './Management.css';
+  
 
 const Management = () => {
   const [username, setUsername] = useState('');
@@ -32,6 +33,36 @@ const Management = () => {
   const [missingFacultyData, setMissingFacultyData] = useState([]);
   const [showMissingFacultyTable, setShowMissingFacultyTable] = useState(false);
   const [totalFacultiesCount, setTotalFacultiesCount] = useState(0);
+  // State for course selection and max registrations (moved inside component)
+  const [allCourses, setAllCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [maxRegistrations, setMaxRegistrations] = useState('');
+  const [setMaxStatus, setSetMaxStatus] = useState('');
+
+  // Fetch all courses for dropdown
+  useEffect(() => {
+    if (isAuthenticated) {
+      axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`)
+        .then(res => setAllCourses(res.data))
+        .catch(() => setAllCourses([]));
+    }
+  }, [isAuthenticated]);
+
+  // Handler to set max registrations for a course
+  const handleSetMaxRegistrations = async () => {
+    if (!selectedCourseId || !maxRegistrations) {
+      setSetMaxStatus('Please select a course and enter a max value.');
+      return;
+    }
+    try {
+      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/courses/set-max/${selectedCourseId}`, {
+        maxRegistrations: Number(maxRegistrations)
+      });
+      setSetMaxStatus(`Max registrations updated for ${response.data.course.courseName}`);
+    } catch (err) {
+      setSetMaxStatus('Failed to update max registrations.');
+    }
+  };
 
 
   useEffect(() => {
@@ -500,6 +531,29 @@ const Management = () => {
         <button onClick={toggleRegistration} style={{ marginBottom: "20px" }}>
           {registrationStatus === "Loading" ? "Loading..." : registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
         </button></center>
+      <h2>Set Course Registration Limit</h2>
+      <div style={{marginBottom: '20px'}}>
+        <label>Select Course: </label>
+        <select value={selectedCourseId} onChange={e => setSelectedCourseId(e.target.value)}>
+          <option value=''>-- Select Course --</option>
+          {allCourses.map(course => (
+            <option key={course.courseId} value={course.courseId}>
+              {course.courseName} ({course.courseId})
+            </option>
+          ))}
+        </select>
+        <label style={{marginLeft: '10px'}}>Max Registrations: </label>
+        <input
+          type='number'
+          min='0'
+          value={maxRegistrations}
+          onChange={e => setMaxRegistrations(e.target.value)}
+          style={{width: '80px'}}
+        />
+        <button style={{marginLeft: '10px'}} onClick={handleSetMaxRegistrations}>Set</button>
+        {setMaxStatus && <span style={{marginLeft: '10px', color: setMaxStatus.startsWith('Max') ? 'green' : 'red'}}>{setMaxStatus}</span>}
+      </div>
+
       <h2>Domain Constraints</h2>
       {domainConfigs.map((config, index) => (
         <div key={index}>

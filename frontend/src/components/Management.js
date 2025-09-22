@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; 
 import './Management.css';
-  
 
 const Management = () => {
   const [username, setUsername] = useState('');
@@ -19,7 +18,6 @@ const Management = () => {
   const [domainConfigs, setDomainConfigs] = useState([]);
   const [file, setFile] = useState(null);
   const [courses, setCourses] = useState([]);
-  // New states for forgot password and reset password
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetUsername, setResetUsername] = useState('');
@@ -29,11 +27,9 @@ const Management = () => {
   const [resetError, setResetError] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [registrationStatus, setRegistrationStatus] = useState("Loading");
-
   const [missingFacultyData, setMissingFacultyData] = useState([]);
   const [showMissingFacultyTable, setShowMissingFacultyTable] = useState(false);
   const [totalFacultiesCount, setTotalFacultiesCount] = useState(0);
-  // State for course selection and max registrations (moved inside component)
   const [allCourses, setAllCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [maxRegistrations, setMaxRegistrations] = useState('');
@@ -58,8 +54,8 @@ const Management = () => {
     }
     const course = allCourses.find(c => c.courseId === selectedCourseId);
     if (course && typeof course.maxRegistrations === 'number' && course.maxRegistrations > 0) {
-      setMaxRegistrations(course.maxRegistrations);
-    } else if (course && (course.maxRegistrations === 0 || course.maxRegistrations === undefined)) {
+      setMaxRegistrations(course.maxRegistrations.toString());
+    } else if (course && (course.maxRegistrations === 0 || course.maxRegistrations === undefined || course.maxRegistrations === null)) {
       setMaxRegistrations('-');
     } else {
       setMaxRegistrations('');
@@ -68,20 +64,27 @@ const Management = () => {
 
   // Handler to set max registrations for a course
   const handleSetMaxRegistrations = async () => {
-    if (!selectedCourseId || !maxRegistrations) {
+    if (!selectedCourseId || !maxRegistrations || maxRegistrations === '-') {
       setSetMaxStatus('Please select a course and enter a max value.');
+      return;
+    }
+    let maxValue = Number(maxRegistrations);
+    if (isNaN(maxValue) || maxValue < 0) {
+      setSetMaxStatus('Please enter a valid non-negative number.');
       return;
     }
     try {
       const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/courses/set-max/${selectedCourseId}`, {
-        maxRegistrations: Number(maxRegistrations)
+        maxRegistrations: maxValue
       });
       setSetMaxStatus(`Max registrations updated for ${response.data.course.courseName}`);
+      // Update the course in allCourses to reflect the new max
+      setAllCourses(prev => prev.map(c => c.courseId === selectedCourseId ? { ...c, maxRegistrations: maxValue } : c));
+      setMaxRegistrations(maxValue.toString());
     } catch (err) {
       setSetMaxStatus('Failed to update max registrations.');
     }
   };
-
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
@@ -113,10 +116,9 @@ const Management = () => {
           const maxCount = dataPoint.maxCount;
           return {domain, minCount, maxCount};
         }) || [];
-        // ✅ Ensure domains are extracted correctly
         setDomainConfigs(domainConfigs);
       })
-      .catch(error => console.error("❌ Error fetching domain configs from MongoDB:", error));
+      .catch(error => console.error("Error fetching domain configs from MongoDB:", error));
   }, []);
 
   // Handle user input for min/max
@@ -136,6 +138,7 @@ const Management = () => {
       alert("Failed to update constraints.");
     }
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -195,7 +198,7 @@ const Management = () => {
         fetchData();
       }, 5000);
   
-      return () => clearInterval(intervalId); // Cleanup on unmount
+      return () => clearInterval(intervalId);
     }
   }, [isAuthenticated]);
 
@@ -205,7 +208,6 @@ const Management = () => {
       const facultyJson = await response.json();
       setTotalFacultiesCount(facultyJson.length);
 
-      // Filter faculties who haven't selected any courses (i.e., their `selectedCourses` is empty)
       const missingFaculties = facultyJson.filter(faculty => {
         const isRegisteredInBackend = facultyDataFromBackend.some(fac => fac.empId === faculty.empId);
         return !isRegisteredInBackend;
@@ -242,10 +244,7 @@ const Management = () => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
 
-      // ✅ Convert Excel data to JSON format
       const parsedData = XLSX.utils.sheet_to_json(sheet);
-      
-      // ✅ Store courses in a map to avoid duplicates
       const coursesMap = {};
 
       parsedData.forEach((row) => {
@@ -266,15 +265,11 @@ const Management = () => {
         }
       });
 
-      
-
-      // ✅ Convert map to array & store in localStorage
       const formattedCourses = Object.values(coursesMap);
       localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
       setUploadedCourses(formattedCourses);
 
       try {
-        // ✅ Send courses data to backend API
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/courses/upload-courses`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -284,12 +279,12 @@ const Management = () => {
         if (!response.ok) throw new Error("Failed to upload courses");
 
         alert("✅ Courses uploaded to MongoDB successfully!");
+        setCourses(formattedCourses);
       } catch (error) {
         console.error("❌ Error uploading courses:", error);
         alert("Error uploading courses. Incorrect format. Try again.");
       }
 
-      // ✅ Download courses.json automatically
       const jsonString = JSON.stringify(formattedCourses, null, 2);
       const blob = new Blob([jsonString], { type: "application/json" });
       const link = document.createElement("a");
@@ -297,12 +292,10 @@ const Management = () => {
       
       document.body.appendChild(link);
       document.body.removeChild(link);
-      
-      
     };
 
     reader.readAsArrayBuffer(file);
-};
+  };
 
   // Download faculty course selection as Excel
   const handleDownloadFacultyExcel = () => {
@@ -326,9 +319,7 @@ const Management = () => {
           "Empld": faculty.empId,
           "Course Name": course.courseName,
           "Choice": `Choice ${index + 1}`,
-          // "UG": faculty.ug,
           "UG SPL": faculty.ugspecialization,
-          // "PG": faculty.pg,
           "PG SPL": faculty.pgspecialization,
           "RESEARCH DOMAIN": faculty.researchdomain,
           "Submission Time": faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'
@@ -352,7 +343,7 @@ const Management = () => {
       facultyList.forEach(({ facultyName, choice, facultyId }) => {
         courseExcelData.push({
           "Course Name": courseName,
-          "EmpId": facultyId,  // facultyId should now have values
+          "EmpId": facultyId,
           "Faculty Name": facultyName,
           "Choice": choice
         });
@@ -423,8 +414,8 @@ const Management = () => {
   };
 
   return (
-    <div style={{ padding: "0px 100px" }}>
-      <h1>Management Portal </h1>
+    <div className="management-container">
+      <h1>Management Portal</h1>
 
       {/* Login Form */}
       {!isAuthenticated ? (
@@ -545,265 +536,372 @@ const Management = () => {
         </div>
       ) : (
         <>
-        <div><center>
-        <button onClick={toggleRegistration} style={{ marginBottom: "20px" }}>
-          {registrationStatus === "Loading" ? "Loading..." : registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
-        </button></center>
-      <h2>Set Course Registration Limit</h2>
-      <div style={{marginBottom: '20px', position: 'relative'}}>
-        <label>Select Course: </label>
-        <div style={{display: 'inline-block', width: '320px'}}>
-          <div
-            style={{ position: 'relative', width: '100%' }}
-            tabIndex={0}
-            onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
-          >
-            <input
-              type="text"
-              placeholder="Search by name or code..."
-              value={courseSearch}
-              onChange={e => {
-                setCourseSearch(e.target.value);
-                setDropdownOpen(true);
-              }}
-              onFocus={() => setDropdownOpen(true)}
-              style={{width: '100%', marginBottom: 0, borderRadius: '4px 4px 0 0'}}
-            />
-            {dropdownOpen && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                background: '#fff',
-                border: '1px solid #ccc',
-                maxHeight: '200px',
-                overflowY: 'auto',
-                zIndex: 10
-              }}>
-                {allCourses
-                  .filter(course =>
-                    course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
-                    course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
-                  )
-                  .map(course => (
-                    <div
-                      key={course.courseId}
-                      onMouseDown={() => {
-                        setSelectedCourseId(course.courseId);
-                        setCourseSearch(`${course.courseName} (${course.courseId})`);
-                        setDropdownOpen(false);
-                      }}
-                      style={{
-                        padding: '8px',
-                        cursor: 'pointer',
-                        background: selectedCourseId === course.courseId ? '#e6f7ff' : '#fff'
-                      }}
-                    >
-                      {course.courseName} ({course.courseId})
+          {/* Registration Status Section */}
+          <div className="dashboard-section">
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">Registration Control</h2>
+                <p className="section-description">Manage faculty registration status</p>
+              </div>
+            </div>
+            <div className="registration-status">
+              <div className={`status-indicator ${registrationStatus.toLowerCase()}`}></div>
+              <span>Registration is currently <strong>{registrationStatus}</strong></span>
+              <button 
+                onClick={toggleRegistration} 
+                className={registrationStatus === "OPEN" ? "btn-danger" : "btn-success"}
+              >
+                {registrationStatus === "Loading" ? "Loading..." : 
+                 registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
+              </button>
+            </div>
+          </div>
+
+          {/* Statistics Section */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-number">{facultyData.length}</div>
+              <div className="stat-label">Registered Faculty</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{totalFacultiesCount - 3}</div>
+              <div className="stat-label">Total Faculty</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{missingFacultyData.length - 3}</div>
+              <div className="stat-label">Pending Registration</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{Object.keys(courseData).length}</div>
+              <div className="stat-label">Courses Available</div>
+            </div>
+          </div>
+
+          {/* Course Registration Limit Section */}
+          <div className="dashboard-section">
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">Course Registration Limits</h2>
+                <p className="section-description">Set maximum registration limits for courses</p>
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Select Course:</label>
+                <div className="dropdown-container" style={{ position: 'relative', zIndex: 100 }}>
+                  <input
+                    ref={inputRef => { if (inputRef) inputRef.setAttribute('autocomplete', 'off'); }}
+                    type="text"
+                    placeholder="Search by name or code..."
+                    value={courseSearch}
+                    onChange={e => {
+                      setCourseSearch(e.target.value);
+                      setDropdownOpen(true);
+                    }}
+                    onFocus={() => setDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+                    style={{ position: 'relative', zIndex: 101 }}
+                  />
+                  {dropdownOpen && (
+                    <div className="dropdown-menu" style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: '100%',
+                      width: '100%',
+                      maxHeight: 250,
+                      overflowY: 'auto',
+                      zIndex: 9999,
+                      background: '#fff',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                      border: '1px solid #e5e7eb',
+                    }}>
+                      {allCourses
+                        .filter(course =>
+                          course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                          course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
+                        )
+                        .map(course => (
+                          <div
+                            key={course.courseId}
+                            className={`dropdown-item ${selectedCourseId === course.courseId ? 'selected' : ''}`}
+                            onMouseDown={() => {
+                              setSelectedCourseId(course.courseId);
+                              setCourseSearch(`${course.courseName} (${course.courseId})`);
+                              setDropdownOpen(false);
+                            }}
+                          >
+                            {course.courseName} ({course.courseId})
+                          </div>
+                        ))}
+                      {allCourses.filter(course =>
+                        course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                        course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
+                      ).length === 0 && (
+                        <div className="dropdown-item">No courses found</div>
+                      )}
                     </div>
-                  ))}
-                {allCourses.filter(course =>
-                  course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
-                  course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
-                ).length === 0 && (
-                  <div style={{ padding: '8px', color: '#888' }}>No courses found</div>
-                )}
+                  )}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Max Registrations:</label>
+                <input
+                  type="text"
+                  min='0'
+                  value={maxRegistrations}
+                  onChange={e => setMaxRegistrations(e.target.value.replace(/[^\d-]/g, ''))}
+                  placeholder="-"
+                />
+              </div>
+              <button className="btn-primary" onClick={handleSetMaxRegistrations}>
+                Set Limit
+              </button>
+            </div>
+            {setMaxStatus && (
+              <div className={`status-message ${setMaxStatus.startsWith('Max') ? 'success' : 'error'}`}>
+                {setMaxStatus}
               </div>
             )}
           </div>
-        </div>
-        <label style={{marginLeft: '10px'}}>Max Registrations: </label>
-        <input
-          type={maxRegistrations === '-' ? 'text' : 'number'}
-          min='0'
-          value={maxRegistrations}
-          onChange={e => setMaxRegistrations(e.target.value)}
-          style={{width: '80px'}}
-          disabled={maxRegistrations === '-'}
-        />
-        <button style={{marginLeft: '10px'}} onClick={handleSetMaxRegistrations}>Set</button>
-        {setMaxStatus && <span style={{marginLeft: '10px', color: setMaxStatus.startsWith('Max') ? 'green' : 'red'}}>{setMaxStatus}</span>}
-      </div>
 
-      <h2>Domain Constraints</h2>
-      {domainConfigs.map((config, index) => (
-        <div key={index}>
-          <h3>{config.domain}</h3>
-          <label>Min:</label>
-          <input 
-            type="number" 
-            defaultValue={config.minCount}
-            onChange={(e) => handleInputChange(index, 'minCount', e.target.value)}
-          />
-          {"                "}
-          <label>Max:</label>
-          <input 
-            type="number"
-            defaultValue={config.maxCount}
-            onChange={(e) => handleInputChange(index, 'maxCount', e.target.value)}
-          />
-        </div>
-      ))}
-      <button onClick={saveDomainConfig}>Save Settings</button>
-    </div>
-
-    <div>
-      <h2>Upload Course Data (Excel to JSON)</h2>
-      <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Generate Courses JSON</button>
-
-      {/* Display Processed Courses */}
-      
-      {courses.length > 0 && (
-        <div>
-          <h2>Extracted Course Data:</h2>
-          <pre>{JSON.stringify(courses, null, 2)}</pre>
-        </div>
-      )}
-    </div>
-        
-          {/* Faculty Course Selection Table */}
-          <>
-          <button onClick={() => setShowFacultyTable(!showFacultyTable)}>
-          {showFacultyTable ? "Hide Faculty Table" : "Show Faculty Table"}
-          </button>
-          {"                "}
-          <button onClick={handleDownloadFacultyExcel}>Download Faculty Excel</button>
-          
-
-          {showFacultyTable && (
-            <>
-          <div className="table-container">
-          <h2>Faculty Course Selection ({facultyData.length} entries  / {totalFacultiesCount - 3} )</h2>
-          <table border="1">
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Faculty Name</th>
-                <th>Employee ID</th>
-                <th>Preference</th>
-                <th>Selected Courses</th>
-                {/*<th>UG</th>*/}
-                <th>UG Specialization</th>
-                {/*<th>PG</th>*/}
-                <th>PG Specialization</th>
-                <th>Research Domain</th>
-                <th>Submission Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {facultyData.map((faculty,index) => (
-                <tr key={faculty.empId}>
-                  <td>{index + 1}</td> 
-                  <td>{faculty.name}</td>
-                  <td>{faculty.empId}</td>
-                  <td>{faculty.preference}</td>
-                  <td>{faculty.selectedCourses.map(course => course.courseName).join(", ")}</td>
-                  {/*<td>{faculty.ug || "N/A"}</td>*/}
-                  <td>{faculty.ugspecialization || "N/A"}</td>
-                  {/*<td>{faculty.pg || "N/A"}</td>*/}
-                  <td>{faculty.pgspecialization || "N/A"}</td>
-                  <td>{faculty.researchdomain || "N/A"}</td>
-                  <td>{faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          
-
-          {/* Button to download Faculty Excel */}
-          </div>
-          </>
-          )}
-        </>
-        <br></br>
-
-        {/* Toggle Missing Faculty Table */}
-        <button onClick={toggleMissingFacultyTable}>
-            {showMissingFacultyTable ? "Hide Missing Faculty Table" : "Show Missing Faculty Table"}
-          </button><br></br>
-
-          {/* Missing Faculty Table */}
-          {showMissingFacultyTable && (
-            <div className="table-container">
-              <h2>Missing Faculty Data  ({missingFacultyData.length -3 } Not Entered)</h2>
-              <table border="1">
-                <thead>
-                  <tr>
-                    <th>S.NO</th>
-                    <th>Faculty Name</th>
-                    <th>Employee ID</th>
-                    <th>Course Preference</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {missingFacultyData.length > 0 ? (
-                    missingFacultyData.map((faculty, index) => (
-                      <tr key={faculty.empId}>
-                        <td>{index+1}</td>
-                        <td>{faculty.name}</td>
-                        <td>{faculty.empId}</td>
-                        <td>{faculty.coursePreference || "N/A"}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan="3">No missing faculty data found.</td></tr>
-                  )}
-                </tbody>
-              </table>
+          {/* Domain Configuration Section */}
+          <div className="dashboard-section">
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">Domain Constraints</h2>
+                <p className="section-description">Configure minimum and maximum course selections per domain</p>
+              </div>
+              <button className="btn-success" onClick={saveDomainConfig}>
+                Save Configuration
+              </button>
             </div>
-          )}
-
-        <button onClick={() => setShowCourseTable(!showCourseTable)}>
-          {showCourseTable ? "Hide Course Table" : "Show Course Table"}
-        </button>
-        {"                "}
-        <button onClick={handleDownloadCourseExcel}>Download Course Excel</button>
-        {showCourseTable && (
-            <>
-          <div className="table-container">
-
-          {/* Courses Selected by Faculty Table */}
-          <h2>Courses Selected by Faculty</h2>
-          <table border="1">
-            <thead>
-              <tr>
-                <th>Course Name</th>
-                <th>Selected by Faculty</th>
-                <th>Choice</th>
-              </tr>
-            </thead>
-            <tbody>
-            {Object.entries(courseData).map(([courseName, facultyList]) => (
-              <tr key={courseName}>
-                <td>{courseName}</td>
-                <td>
-                  {facultyList.length > 0
-                    ? facultyList.map(item => item.facultyName).join(", ")
-                    : <span style={{ color: "red", fontStyle: "italic" }}>No faculty has chosen this course</span>
-                  }
-                </td>
-                <td>
-                  {facultyList.length > 0
-                    ? facultyList.map(item => item.choice).join(", ")
-                    : "-"
-                  }
-                </td>
-              </tr>
-            ))}
-
-            </tbody>
-          </table>
-
-          {/* Button to download Course Excel */}
+            <div className="domain-config">
+              {domainConfigs.map((config, index) => (
+                <div key={index} className="domain-item">
+                  <h3>{config.domain}</h3>
+                  <div className="domain-controls">
+                    <label>Min:</label>
+                    <input 
+                      type="number" 
+                      defaultValue={config.minCount}
+                      onChange={(e) => handleInputChange(index, 'minCount', e.target.value)}
+                    />
+                    <label>Max:</label>
+                    <input 
+                      type="number"
+                      defaultValue={config.maxCount}
+                      onChange={(e) => handleInputChange(index, 'maxCount', e.target.value)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          </>
-          )}
+          {/* Course Data Upload Section */}
+          <div className="dashboard-section">
+            <div className="section-header">
+              <div>
+                <h2 className="section-title">Course Data Management</h2>
+                <p className="section-description">Upload course data from Excel files</p>
+              </div>
+            </div>
+            <div className="upload-section">
+              <div className="file-input-wrapper">
+                <input 
+                  type="file" 
+                  accept=".xlsx, .xls" 
+                  onChange={handleFileChange}
+                  className="file-input"
+                />
+                <button className="btn-primary" onClick={handleUpload}>
+                  Upload & Process
+                </button>
+              </div>
+              {courses.length > 0 && (
+                <div className="status-message success">
+                  Successfully processed {courses.length} courses
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Faculty Data Tables Section */}
+          <div className="dashboard-section">
+            <div className="table-container">
+              <div className="table-header">
+                <h3 className="table-title">
+                  Faculty Course Selection ({facultyData.length} entries / {totalFacultiesCount - 3})
+                </h3>
+                <div className="table-actions">
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => setShowFacultyTable(!showFacultyTable)}
+                  >
+                    {showFacultyTable ? "Hide Table" : "Show Table"}
+                  </button>
+                  <button className="btn-success" onClick={handleDownloadFacultyExcel}>
+                    Download Excel
+                  </button>
+                </div>
+              </div>
+              
+              {showFacultyTable && (
+                <div className="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>S.No</th>
+                        <th>Faculty Name</th>
+                        <th>Employee ID</th>
+                        <th>Preference</th>
+                        <th>Selected Courses</th>
+                        <th>UG Specialization</th>
+                        <th>PG Specialization</th>
+                        <th>Research Domain</th>
+                        <th>Submission Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {facultyData.map((faculty, index) => (
+                        <tr key={faculty.empId}>
+                          <td>{index + 1}</td>
+                          <td>{faculty.name}</td>
+                          <td>{faculty.empId}</td>
+                          <td>
+                            <span className={`badge ${faculty.preference === 'Theory' ? 'badge-info' : 'badge-warning'}`}>
+                              {faculty.preference}
+                            </span>
+                          </td>
+                          <td>{faculty.selectedCourses.map(course => course.courseName).join(", ")}</td>
+                          <td>{faculty.ugspecialization || "N/A"}</td>
+                          <td>{faculty.pgspecialization || "N/A"}</td>
+                          <td>{faculty.researchdomain || "N/A"}</td>
+                          <td>
+                            {faculty.submittedAt 
+                              ? new Date(faculty.submittedAt).toLocaleString() 
+                              : 'Not Submitted'
+                            }
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Missing Faculty Section */}
+          <div className="dashboard-section">
+            <div className="table-container">
+              <div className="table-header">
+                <h3 className="table-title">
+                  Missing Faculty Data ({missingFacultyData.length - 3} Not Entered)
+                </h3>
+                <div className="table-actions">
+                  <button 
+                    className="btn-secondary" 
+                    onClick={toggleMissingFacultyTable}
+                  >
+                    {showMissingFacultyTable ? "Hide Table" : "Show Table"}
+                  </button>
+                </div>
+              </div>
+
+              {showMissingFacultyTable && (
+                <div className="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>S.No</th>
+                        <th>Faculty Name</th>
+                        <th>Employee ID</th>
+                        <th>Course Preference</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {missingFacultyData.length > 0 ? (
+                        missingFacultyData.map((faculty, index) => (
+                          <tr key={faculty.empId}>
+                            <td>{index + 1}</td>
+                            <td>{faculty.name}</td>
+                            <td>{faculty.empId}</td>
+                            <td>{faculty.coursePreference || "N/A"}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" style={{textAlign: 'center', fontStyle: 'italic', color: 'var(--text-muted)'}}>
+                            No missing faculty data found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Course Selection Data Section */}
+          <div className="dashboard-section">
+            <div className="table-container">
+              <div className="table-header">
+                <h3 className="table-title">
+                  Courses Selected by Faculty
+                </h3>
+                <div className="table-actions">
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => setShowCourseTable(!showCourseTable)}
+                  >
+                    {showCourseTable ? "Hide Table" : "Show Table"}
+                  </button>
+                  <button className="btn-success" onClick={handleDownloadCourseExcel}>
+                    Download Excel
+                  </button>
+                </div>
+              </div>
+
+              {showCourseTable && (
+                <div className="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Course Name</th>
+                        <th>Selected by Faculty</th>
+                        <th>Choice</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(courseData).map(([courseName, facultyList]) => (
+                        <tr key={courseName}>
+                          <td><strong>{courseName}</strong></td>
+                          <td>
+                            {facultyList.length > 0
+                              ? facultyList.map(item => item.facultyName).join(", ")
+                              : <span style={{ color: "var(--danger-color)", fontStyle: "italic" }}>
+                                  No faculty has chosen this course
+                                </span>
+                            }
+                          </td>
+                          <td>
+                            {facultyList.length > 0
+                              ? facultyList.map(item => item.choice).join(", ")
+                              : "-"
+                            }
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         </>
-        
-        )}
+      )}
     </div>
   );
 };

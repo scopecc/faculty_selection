@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Home.css";
@@ -7,7 +7,6 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   const [facultyEmpid, setLocalFacultyEmpid] = useState("");
   const [facultyEmail, setLocalFacultyEmail] = useState("");
   const [empIdInput, setEmpIdInput] = useState("");
-  // const [preference, setLocalPreference] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [serverOtp, setServerOtp] = useState(null);
@@ -24,7 +23,6 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       .catch(error => console.error("Error fetching registration status:", error));
   }, []);
 
-  // ✅ Function to request OTP
   const sendOtp = async () => {
     setLoading(true);
     const empId = facultyEmpid;
@@ -35,10 +33,10 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     if (!faculty) {
       alert("Faculty not found. Please check the Employee ID.");
       setLoading(false);
-      return; // Stop execution if faculty is not found
+      return;
     }
-    const facultyEmail = faculty.email; // Now it is safe to access
-    setLocalFacultyEmail(facultyEmail); // Save email in state
+    const facultyEmail = faculty.email;
+    setLocalFacultyEmail(facultyEmail);
 
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${facultyEmpid}`);
@@ -68,7 +66,6 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     }
   };
 
-  // ✅ Function to handle OTP verification and registration
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!otpSent) {
@@ -79,16 +76,14 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     try {
       const verifyResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/verify-otp`, {
         email: facultyEmail,
-        otp: otp, // ✅ Send entered OTP to backend
+        otp: otp,
       });
 
-      // Proceed with faculty check
       const empId = facultyEmpid;
 
       if (facultyEmail && facultyEmpid) {
         localStorage.setItem("empId", empId);
         localStorage.setItem("facultyEmail", facultyEmail);
-        // localStorage.setItem("preference", preference);
 
         const checkResponse = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`
@@ -108,89 +103,70 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     }
   };
 
+  // Loading state
+  if (registrationStatus === "Loading") {
+    return (
+      <div className="home-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading registration status...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Registration closed state
+  if (registrationStatus !== "OPEN") {
+    return (
+      <div className="home-container">
+        <h1>Faculty Registration</h1>
+        <div className="registration-closed">
+          <h2>Registration Closed</h2>
+          <p>The registration period has ended. Please contact the administrator for assistance.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Main registration form
   return (
     <div className="home-container">
-      <h1>Faculty Registration</h1><br></br><br></br>
-      {registrationStatus == "Loading"
-        ?
-        <div>
-          Loading...
-        </div>
-        :
-        registrationStatus == "OPEN" 
-          ?
-            <form onSubmit={handleSubmit} className="home-form">
-              {/* Faculty Email Input */}
-              <input
-                type="number"
-                placeholder="Faculty Employee ID"
-                value={facultyEmpid}
-                onChange={(e) => setLocalFacultyEmpid(e.target.value)}
-                required
-              />
-              
-              {/* Send OTP Button */}
-              {!otpSent && (
-                <button type="button" onClick={sendOtp} disabled={loading}>
-                  {loading ? "Sending OTP..." : "Send OTP"}
-                </button>
-              )}
+      <h1>Faculty Registration</h1>
+      
+      <form onSubmit={handleSubmit} className="home-form">
+        <input
+          type="number"
+          placeholder="Enter Faculty Employee ID"
+          value={facultyEmpid}
+          onChange={(e) => setLocalFacultyEmpid(e.target.value)}
+          required
+        />
+        
+        {!otpSent && (
+          <button type="button" onClick={sendOtp} disabled={loading}>
+            {loading ? "Sending OTP..." : "Send OTP to Email"}
+          </button>
+        )}
 
-              {/* Show OTP Sent Text */}
-              {otpSent && <p>OTP has been sent to your email.</p>}
-
-              {/* Show OTP Input only after OTP is Sent */}
-              {otpSent && (
-                <div> 
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
-                  <button style={{width:"250px"}} type="submit">Sign In</button>
-                </div>
-              )}
-
-              {/* {otpSent && <p>1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
-                2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>} */}
-
-              {/* Show Employee ID & Preference only after OTP is Sent */}
-              {/* {otpSent && (
-                <>
-                  <div className="radio-group">
-                    <label>
-                      <input
-                        type="radio"
-                        name="preference"
-                        value="Theory"
-                        onChange={(e) => setLocalPreference(e.target.value)}
-                        required
-                      />
-                      Theory
-                    </label>
-
-                    <label>
-                      <input
-                        type="radio"
-                        name="preference"
-                        value="Theory+Lab"
-                        onChange={(e) => setLocalPreference(e.target.value)}
-                        required
-                      />
-                      Theory + Lab
-                    </label>
-                  </div>
-
-                </>
-              )} */}
-            </form> 
-          :
-            <div>
-              Registration Closed
-            </div>
-      }
+        {otpSent && (
+          <>
+            <p>✓ OTP has been sent to your registered email address</p>
+            
+            <input
+              type="text"
+              placeholder="Enter 6-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              maxLength="6"
+              required
+            />
+            
+            <button type="submit">
+              Verify & Continue
+            </button>
+          </>
+        )}
+      </form>
     </div>
   );
 };

@@ -7,7 +7,7 @@ const FacultyDetails = () => {
   const { empId } = useParams();
   const navigate = useNavigate();
   const [faculty, setFaculty] = useState(null);
-  const [loading, setLoading] = useState(false); // Don't load until OTP is verified
+  const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
@@ -15,7 +15,6 @@ const FacultyDetails = () => {
   const [sendingOtp, setSendingOtp] = useState(false);
 
   useEffect(() => {
-    // Fetch faculty email for OTP (but do NOT fetch faculty details yet)
     const fetchFacultyEmail = async () => {
       try {
         const response = await axios.get('/faculties.json');
@@ -31,7 +30,6 @@ const FacultyDetails = () => {
     fetchFacultyEmail();
   }, [empId]);
 
-  // Send OTP to email
   const sendOtp = async () => {
     if (!facultyEmail) {
       alert("Faculty email not found. Cannot send OTP.");
@@ -49,7 +47,6 @@ const FacultyDetails = () => {
     }
   };
 
-  // Verify OTP and fetch faculty details
   const verifyOtp = async () => {
     if (!otp) {
       alert("Please enter the OTP.");
@@ -58,7 +55,6 @@ const FacultyDetails = () => {
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/verify-otp`, { email: facultyEmail, otp });
       setLoading(true);
-      // OTP verified, fetch faculty details
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`);
       if (response.data.exists) {
         setFaculty(response.data.faculty);
@@ -95,61 +91,84 @@ const FacultyDetails = () => {
     window.print();
   };
 
-  // If not verified, show OTP prompt
-  if (!otpVerified) {
+  // Loading state
+  if (loading) {
     return (
       <div className="faculty-details-print">
-        <h2>Registration already done</h2>
-        <p>To view or delete your registration, please verify with OTP sent to your registered email.</p>
-        <button onClick={sendOtp} disabled={sendingOtp || otpSent} style={{marginBottom: '10px'}}>
-          {sendingOtp ? 'Sending OTP...' : otpSent ? 'OTP Sent' : 'Send OTP'}
-        </button>
-        {otpSent && (
-          <div>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={e => setOtp(e.target.value)}
-              style={{marginRight: '10px'}}
-            />
-            <button onClick={verifyOtp}>Verify OTP</button>
-          </div>
-        )}
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading faculty details...</p>
+        </div>
       </div>
     );
   }
 
-  if (loading) return <p>Loading faculty details...</p>;
+  // OTP verification screen
+  if (!otpVerified) {
+    return (
+      <div className="faculty-details-print">
+        <div className="otp-section">
+          <h2>Registration Already Done</h2>
+          <p>To view or delete your registration, please verify with OTP sent to your registered email.</p>
+          <button onClick={sendOtp} disabled={sendingOtp || otpSent}>
+            {sendingOtp ? 'Sending OTP...' : otpSent ? 'OTP Sent' : 'Send OTP'}
+          </button>
+          {otpSent && (
+            <div className="otp-input-container">
+              <input
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                maxLength="6"
+              />
+              <button onClick={verifyOtp}>Verify OTP</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
-  // If verified, show details and delete option
+  // Faculty details display
   return (
     <div className="faculty-details-print">
-      <h2>Faculty Details</h2>
-      <p><strong>Name:</strong> {faculty.name}</p>
-      <p><strong>Employee ID:</strong> {faculty.empId}</p>
-      <p><strong>Preference:</strong> {faculty.preference}</p>
-      <p><strong>UG:</strong> {faculty.ug || "N/A"} &nbsp;&nbsp;&nbsp;
-      <strong>UG Specialization:</strong> {faculty.ugspecialization || "N/A"}</p>
-      <p><strong>PG:</strong> {faculty.pg || "N/A"} &nbsp;&nbsp;&nbsp;
-      <strong>PG Specialization:</strong> {faculty.pgspecialization || "N/A"}</p>
-      <p><strong>Research Domain:</strong> {faculty.researchdomain || "N/A"}</p>
+      <h2>Faculty Registration Details</h2>
+      
+      <div className="faculty-info">
+        <p><strong>Name:</strong> {faculty.name}</p>
+        <p><strong>Employee ID:</strong> {faculty.empId}</p>
+        <p><strong>Preference:</strong> {faculty.preference}</p>
+        <p>
+          <strong>UG:</strong> {faculty.ug || "N/A"}
+          <strong>UG Specialization:</strong> {faculty.ugspecialization || "N/A"}
+        </p>
+        <p>
+          <strong>PG:</strong> {faculty.pg || "N/A"}
+          <strong>PG Specialization:</strong> {faculty.pgspecialization || "N/A"}
+        </p>
+        <p><strong>Research Domain:</strong> {faculty.researchdomain || "N/A"}</p>
+      </div>
 
-      <h3>Selected Courses</h3>
-      {faculty.selectedCourses.length > 0 ? (
-        <ol>
-          {faculty.selectedCourses.map((course, index) => (
-            <li key={index}>
-              <strong>{course.courseName}</strong> ({course.courseType}, {course.domain})
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <p>No courses selected.</p>
-      )}
+      <div className="courses-section">
+        <h3>Selected Courses</h3>
+        {faculty.selectedCourses.length > 0 ? (
+          <ol>
+            {faculty.selectedCourses.map((course, index) => (
+              <li key={index}>
+                <strong>{course.courseName}</strong> ({course.courseType}, {course.domain})
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p>No courses selected.</p>
+        )}
+      </div>
 
-      <button onClick={handlePrint} className="btn btn-primary">Print</button>
-      <button onClick={handleDelete} className="btn btn-danger">Delete</button>
+      <div className="button-container">
+        <button onClick={handlePrint} className="btn-primary">Print Details</button>
+        <button onClick={handleDelete} className="btn-danger">Delete Registration</button>
+      </div>
     </div>
   );
 };

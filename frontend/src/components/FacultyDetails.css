@@ -1,33 +1,378 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #6366f1;
+  --secondary-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --background-color: #fafafa;
+  --card-background: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
 .faculty-details-print {
-    max-width: 1000px;
-    margin: auto;
+  max-width: 900px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-xl);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--card-background);
+  box-shadow: var(--shadow-lg);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.faculty-details-print::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Headers */
+h2 {
+  text-align: center;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin: 0 0 var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h3 {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: var(--spacing-lg) 0 var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--border-light);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Faculty information section */
+.faculty-info {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.faculty-details-print p {
+  margin: var(--spacing-md) 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.faculty-details-print p strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 140px;
+}
+
+/* OTP verification section */
+.otp-section {
+  background: linear-gradient(135deg, #fef3cd 0%, #fde68a 100%);
+  border: 1px solid var(--warning-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.otp-section p {
+  color: #92400e;
+  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+}
+
+.otp-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.otp-input-container input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.otp-input-container input:focus {
+  outline: none;
+  border-color: var(--warning-color);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Courses list */
+.courses-section {
+  background: var(--card-background);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.faculty-details-print ol {
+  padding-left: var(--spacing-lg);
+  counter-reset: course-counter;
+}
+
+.faculty-details-print li {
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--primary-color);
+  font-weight: 500;
+  position: relative;
+  counter-increment: course-counter;
+  color: var(--text-secondary);
+}
+
+.faculty-details-print li strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.faculty-details-print li::marker {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Buttons */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.5px;
+  min-width: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none !important;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* OTP buttons */
+.otp-section button {
+  background: linear-gradient(135deg, var(--warning-color), #d97706);
+  color: white;
+}
+
+.otp-section button:not(:disabled):hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+/* Primary button (Print) */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), #5b5efc);
+  color: white;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, #5b5efc, #4f46e5);
+}
+
+/* Danger button (Delete) */
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger-color), #dc2626);
+  color: white;
+}
+
+.btn-danger:not(:disabled):hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-light);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Print styles */
+@media print {
+  .faculty-details-print {
+    box-shadow: none;
+    border: 1px solid #000;
+    margin: 0;
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: white;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
   }
   
-  h2{
-    text-align: center;
+  .button-container {
+    display: none;
+  }
+  
+  .faculty-details-print::before {
+    display: none;
+  }
+  
+  h2, h3 {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+  
+  .faculty-details-print li strong {
+    color: #000 !important;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .faculty-details-print {
+    margin: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+  }
+  
+  .faculty-details-print p {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .faculty-details-print p strong {
+    min-width: auto;
+  }
+  
+  .button-container {
+    flex-direction: column;
+    align-items: center;
   }
   
   button {
-    margin: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
   }
   
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
+  .otp-input-container {
+    flex-direction: column;
   }
   
-  .btn-danger {
-    background-color: #dc3545;
-    color: white;
+  .otp-input-container input {
+    width: 100%;
+    min-width: auto;
   }
-    
+}
+
+@media (max-width: 480px) {
+  .faculty-details-print {
+    margin: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+  
+  h2 {
+    font-size: 1.6rem;
+  }
+}

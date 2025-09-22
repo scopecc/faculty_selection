@@ -38,6 +38,8 @@ const Management = () => {
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [maxRegistrations, setMaxRegistrations] = useState('');
   const [setMaxStatus, setSetMaxStatus] = useState('');
+  const [courseSearch, setCourseSearch] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Fetch all courses for dropdown
   useEffect(() => {
@@ -47,6 +49,22 @@ const Management = () => {
         .catch(() => setAllCourses([]));
     }
   }, [isAuthenticated]);
+
+  // Auto-fill maxRegistrations when course is selected
+  useEffect(() => {
+    if (!selectedCourseId) {
+      setMaxRegistrations('');
+      return;
+    }
+    const course = allCourses.find(c => c.courseId === selectedCourseId);
+    if (course && typeof course.maxRegistrations === 'number' && course.maxRegistrations > 0) {
+      setMaxRegistrations(course.maxRegistrations);
+    } else if (course && (course.maxRegistrations === 0 || course.maxRegistrations === undefined)) {
+      setMaxRegistrations('-');
+    } else {
+      setMaxRegistrations('');
+    }
+  }, [selectedCourseId, allCourses]);
 
   // Handler to set max registrations for a course
   const handleSetMaxRegistrations = async () => {
@@ -532,23 +550,77 @@ const Management = () => {
           {registrationStatus === "Loading" ? "Loading..." : registrationStatus === "OPEN" ? "Stop Registration" : "Start Registration"}
         </button></center>
       <h2>Set Course Registration Limit</h2>
-      <div style={{marginBottom: '20px'}}>
+      <div style={{marginBottom: '20px', position: 'relative'}}>
         <label>Select Course: </label>
-        <select value={selectedCourseId} onChange={e => setSelectedCourseId(e.target.value)}>
-          <option value=''>-- Select Course --</option>
-          {allCourses.map(course => (
-            <option key={course.courseId} value={course.courseId}>
-              {course.courseName} ({course.courseId})
-            </option>
-          ))}
-        </select>
+        <div style={{display: 'inline-block', width: '320px'}}>
+          <div
+            style={{ position: 'relative', width: '100%' }}
+            tabIndex={0}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+          >
+            <input
+              type="text"
+              placeholder="Search by name or code..."
+              value={courseSearch}
+              onChange={e => {
+                setCourseSearch(e.target.value);
+                setDropdownOpen(true);
+              }}
+              onFocus={() => setDropdownOpen(true)}
+              style={{width: '100%', marginBottom: 0, borderRadius: '4px 4px 0 0'}}
+            />
+            {dropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                background: '#fff',
+                border: '1px solid #ccc',
+                maxHeight: '200px',
+                overflowY: 'auto',
+                zIndex: 10
+              }}>
+                {allCourses
+                  .filter(course =>
+                    course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                    course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
+                  )
+                  .map(course => (
+                    <div
+                      key={course.courseId}
+                      onMouseDown={() => {
+                        setSelectedCourseId(course.courseId);
+                        setCourseSearch(`${course.courseName} (${course.courseId})`);
+                        setDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '8px',
+                        cursor: 'pointer',
+                        background: selectedCourseId === course.courseId ? '#e6f7ff' : '#fff'
+                      }}
+                    >
+                      {course.courseName} ({course.courseId})
+                    </div>
+                  ))}
+                {allCourses.filter(course =>
+                  course.courseName.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                  course.courseId.toLowerCase().includes(courseSearch.toLowerCase())
+                ).length === 0 && (
+                  <div style={{ padding: '8px', color: '#888' }}>No courses found</div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
         <label style={{marginLeft: '10px'}}>Max Registrations: </label>
         <input
-          type='number'
+          type={maxRegistrations === '-' ? 'text' : 'number'}
           min='0'
           value={maxRegistrations}
           onChange={e => setMaxRegistrations(e.target.value)}
           style={{width: '80px'}}
+          disabled={maxRegistrations === '-'}
         />
         <button style={{marginLeft: '10px'}} onClick={handleSetMaxRegistrations}>Set</button>
         {setMaxStatus && <span style={{marginLeft: '10px', color: setMaxStatus.startsWith('Max') ? 'green' : 'red'}}>{setMaxStatus}</span>}

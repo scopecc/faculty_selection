@@ -15,7 +15,8 @@ const FacultySchema = new mongoose.Schema({
   pgspecialization:{ type: String},
   ugspecialization:{ type: String },
   researchdomain:{ type: String },
-  submittedAt: { type: Date } ,
+  submittedAt: { type: Date },
+  draftId: { type: mongoose.Schema.Types.ObjectId, ref: 'Draft', required: false }
 });
 
 const Faculty = mongoose.model('Faculty', FacultySchema);

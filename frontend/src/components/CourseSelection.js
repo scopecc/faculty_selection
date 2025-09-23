@@ -15,18 +15,20 @@ const Accordion = ({ title, children }) => {
   );
 };
 
+
 const CourseSelection = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Get data from location state or fallback to localStorage
   const storedEmpId = localStorage.getItem('empId');
   const storedFacultyEmail = localStorage.getItem('facultyEmail');
   const storedPreference = localStorage.getItem('preference');
+  const storedDraftId = localStorage.getItem('draftId');
 
   const empId = location.state?.empId || storedEmpId;
   const facultyEmail = location.state?.facultyEmail || storedFacultyEmail;
-  // const preference = location.state?.preference || storedPreference;
+  const draftId = location.state?.draftId || storedDraftId || null;
 
   const [facultyName, setFacultyName] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
@@ -82,9 +84,11 @@ const [courseRegCounts, setCourseRegCounts] = useState({});
 
 // Fetch course data and registration counts
 useEffect(() => {
+  if (!draftId) return;
+  localStorage.setItem('draftId', draftId);
   const fetchCoursesAndCounts = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`, { params: { draftId } });
       let updatedCourses = [];
       if (Array.isArray(response.data) && response.data.length > 0) {
         updatedCourses = response.data.map(course => ({
@@ -96,7 +100,7 @@ useEffect(() => {
         setCourses([]);
       }
       // Fetch registration counts for all courses
-      const regRes = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
+      const regRes = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`, { params: { draftId } });
       const regCounts = {};
       regRes.data.forEach(fac => {
         (fac.selectedCourses || []).forEach(c => {
@@ -111,7 +115,7 @@ useEffect(() => {
     }
   };
   fetchCoursesAndCounts();
-}, []);
+}, [draftId]);
 
 
 const groupByDomain = (courses) => {
@@ -144,7 +148,8 @@ useEffect(() => {
 }, [courses]); // ✅ Dependency on `courses`
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`)
+    if (!draftId) return;
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config`, { params: { draftId } })
       .then(response => {
         const constraints = response.data.reduce((acc, config) => {
           acc[config.domain] = { minCount: config.minCount, maxCount: config.maxCount };
@@ -153,7 +158,7 @@ useEffect(() => {
         setDomainConstraints(constraints);
       })
       .catch(error => console.error("Error fetching domain constraints:", error));
-  }, []);
+  }, [draftId]);
 
   const maxCourses = 7
 
@@ -221,11 +226,11 @@ useEffect(() => {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, facultyName, facultyEmail, preference, selectedCourses },
+        { empId, name: facultyName, facultyEmail, preference, selectedCourses, draftId },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
-        empId, ug, ugspecialization, pg, pgspecialization, researchDomain
+        empId, ug, ugspecialization, pg, pgspecialization, researchDomain, draftId
       },{ headers: { 'Content-Type': 'application/json' } })
       alert("Courses submitted successfully!");
       navigate('/');

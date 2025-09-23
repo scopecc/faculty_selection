@@ -55,7 +55,12 @@ const FacultyDetails = () => {
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/verify-otp`, { email: facultyEmail, otp });
       setLoading(true);
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`);
+      // Get draftId from localStorage (or update if you use another source)
+      const draftId = localStorage.getItem('draftId');
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`,
+        { params: { draftId } }
+      );
       if (response.data.exists) {
         setFaculty(response.data.faculty);
         setOtpVerified(true);
@@ -77,7 +82,11 @@ const FacultyDetails = () => {
     }
     if (window.confirm("Are you sure you want to delete this faculty record?")) {
       try {
-        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/faculty/delete/${empId}`);
+        // Get draftId from localStorage (or update if you use another source)
+        const draftId = localStorage.getItem('draftId');
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/faculty/delete/${empId}`, {
+          params: { draftId }
+        });
         alert("Faculty record deleted successfully.");
         navigate("/home");
       } catch (error) {

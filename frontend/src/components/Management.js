@@ -70,6 +70,7 @@ const Management = () => {
   const [resetError, setResetError] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [registrationStatus, setRegistrationStatus] = useState("Loading");
+  // Remove login draft selection state
   const [missingFacultyData, setMissingFacultyData] = useState([]);
   const [showMissingFacultyTable, setShowMissingFacultyTable] = useState(false);
   const [totalFacultiesCount, setTotalFacultiesCount] = useState(0);
@@ -81,6 +82,49 @@ const Management = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [toasts, setToasts] = useState([]);
+  // Draft selection state
+  const [drafts, setDrafts] = useState([]);
+  const [selectedDraft, setSelectedDraft] = useState(null);
+  const [newDraftName, setNewDraftName] = useState('');
+  const [draftLoading, setDraftLoading] = useState(false);
+  const [draftError, setDraftError] = useState('');
+
+  // Fetch drafts on mount
+  useEffect(() => {
+    setDraftLoading(true);
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
+      .then(res => {
+        setDrafts(res.data);
+        // Set default draft to "Default Draft" if present, else first draft
+        const defaultDraft = res.data.find(d => d.name === 'Default Draft');
+        setSelectedDraft(defaultDraft || res.data[0] || null);
+        setDraftLoading(false);
+      })
+      .catch(() => {
+        setDrafts([]);
+        setDraftLoading(false);
+      });
+  }, []);
+
+  // Create new draft
+  const handleCreateDraft = async () => {
+    if (!newDraftName.trim()) {
+      setDraftError('Draft name required');
+      return;
+    }
+    setDraftLoading(true);
+    setDraftError('');
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/drafts/create`, { name: newDraftName });
+      setDrafts(prev => [...prev, res.data.draft]);
+      setSelectedDraft(res.data.draft);
+      setNewDraftName('');
+      setDraftLoading(false);
+    } catch (err) {
+      setDraftError(err.response?.data?.message || 'Failed to create draft');
+      setDraftLoading(false);
+    }
+  };
 
   // Toast management functions
   const addToast = (message, type = 'info') => {
@@ -92,14 +136,14 @@ const Management = () => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
 
-  // Fetch all courses for dropdown
+  // Fetch all courses for dropdown (draft-aware)
   useEffect(() => {
-    if (isAuthenticated) {
-      axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`)
+    if (isAuthenticated && selectedDraft) {
+      axios.get(`${process.env.REACT_APP_BACKEND_URL}/courses`, { params: { draftId: selectedDraft._id } })
         .then(res => setAllCourses(res.data))
         .catch(() => setAllCourses([]));
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, selectedDraft]);
 
   // Auto-fill maxRegistrations when course is selected
   useEffect(() => {
@@ -117,7 +161,7 @@ const Management = () => {
     }
   }, [selectedCourseId, allCourses]);
 
-  // Handler to set max registrations for a course
+  // Handler to set max registrations for a course (draft-aware)
   const handleSetMaxRegistrations = async () => {
     if (!selectedCourseId || !maxRegistrations || maxRegistrations === '-') {
       setSetMaxStatus('Please select a course and enter a max value.');
@@ -129,9 +173,11 @@ const Management = () => {
       return;
     }
     try {
-      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/courses/set-max/${selectedCourseId}`, { maxRegistrations: maxValue });
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/courses/set-max/${selectedCourseId}`,
+        { maxRegistrations: maxValue, draftId: selectedDraft?._id }
+      );
       setSetMaxStatus(`Max registrations updated for ${response.data.course.courseName}`);
-      // Update the course in allCourses to reflect the new max
       setAllCourses(prev => prev.map(c => c.courseId === selectedCourseId ? { ...c, maxRegistrations: maxValue } : c));
       setMaxRegistrations(maxValue.toString());
     } catch (err) {
@@ -139,18 +185,24 @@ const Management = () => {
     }
   };
 
+
+  // Remove login draft selection effect
+
+  // Fetch registration status for selected draft (dashboard)
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
+    if (!selectedDraft) return;
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { params: { draftId: selectedDraft._id } })
       .then(response => {
         setRegistrationStatus(response.data.status);
       })
-      .catch(error => console.error("Error fetching registration status:", error));
-  }, []);
+      .catch(() => setRegistrationStatus("CLOSED"));
+  }, [selectedDraft]);
 
   const toggleRegistration = async () => {
+    if (!selectedDraft) return;
     const newStatus = registrationStatus === "OPEN" ? "CLOSED" : "OPEN";
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { status: newStatus });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { status: newStatus, draftId: selectedDraft._id });
       setRegistrationStatus(newStatus);
       addToast(`Registration has been ${newStatus === "OPEN" ? "opened" : "closed"}!`, 'success');
     } catch (error) {
@@ -159,20 +211,22 @@ const Management = () => {
     }
   };
 
-  // Load courses.json from the public folder
+  // Load domain configs for selected draft
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/`)
-      .then(response => {
-        const domainConfigs = response.data.map((dataPoint)=>{
-          const domain = dataPoint.domain;
-          const minCount = dataPoint.minCount;
-          const maxCount = dataPoint.maxCount;
-          return {domain, minCount, maxCount};
-        }) || [];
-        setDomainConfigs(domainConfigs);
-      })
-      .catch(error => console.error("Error fetching domain configs from MongoDB:", error));
-  }, []);
+    if (isAuthenticated && selectedDraft) {
+      axios.get(`${process.env.REACT_APP_BACKEND_URL}/domain-config/`, { params: { draftId: selectedDraft._id } })
+        .then(response => {
+          const domainConfigs = response.data.map((dataPoint)=>{
+            const domain = dataPoint.domain;
+            const minCount = dataPoint.minCount;
+            const maxCount = dataPoint.maxCount;
+            return {domain, minCount, maxCount};
+          }) || [];
+          setDomainConfigs(domainConfigs);
+        })
+        .catch(error => console.error("Error fetching domain configs from MongoDB:", error));
+    }
+  }, [isAuthenticated, selectedDraft]);
 
   // Handle user input for min/max
   const handleInputChange = (index, field, value) => {
@@ -181,10 +235,10 @@ const Management = () => {
     setDomainConfigs(updatedConfigs);
   };
 
-  // Save domain constraints to MongoDB
+  // Save domain constraints to MongoDB (draft-aware)
   const saveDomainConfig = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/save`, { domainConfigs });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/save`, { domainConfigs, draftId: selectedDraft?._id });
       addToast("Domain constraints updated successfully!", 'success');
     } catch (error) {
       console.error("Error saving domain constraints:", error);
@@ -229,8 +283,10 @@ const Management = () => {
 
   const fetchData = async () => {
     try {
-      console.log("fetching data")
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`);
+      if (!selectedDraft) return;
+      // Debug log for draftId
+      console.log('Fetching faculty data for draftId:', selectedDraft._id, 'draft name:', selectedDraft.name);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`, { params: { draftId: selectedDraft._id } });
       setFacultyData(response.data);
       await loadMissingFacultyData(response.data);
       const courseMap = {};
@@ -253,13 +309,10 @@ const Management = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const intervalId = setInterval(() => {
-        fetchData();
-      }, 5000);
-      return () => clearInterval(intervalId);
+    if (isAuthenticated && selectedDraft) {
+      fetchData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, selectedDraft]);
 
   const loadMissingFacultyData = async (facultyDataFromBackend) => {
     try {
@@ -297,62 +350,25 @@ const Management = () => {
       addToast("Please select a file first.", 'warning');
       return;
     }
-
     const reader = new FileReader();
-    reader.onload = async (event) => {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
+    reader.onload = async (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
       const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const parsedData = XLSX.utils.sheet_to_json(sheet);
-
-      const coursesMap = {};
-      parsedData.forEach((row) => {
-        const courseId = row["Course ID"];
-        const courseName = row["Course Name"];
-        const courseType = row["Course Type"]?.trim();
-        const domain = row["Domain"];
-
-        if (!courseId || !courseName || !courseType) return;
-
-        if (!coursesMap[courseId]) {
-          coursesMap[courseId] = {
-            courseId,
-            courseName,
-            courseType,
-            domain,
-          };
-        }
-      });
-
-      const formattedCourses = Object.values(coursesMap);
-      localStorage.setItem("uploadedCourses", JSON.stringify(formattedCourses));
-      setUploadedCourses(formattedCourses);
-
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/courses/upload-courses`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formattedCourses),
-        });
-
-        if (!response.ok) throw new Error("Failed to upload courses");
-        addToast("Courses uploaded to MongoDB successfully!", 'success');
-        setCourses(formattedCourses);
+        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/courses/upload-courses`, { courses: jsonData, draftId: selectedDraft?._id });
+        addToast("Courses uploaded successfully!", 'success');
+        setUploadedCourses(jsonData);
+        fetchData();
       } catch (error) {
-        console.error("Error uploading courses:", error);
-        addToast("Error uploading courses. Incorrect format. Try again.", 'error');
+        addToast("Failed to upload courses.", 'error');
       }
-
-      const jsonString = JSON.stringify(formattedCourses, null, 2);
-      const blob = new Blob([jsonString], { type: "application/json" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      document.body.appendChild(link);
-      document.body.removeChild(link);
     };
     reader.readAsArrayBuffer(file);
   };
+
 
   // Download faculty course selection as Excel
   const handleDownloadFacultyExcel = () => {
@@ -494,17 +510,15 @@ const Management = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
 
-  // Login form
+  // Login form (no draft selection)
   if (!isAuthenticated) {
     return (
       <>
         <div className="management-container">
-          <h1></h1>
-
+          <h1>Admin Login</h1>
           <div className="login-container">
             <form onSubmit={handleLogin} className="login-form">
               <h2>Admin Login</h2>
-
               <input
                 type="text"
                 placeholder="Username"
@@ -512,7 +526,6 @@ const Management = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-
               <div className="password-container">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -529,11 +542,9 @@ const Management = () => {
                   {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
-
               <button type="submit" className="login-button">
                 Sign In
               </button>
-
               <div className="form-actions">
                 <button
                   type="button"
@@ -552,7 +563,6 @@ const Management = () => {
               </div>
             </form>
           </div>
-
           {/* Forgot Password Modal */}
           {showForgotPassword && (
             <div className="modal">
@@ -570,7 +580,6 @@ const Management = () => {
               </div>
             </div>
           )}
-
           {/* Reset Password Modal */}
           {showResetModal && (
             <div className="modal">
@@ -606,7 +615,6 @@ const Management = () => {
               </div>
             </div>
           )}
-
           {resetMessage && (
             <div className="success" style={{ margin: '20px auto', maxWidth: '400px' }}>
               {resetMessage}
@@ -622,8 +630,45 @@ const Management = () => {
   return (
     <>
       <div className="management-container">
-        <h1></h1>
-
+        <div className="dashboard-header" style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+          <h1 style={{ flex: 1 }}>Management Dashboard</h1>
+          <div className="draft-select-container" style={{ minWidth: 420, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label htmlFor="dashboard-draft-select" style={{ marginRight: 8 }}>Draft:</label>
+            <select
+              id="dashboard-draft-select"
+              value={selectedDraft ? selectedDraft._id : ''}
+              onChange={e => {
+                const found = drafts.find(d => d._id === e.target.value);
+                setSelectedDraft(found || null);
+              }}
+              disabled={draftLoading || drafts.length === 0}
+              style={{ minWidth: 160 }}
+            >
+              <option value="">-- Select Draft --</option>
+              {drafts.map(draft => (
+                <option key={draft._id} value={draft._id}>{draft.name}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="New draft name"
+              value={newDraftName}
+              onChange={e => setNewDraftName(e.target.value)}
+              disabled={draftLoading}
+              style={{ minWidth: 120 }}
+            />
+            <button onClick={handleCreateDraft} disabled={draftLoading} style={{ minWidth: 80 }}>
+              Create
+            </button>
+            {draftLoading && <span style={{ marginLeft: 10 }}>Loading drafts...</span>}
+            {draftError && <div className="error" style={{ marginTop: 8 }}>{draftError}</div>}
+          </div>
+        </div>
+        {!selectedDraft && (
+          <div className="error" style={{ marginBottom: 16 }}>
+            Please select or create a draft to view and manage data.
+          </div>
+        )}
         {/* Statistics */}
         <div className="stats-grid">
           <div className="stat-card">

@@ -8,12 +8,13 @@ router.get('/test', (req, res) => {
 
 // ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
-  const { name, empId, preference, selectedCourses = [] } = req.body;
+  const { name, empId, preference, selectedCourses = [], draftId } = req.body;
   const Course = require('../models/Course');
 
   try {
-    // ✅ Check if faculty already exists
-    const existingFaculty = await Faculty.findOne({ empId });
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    // ✅ Check if faculty already exists in this draft
+    const existingFaculty = await Faculty.findOne({ empId, draftId });
     if (existingFaculty) {
       return res.status(400).json({ message: 'You have already registered.' });
     }
@@ -24,23 +25,23 @@ router.post('/register', async (req, res) => {
     }
 
 
-    // Check maxRegistrations for each selected course
+    // Check maxRegistrations for each selected course in this draft
     for (const course of selectedCourses) {
-      const courseDoc = await Course.findOne({ courseId: course.courseId });
+      const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
       if (courseDoc.maxRegistrations > 0) {
-        // Count current registrations for this course
-        const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId });
+        // Count current registrations for this course in this draft
+        const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
         if (count >= courseDoc.maxRegistrations) {
           return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
         }
       }
     }
 
-    // ✅ Create new faculty entry
-    const faculty = new Faculty({ name, empId, preference, selectedCourses });
+  // ✅ Create new faculty entry
+  const faculty = new Faculty({ name, empId, preference, selectedCourses, draftId });
     await faculty.save();
     res.status(201).json({ message: 'Faculty registered successfully.', faculty });
 
@@ -53,7 +54,9 @@ router.post('/register', async (req, res) => {
 // ✅ Get all faculty records
 router.get('/', async (req, res) => {
   try {
-    const faculties = await Faculty.find();
+    const { draftId } = req.query;
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    const faculties = await Faculty.find({ draftId });
     res.json(faculties);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching faculty', error });
@@ -63,14 +66,15 @@ router.get('/', async (req, res) => {
 // ✅ Submit selected courses for a faculty
 // ✅ Submit selected courses for a faculty
 router.post('/submit-courses', async (req, res) => {
-  let { empId, facultyName, preference, selectedCourses } = req.body;
+  let { empId, name, facultyName, preference, selectedCourses, draftId } = req.body;
 
   console.log("Received course submission request:", req.body);
 
+  if (!draftId) return res.status(400).json({ message: 'draftId required' });
   // ✅ Validate required fields
-  if (!facultyName || !empId || !preference || !Array.isArray(selectedCourses)) {
-    console.error("Invalid data received:", req.body);
-    return res.status(400).json({ message: "Invalid request. Ensure name, empId, preference, and courses are provided correctly." });
+    if (!name || !empId || !preference || !Array.isArray(selectedCourses)) {
+      console.error("Invalid data received:", req.body);
+      return res.status(400).json({ message: "Invalid request. Ensure name, empId, preference, and courses are provided correctly." });
   }
 
   // ✅ Ensure `courseType` exists in each selected course
@@ -81,11 +85,11 @@ router.post('/submit-courses', async (req, res) => {
 
   try {
     const Course = require('../models/Course');
-    let faculty = await Faculty.findOne({ empId });
+  let faculty = await Faculty.findOne({ empId, draftId });
 
     // Check maxRegistrations for each selected course
     for (const course of selectedCourses) {
-      const courseDoc = await Course.findOne({ courseId: course.courseId });
+  const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
@@ -94,7 +98,7 @@ router.post('/submit-courses', async (req, res) => {
         const alreadyRegistered = faculty && faculty.selectedCourses.some(c => c.courseId === course.courseId);
         if (!alreadyRegistered) {
           // Count current registrations for this course
-          const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId });
+          const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
           if (count >= courseDoc.maxRegistrations) {
             return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
           }
@@ -103,14 +107,15 @@ router.post('/submit-courses', async (req, res) => {
     }
 
     if (!faculty) {
-      console.log(`Faculty not found for empId: ${empId}, registering new faculty...`);
+      console.log(`Faculty not found for empId: ${empId} in draft: ${draftId}, registering new faculty...`);
 
-      faculty = new Faculty({
-        name: facultyName,
+        faculty = new Faculty({
+          name,
         empId,
         preference,
         selectedCourses,
-        submittedAt: new Date()
+        submittedAt: new Date(),
+        draftId
       });
 
       await faculty.save();
@@ -137,15 +142,14 @@ router.post('/submit-courses', async (req, res) => {
 router.get('/check/:empId', async (req, res) => {
   const empId = req.params.empId; // ✅ Keep it as a string
 
+  const { draftId } = req.query;
+  if (!draftId) return res.status(400).json({ message: 'draftId required' });
   try {
-    const faculty = await Faculty.findOne({ empId });
-
+    const faculty = await Faculty.findOne({ empId, draftId });
     if (faculty) {
       return res.json({ exists: true, faculty });
     }
-
     res.json({ exists: false });
-
   } catch (error) {
     console.error("❌ Error checking faculty ID:", error);
     res.status(500).json({ message: 'Error checking faculty ID', error });
@@ -156,15 +160,14 @@ router.get('/check/:empId', async (req, res) => {
 router.delete('/delete/:empId', async (req, res) => {
   const { empId } = req.params;
 
+  const { draftId } = req.query;
+  if (!draftId) return res.status(400).json({ message: 'draftId required' });
   try {
-    const faculty = await Faculty.findOneAndDelete({ empId });
-
+    const faculty = await Faculty.findOneAndDelete({ empId, draftId });
     if (!faculty) {
       return res.status(404).json({ message: "Faculty not found" });
     }
-
     res.json({ message: "Faculty deleted successfully" });
-
   } catch (error) {
     console.error("❌ Error deleting faculty:", error);
     res.status(500).json({ message: "Error deleting faculty", error });
@@ -181,14 +184,13 @@ router.delete('/delete/:empId', async (req, res) => {
 // researchdomain:{ type: String },
 
 router.post("/storeugpg", async (req, res) => {
-  const { empId, pgspecialization, ugspecialization, researchDomain } = req.body;
+  const { empId, pgspecialization, ugspecialization, researchDomain, draftId } = req.body;
+  if (!draftId) return res.status(400).json({ message: 'draftId required' });
   try {
-    let faculty = await Faculty.findOne({ empId });
+    let faculty = await Faculty.findOne({ empId, draftId });
     if (!faculty) {
       return res.status(400).json({ message: 'Faculty not found' });
     }
-    // faculty.pg = pg;
-    // faculty.ug = ug;
     faculty.pgspecialization = pgspecialization;
     faculty.ugspecialization = ugspecialization;
     faculty.researchdomain = researchDomain;

@@ -60,6 +60,27 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   const navigate = useNavigate();
 
   const [registrationStatus, setRegistrationStatus] = useState("Loading");
+  // Draft selection state
+  const [drafts, setDrafts] = useState([]);
+  const [selectedDraft, setSelectedDraft] = useState(null);
+  const [draftLoading, setDraftLoading] = useState(false);
+
+  // Fetch drafts on mount
+  useEffect(() => {
+    setDraftLoading(true);
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
+      .then(res => {
+        setDrafts(res.data);
+        // Default to 'Default Draft' if present
+        const defaultDraft = res.data.find(d => d.name === 'Default Draft');
+        setSelectedDraft(defaultDraft || res.data[0] || null);
+        setDraftLoading(false);
+      })
+      .catch(() => {
+        setDrafts([]);
+        setDraftLoading(false);
+      });
+  }, []);
 
   // Toast management functions
   const addToast = (message, type = 'info') => {
@@ -72,7 +93,11 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
   };
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`)
+    if (!selectedDraft) {
+      setRegistrationStatus("Loading");
+      return;
+    }
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { params: { draftId: selectedDraft._id } })
       .then(response => {
         setRegistrationStatus(response.data.status);
       })
@@ -80,7 +105,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
         console.error("Error fetching registration status:", error);
         addToast("Failed to load registration status", "error");
       });
-  }, []);
+  }, [selectedDraft]);
 
   const sendOtp = async () => {
     setLoading(true);
@@ -100,9 +125,12 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
       const facultyEmail = faculty.email;
       setLocalFacultyEmail(facultyEmail);
 
-      // Check if already registered
+      // Check if already registered (send draftId)
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty/check/${facultyEmpid}`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${facultyEmpid}`,
+          { params: { draftId: selectedDraft?._id } }
+        );
         if (response.data.exists) {
           addToast("You have already registered.", "warning");
           navigate(`/faculty/${empId}`);
@@ -163,7 +191,8 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
 
         // Double-check if already registered
         const checkResponse = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`
+          `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`,
+          { params: { draftId: selectedDraft?._id } }
         );
         if (checkResponse.data.exists) {
           addToast("You have already registered.", "warning");
@@ -172,7 +201,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
 
         addToast("Email verified successfully! Redirecting...", "success");
         setTimeout(() => {
-          navigate("/course-selection", { state: { facultyEmail, empId } });
+          navigate("/course-selection", { state: { facultyEmail, empId, draftId: selectedDraft?._id } });
         }, 1500);
       } else {
         addToast("Invalid Employee ID or Email.", "error");
@@ -223,6 +252,24 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
         <h1>Faculty Registration</h1>
 
         <form onSubmit={handleSubmit} className="home-form">
+          <div className="form-group">
+            <label htmlFor="draft-select">Select Draft</label>
+            <select
+              id="draft-select"
+              value={selectedDraft ? selectedDraft._id : ''}
+              onChange={e => {
+                const found = drafts.find(d => d._id === e.target.value);
+                setSelectedDraft(found || null);
+              }}
+              disabled={draftLoading || drafts.length === 0}
+              required
+            >
+              <option value="">-- Select Draft --</option>
+              {drafts.map(draft => (
+                <option key={draft._id} value={draft._id}>{draft.name}</option>
+              ))}
+            </select>
+          </div>
           <input
             type="number"
             placeholder="Enter Faculty Employee ID"
@@ -232,7 +279,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
           />
 
           {!otpSent && (
-            <button type="button" onClick={sendOtp} disabled={loading || !facultyEmpid}>
+            <button type="button" onClick={sendOtp} disabled={loading || !facultyEmpid || !selectedDraft}>
               {loading ? "Sending OTP..." : "Send OTP"}
             </button>
           )}

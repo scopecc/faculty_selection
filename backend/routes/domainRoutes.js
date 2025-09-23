@@ -7,18 +7,17 @@ const DomainConfig = require("../models/DomainConfig");
 // ✅ Insert courses.json data (One-time operation)
 router.post("/insert-courses", async (req, res) => {
   try {
-    const courses = req.body; // JSON data sent from frontend
-    await Course.insertMany(courses);
-    
+    const { courses, draftId } = req.body;
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    await Course.insertMany(courses.map(c => ({ ...c, draftId })));
     // Extract unique domains & set default min/max counts
     const uniqueDomains = [...new Set(courses.map(course => course.domain))];
-
     const domainConfigs = uniqueDomains.map(domain => ({
       domain,
-      minCount: 0,  // Default min count
-      maxCount: 2   // Default max count
+      minCount: 0,
+      maxCount: 2,
+      draftId
     }));
-
     await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch(err => {}); // Ignore duplicates
     res.json({ message: "Courses inserted successfully!" });
   } catch (error) {
@@ -30,7 +29,9 @@ router.post("/insert-courses", async (req, res) => {
 // ✅ Fetch domain constraints
 router.get("/", async (req, res) => {
   try {
-    const configs = await DomainConfig.find();
+    const { draftId } = req.query;
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    const configs = await DomainConfig.find({ draftId });
     res.json(configs);
   } catch (error) {
     console.error("Error fetching domain constraints:", error);
@@ -41,11 +42,12 @@ router.get("/", async (req, res) => {
 // ✅ Update domain constraints
 router.post("/save", async (req, res) => {
   try {
-    const { domainConfigs } = req.body;
+    const { domainConfigs, draftId } = req.body;
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
     for (const config of domainConfigs) {
       await DomainConfig.updateOne(
-        { domain: config.domain },
-        { $set: { minCount: config.minCount, maxCount: config.maxCount } },
+        { domain: config.domain, draftId },
+        { $set: { minCount: config.minCount, maxCount: config.maxCount, draftId } },
         { upsert: true }
       );
     }
@@ -58,10 +60,11 @@ router.post("/save", async (req, res) => {
 
 router.get("/domains", async (req, res) => {
   try {
-    const domains = await Course.distinct("domain"); // ✅ Get unique domains from MongoDB
+    const { draftId } = req.query;
+    if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    const domains = await Course.distinct("domain", { draftId });
     console.log("✅ Fetched Domains:", domains);
-    
-    res.json(domains); // ✅ Return the unique domain list
+    res.json(domains);
   } catch (error) {
     console.error("❌ Error fetching domains:", error);
     res.status(500).json({ error: "Internal Server Error" });

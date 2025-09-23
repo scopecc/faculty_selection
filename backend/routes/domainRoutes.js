@@ -8,18 +8,26 @@ const DomainConfig = require("../models/DomainConfig");
 router.post("/insert-courses", async (req, res) => {
   try {
     const { courses, draftId } = req.body;
+    console.log('DEBUG /insert-courses: draftId =', draftId);
+    console.log('DEBUG /insert-courses: courses =', courses);
     if (!draftId) return res.status(400).json({ message: 'draftId required' });
+    // Delete all existing courses and domain constraints for this draft
+    await Course.deleteMany({ draftId });
+    await DomainConfig.deleteMany({ draftId });
     await Course.insertMany(courses.map(c => ({ ...c, draftId })));
     // Extract unique domains & set default min/max counts
     const uniqueDomains = [...new Set(courses.map(course => course.domain))];
+    console.log('DEBUG /insert-courses: uniqueDomains =', uniqueDomains);
     const domainConfigs = uniqueDomains.map(domain => ({
       domain,
       minCount: 0,
       maxCount: 2,
       draftId
     }));
-    await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch(err => {}); // Ignore duplicates
-    res.json({ message: "Courses inserted successfully!" });
+    await DomainConfig.insertMany(domainConfigs, { ordered: false }).catch(err => {
+      console.error('ERROR inserting domainConfigs:', err);
+    });
+    res.json({ message: "Courses and domain constraints inserted successfully!" });
   } catch (error) {
     console.error("Error inserting courses:", error);
     res.status(500).json({ error: "Internal Server Error" });

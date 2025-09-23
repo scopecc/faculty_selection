@@ -356,14 +356,30 @@ const Management = () => {
       const workbook = XLSX.read(data, { type: 'array' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      let jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+      // Normalize keys and ensure 'domain' field exists
+      jsonData = jsonData.map(row => {
+        const normalized = {};
+        Object.keys(row).forEach(key => {
+          const cleanKey = key.trim().toLowerCase();
+          normalized[cleanKey] = row[key];
+        });
+        // Map possible variations to expected backend keys
+        return {
+          courseId: normalized['courseid'] || normalized['course_id'] || '',
+          courseName: normalized['coursename'] || normalized['course_name'] || '',
+          domain: normalized['domain'] || '',
+          courseType: normalized['coursetype'] || normalized['course_type'] || '',
+        };
+      });
       try {
         await axios.post(`${process.env.REACT_APP_BACKEND_URL}/courses/upload-courses`, { courses: jsonData, draftId: selectedDraft?._id });
-        addToast("Courses uploaded successfully!", 'success');
+        await axios.post(`${process.env.REACT_APP_BACKEND_URL}/domain-config/insert-courses`, { courses: jsonData, draftId: selectedDraft?._id });
+        addToast("Courses and domain constraints uploaded successfully!", 'success');
         setUploadedCourses(jsonData);
         fetchData();
       } catch (error) {
-        addToast("Failed to upload courses.", 'error');
+        addToast("Failed to upload courses or domain constraints.", 'error');
       }
     };
     reader.readAsArrayBuffer(file);
@@ -849,7 +865,7 @@ const Management = () => {
               </thead>
               <tbody>
                 {domainConfigs.map((config, index) => (
-                  <tr key={index}>
+                  <tr key={config.domain + '-' + (config.draftId || index)}>
                     <td>{config.domain}</td>
                     <td>
                       <input

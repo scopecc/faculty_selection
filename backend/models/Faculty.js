@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const FacultySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  empId: { type: Number, required: true, unique: true },
+  empId: { type: Number, required: true },
   preference: { type: String, required: true },
   selectedCourses: [{
     courseId: { type: String, required: true },
@@ -18,6 +18,10 @@ const FacultySchema = new mongoose.Schema({
   submittedAt: { type: Date },
   draftId: { type: mongoose.Schema.Types.ObjectId, ref: 'Draft', required: false }
 });
+
+
+// Compound unique index: empId + draftId
+FacultySchema.index({ empId: 1, draftId: 1 }, { unique: true });
 
 const Faculty = mongoose.model('Faculty', FacultySchema);
 module.exports = Faculty;

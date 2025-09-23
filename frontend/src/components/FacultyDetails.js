@@ -13,6 +13,26 @@ const FacultyDetails = () => {
   const [otpVerified, setOtpVerified] = useState(false);
   const [facultyEmail, setFacultyEmail] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
+  // Draft selection state
+  const [drafts, setDrafts] = useState([]);
+  const [selectedDraft, setSelectedDraft] = useState(null);
+  const [draftLoading, setDraftLoading] = useState(false);
+  // Fetch drafts on mount
+  useEffect(() => {
+    setDraftLoading(true);
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
+      .then(res => {
+        setDrafts(res.data);
+        // Default to 'Default Draft' if present
+        const defaultDraft = res.data.find(d => d.name === 'Default Draft');
+        setSelectedDraft(defaultDraft || res.data[0] || null);
+        setDraftLoading(false);
+      })
+      .catch(() => {
+        setDrafts([]);
+        setDraftLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const fetchFacultyEmail = async () => {
@@ -52,11 +72,14 @@ const FacultyDetails = () => {
       alert("Please enter the OTP.");
       return;
     }
+    if (!selectedDraft) {
+      alert("Please select a draft.");
+      return;
+    }
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/otp/verify-otp`, { email: facultyEmail, otp });
       setLoading(true);
-      // Get draftId from localStorage (or update if you use another source)
-      const draftId = localStorage.getItem('draftId');
+      const draftId = selectedDraft._id;
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/faculty/check/${empId}`,
         { params: { draftId } }
@@ -65,8 +88,9 @@ const FacultyDetails = () => {
         setFaculty(response.data.faculty);
         setOtpVerified(true);
       } else {
-        alert("Faculty not found!");
-        navigate("/home");
+        alert("Faculty not found in selected draft!");
+        setOtpVerified(false);
+        setFaculty(null);
       }
     } catch (error) {
       alert("Invalid OTP. Please try again.");
@@ -80,10 +104,13 @@ const FacultyDetails = () => {
       alert("Please verify OTP first.");
       return;
     }
+    if (!selectedDraft) {
+      alert("Please select a draft.");
+      return;
+    }
     if (window.confirm("Are you sure you want to delete this faculty record?")) {
       try {
-        // Get draftId from localStorage (or update if you use another source)
-        const draftId = localStorage.getItem('draftId');
+        const draftId = selectedDraft._id;
         await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/faculty/delete/${empId}`, {
           params: { draftId }
         });
@@ -119,6 +146,27 @@ const FacultyDetails = () => {
         <div className="otp-section">
           <h2>Registration Already Done</h2>
           <p>To view or delete your registration, please verify with OTP sent to your registered email.</p>
+          <div className="draft-dropdown-container">
+            <label htmlFor="draft-select"><strong>Select Draft:</strong></label>
+            {draftLoading ? (
+              <span>Loading drafts...</span>
+            ) : (
+              <select
+                id="draft-select"
+                value={selectedDraft ? selectedDraft._id : ''}
+                onChange={e => {
+                  const draft = drafts.find(d => d._id === e.target.value);
+                  setSelectedDraft(draft || null);
+                  setFaculty(null);
+                  setOtpVerified(false);
+                }}
+              >
+                {drafts.map(draft => (
+                  <option key={draft._id} value={draft._id}>{draft.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
           <button onClick={sendOtp} disabled={sendingOtp || otpSent}>
             {sendingOtp ? 'Sending OTP...' : otpSent ? 'OTP Sent' : 'Send OTP'}
           </button>

@@ -4,18 +4,7 @@ import './Navbar.css';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -43,7 +32,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+    <nav className="navbar">
       <div className="navbar-brand">
         <h2 className="navbar-title">Faculty Selection</h2>
       </div>
@@ -54,13 +43,13 @@ const Navbar = () => {
           to="/" 
           className={`nav-link ${isActive('/') ? 'active' : ''}`}
         >
-          <span>Home</span>
+          Home
         </Link>
         <Link 
           to="/management" 
           className={`nav-link ${isActive('/management') ? 'active' : ''}`}
         >
-          <span>Management</span>
+          Management
         </Link>
       </div>
 

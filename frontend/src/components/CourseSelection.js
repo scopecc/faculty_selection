@@ -244,7 +244,7 @@ useEffect(() => {
   return (
     <div className="course-selection-container">
       <h1>Course Selection</h1>
-      <p className="faculty-details" style={{fontSize:"45px"}}>Welcome,<strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
+      <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p className="faculty-details" style={{color:"red",textAlign:"left"}}><strong>1. You must select exactly {maxCourses} courses.<br></br><br></br>2. The selected courses will be displayed in the order in which you select the courses.<br></br><br></br>3. If you are more preferred to choose Theory only course, choose 5 Theory only courses and 2 Theory+Lab courses.
@@ -429,15 +429,15 @@ useEffect(() => {
                   <span style={{ display: "flex" }}>
                     <button 
                       onClick={() => moveCourseUp(index)} 
-                      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "16px",padding: "0" }}
                       title="Move Up"
+                      className="move-button"
                     >
                       ⬆️
                     </button>
                     <button 
                       onClick={() => moveCourseDown(index)} 
-                      style={{ background: "transparent", border: "none", cursor: "pointer", fontSize: "16px",padding: "0" }}
                       title="Move Down"
+                      className="move-button"
                     >
                       ⬇️
                     </button>

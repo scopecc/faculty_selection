@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #6366f1;
-  --secondary-color: #10b981;
-  --accent-color: #f59e0b;
+  --primary-color: #2563eb;
+  --secondary-color: #1d4ed8;
+  --accent-color: #3b82f6;
   --background-color: #fafafa;
   --card-background: #ffffff;
   --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
   --border-light: #e5e7eb;
   --border-medium: #d1d5db;
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -22,8 +22,15 @@
   --spacing-md: 20px;
   --spacing-lg: 32px;
   --spacing-xl: 48px;
+  --success-color: #059669;
+  --success-hover: #047857;
+  --warning-bg: #fef3cd;
+  --warning-border: #f59e0b;
+  --warning-text: #92400e;
+  --info-bg: #dbeafe;
+  --info-border: #3b82f6;
+  --info-text: #1e40af;
 }
-
 * {
   box-sizing: border-box;
 }
@@ -49,31 +56,23 @@ body {
 
 h1 {
   text-align: center;
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 700;
   font-size: 2.5rem;
   margin: 0 0 var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 h2 {
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 600;
   font-size: 1.5rem;
   margin: var(--spacing-lg) 0 var(--spacing-md);
   text-align: center;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* Welcome messages - override inline styles */
 .faculty-details {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  background-color: #f8fafc !important;
   border: 1px solid var(--border-light) !important;
   border-radius: var(--radius-md) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
@@ -93,14 +92,14 @@ h2 {
 
 /* Instructions styling */
 p[style*="color:red"] {
-  background: linear-gradient(135deg, #fef3cd 0%, #fde68a 100%) !important;
-  border: 1px solid #f59e0b !important;
+  background-color: var(--warning-bg) !important;
+  border: 1px solid var(--warning-border) !important;
   border-radius: var(--radius-md) !important;
   padding: var(--spacing-md) !important;
   margin: var(--spacing-lg) 0 !important;
   font-size: 0.85rem !important;
   line-height: 1.6 !important;
-  color: #92400e !important;
+  color: var(--warning-text) !important;
   text-align: left !important;
 }
 
@@ -112,14 +111,14 @@ p[style*="color:red"] strong {
 
 /* Course code info */
 p[style*="color:blue"] {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-  border: 1px solid #3b82f6 !important;
+  background-color: var(--info-bg) !important;
+  border: 1px solid var(--info-border) !important;
   border-radius: var(--radius-md) !important;
   padding: var(--spacing-md) !important;
   margin: var(--spacing-lg) 0 !important;
   font-size: 0.9rem !important;
   line-height: 1.6 !important;
-  color: #1e40af !important;
+  color: var(--info-text) !important;
   text-align: center !important;
 }
 
@@ -158,7 +157,7 @@ p[style*="color:blue"] {
   outline: none;
   border-color: var(--primary-color);
   background-color: white;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 /* Radio button styling */
@@ -202,10 +201,10 @@ label[style*="display:flex"]:hover {
   margin-bottom: 0 !important;
 }
 
-/* FIXED: Accordion title (group headers) - ensuring white text is visible */
+/* Accordion title (group headers) - solid color */
 .accordion-title {
-  background: linear-gradient(135deg, var(--primary-color), #5b5efc) !important;
-  color: #ffffff !important; /* Force white color */
+  background-color: var(--primary-color) !important;
+  color: #ffffff !important;
   padding: var(--spacing-md) var(--spacing-lg) !important;
   margin: 0 !important;
   font-weight: 600 !important;
@@ -216,16 +215,11 @@ label[style*="display:flex"]:hover {
   border: none !important;
   width: 100% !important;
   text-align: left !important;
-  /* Remove any text effects that might make text invisible */
-  text-shadow: none !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background-clip: border-box !important;
 }
 
 .accordion-title:hover {
-  background: linear-gradient(135deg, #5b5efc, #4f46e5) !important;
-  color: #ffffff !important; /* Ensure white text on hover */
-  -webkit-text-fill-color: #ffffff !important;
+  background-color: var(--secondary-color) !important;
+  color: #ffffff !important;
 }
 
 /* Accordion content */
@@ -284,7 +278,7 @@ label[style*="display:flex"]:hover {
 }
 
 .accordion-content label:has(input[type="checkbox"]:checked) {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
+  background-color: rgba(37, 99, 235, 0.1);
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
@@ -298,7 +292,7 @@ label[style*="display:flex"]:hover {
 
 /* Selected courses section */
 .selected-courses {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  background-color: var(--info-bg) !important;
   border: 1px solid var(--primary-color) !important;
   border-radius: var(--radius-md) !important;
   padding: var(--spacing-lg) !important;
@@ -315,8 +309,6 @@ label[style*="display:flex"]:hover {
   font-size: 1.3rem !important;
   margin: 0 0 var(--spacing-md) !important;
   text-align: center !important;
-  background: none !important;
-  -webkit-text-fill-color: var(--primary-color) !important;
 }
 
 .selected-courses ol {
@@ -324,8 +316,8 @@ label[style*="display:flex"]:hover {
 }
 
 .selected-courses li {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
   border-radius: var(--radius-sm) !important;
   margin-bottom: var(--spacing-sm) !important;
   font-size: 0.85rem !important;
@@ -340,7 +332,7 @@ label[style*="display:flex"]:hover {
 .submit-button {
   width: 100% !important;
   padding: var(--spacing-md) var(--spacing-lg) !important;
-  background: linear-gradient(135deg, var(--secondary-color), #059669) !important;
+  background-color: var(--success-color) !important;
   color: white !important;
   border: none !important;
   border-radius: var(--radius-md) !important;
@@ -354,7 +346,7 @@ label[style*="display:flex"]:hover {
 }
 
 .submit-button:hover {
-  background: linear-gradient(135deg, #059669, #047857) !important;
+  background-color: var(--success-hover) !important;
   transform: translateY(-2px) !important;
   box-shadow: var(--shadow-lg) !important;
 }
@@ -366,7 +358,7 @@ label[style*="display:flex"]:hover {
 hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
+  background-color: var(--border-medium);
   margin: var(--spacing-xl) 0;
 }
 
@@ -393,7 +385,7 @@ hr {
   .selection-view {
     flex-direction: column !important;
   }
-  
+
   .selected-courses {
     position: static !important;
     max-height: none !important;
@@ -407,26 +399,31 @@ hr {
     margin: var(--spacing-md);
     padding: var(--spacing-md);
   }
-  
+
   h1 {
     font-size: 2rem;
   }
-  
+
   .input-fields input,
   .input-fields select {
     width: 100%;
     margin: var(--spacing-xs) 0;
   }
-  
+
   .selection-view {
     gap: var(--spacing-md) !important;
   }
-  
+
   .faculty-details {
     font-size: 0.8rem !important;
   }
-  
+
   .faculty-details strong {
     font-size: 0.8rem !important;
   }
+}
+
+.move-button {
+  background: transparent;
+  min-width: 30px;
 }

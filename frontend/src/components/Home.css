@@ -1,16 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #6366f1;
-  --secondary-color: #10b981;
-  --danger-color: #ef4444;
+  --primary-color: #000000;
+  --secondary-color: #333333;
+  --danger-color: #dc2626;
   --warning-color: #f59e0b;
-  --success-color: #10b981;
-  --background-color: #fafafa;
+  --success-color: #16a34a;
+  --background-color: #ffffff;
   --card-background: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-muted: #999999;
   --border-light: #e5e7eb;
   --border-medium: #d1d5db;
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -48,19 +48,15 @@ body {
   justify-content: center;
   align-items: center;
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, #fafafa 0%, #f3f4f6 100%);
+  background-color: #fafafa;
 }
 
 .home-container h1 {
   text-align: center;
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 700;
   font-size: 2.5rem;
   margin: 0 0 var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   letter-spacing: -0.02em;
 }
 
@@ -72,19 +68,8 @@ body {
   background-color: var(--card-background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border-light);
+  border: 2px solid var(--primary-color);
   position: relative;
-  overflow: hidden;
-}
-
-.home-form::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 /* Input Fields */
@@ -98,7 +83,7 @@ body {
   font-size: 1rem;
   font-weight: 500;
   color: var(--text-primary);
-  background-color: #fafafa;
+  background-color: var(--background-color);
   transition: all 0.3s ease;
 }
 
@@ -112,8 +97,7 @@ body {
   outline: none;
   border-color: var(--primary-color);
   background-color: var(--card-background);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Radio Button Group */
@@ -123,7 +107,7 @@ body {
   gap: var(--spacing-lg);
   margin: var(--spacing-lg) 0;
   padding: var(--spacing-md);
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background-color: #f9f9f9;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
 }
@@ -145,7 +129,7 @@ body {
 
 .radio-group label:hover {
   color: var(--primary-color);
-  background-color: rgba(99, 102, 241, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .radio-group input[type="radio"] {
@@ -155,10 +139,10 @@ body {
   margin: 0;
 }
 
-/* Buttons */
+/* Buttons - Solid colors, proper alignment */
 .home-form button {
   width: 100%;
-  background: linear-gradient(135deg, var(--primary-color), #5b5efc);
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: var(--spacing-md) var(--spacing-lg);
@@ -168,29 +152,19 @@ body {
   letter-spacing: 0.5px;
   border-radius: var(--radius-md);
   cursor: pointer;
-  margin-top: var(--spacing-md);
+  margin: var(--spacing-md) 0;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Special styling for Sign In button */
-.home-form button[style*="width:250px"] {
-  width: 100% !important;
-  max-width: 250px;
-  margin: var(--spacing-md) auto 0;
-  background: linear-gradient(135deg, var(--secondary-color), #059669);
-}
-
-.home-form button[style*="width:250px"]:hover {
-  background: linear-gradient(135deg, #059669, #047857);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Button Hover Effect */
 .home-form button:hover {
-  background: linear-gradient(135deg, #5b5efc, #4f46e5);
-  transform: translateY(-2px);
+  background-color: var(--secondary-color);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -202,24 +176,57 @@ body {
 
 /* Disabled Button */
 .home-form button:disabled {
-  background: linear-gradient(135deg, var(--text-muted), #9ca3af);
+  background-color: var(--text-muted);
   cursor: not-allowed;
   transform: none;
   box-shadow: var(--shadow-sm);
   opacity: 0.6;
 }
 
-/* OTP Success Message */
-.home-form p {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+/* Success Message - Clean notification style */
+.success-notification {
+  background-color: #f0f9ff;
   color: var(--success-color);
-  border: 1px solid #bbf7d0;
-  border-radius: var(--radius-sm);
+  border: 1px solid #a5f3fc;
+  border-radius: var(--radius-md);
   padding: var(--spacing-md);
   margin: var(--spacing-md) 0;
   font-weight: 500;
   text-align: center;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.success-notification::before {
+  content: "✓";
+  font-weight: 700;
+  color: var(--success-color);
+}
+
+/* Error Message - Clean notification style */
+.error-notification {
+  background-color: #fef2f2;
+  color: var(--danger-color);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.error-notification::before {
+  content: "⚠";
+  font-weight: 700;
+  color: var(--danger-color);
 }
 
 /* Loading State */
@@ -262,8 +269,8 @@ body {
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  border: 2px solid var(--danger-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   text-align: center;
@@ -281,22 +288,6 @@ body {
   color: #dc2626;
   font-weight: 500;
   margin: 0;
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-/* Error States */
-.error-message {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  color: var(--danger-color);
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-sm);
-  padding: var(--spacing-md);
-  margin: var(--spacing-md) 0;
-  font-weight: 500;
-  text-align: center;
-  font-size: 0.95rem;
 }
 
 /* Step Indicators */
@@ -352,6 +343,94 @@ body {
   color: var(--text-primary);
 }
 
+/* Custom Toast/Notification Container */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 400px;
+}
+
+.toast {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+}
+
+.toast.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.toast.error {
+  border-left: 4px solid var(--danger-color);
+}
+
+.toast.warning {
+  border-left: 4px solid var(--warning-color);
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.toast.success .toast-icon {
+  color: var(--success-color);
+}
+
+.toast.error .toast-icon {
+  color: var(--danger-color);
+}
+
+.toast.warning .toast-icon {
+  color: var(--warning-color);
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-close:hover {
+  color: var(--text-primary);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .home-container {
@@ -375,6 +454,13 @@ body {
 
   .radio-group label {
     justify-content: center;
+  }
+
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
   }
 }
 

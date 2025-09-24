@@ -41,6 +41,7 @@ const CourseSelection = () => {
   const [domainConstraints, setDomainConstraints] = useState({});
 
   const [preference, setLocalPreference] = useState("");
+  const [willingness, setWillingness] = useState(false); // New state for willingness
 
   const moveCourseUp = (index) => {
     if (index === 0) return;
@@ -226,7 +227,7 @@ useEffect(() => {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name: facultyName, facultyEmail, preference, selectedCourses, draftId },
+        { empId, name: facultyName, facultyEmail, preference, selectedCourses, draftId, willingness },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
@@ -326,7 +327,8 @@ useEffect(() => {
         1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
         2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>
 
-      <div style={{width:"100%", display:"flex", gap:"20px" , justifyContent:"center"}}>
+
+      <div style={{width:"100%", display:"flex", gap:"20px" , justifyContent:"center", alignItems: "center"}}>
         <label style={{display:"flex",alignItems:"center",width:"105px"}}>
           <input
             type="radio"
@@ -338,7 +340,7 @@ useEffect(() => {
           Theory
         </label>
 
-        <label style={{display:"flex",alignItems:"center",width:"105px"}}>
+        <label style={{display:"flex",alignItems:"center",width:"120px"}}>
           <input
             type="radio"
             name="preference"
@@ -347,6 +349,17 @@ useEffect(() => {
             required
           />
           Theory + Lab
+        </label>
+
+        {/* Willingness Checkbox */}
+        <label style={{display:"flex",alignItems:"center",marginLeft:"30px",fontWeight:600,fontSize:"16px"}}>
+          <input
+            type="checkbox"
+            checked={willingness}
+            onChange={e => setWillingness(e.target.checked)}
+            style={{marginRight:"8px"}}
+          />
+          Willingness to take more courses
         </label>
       </div>
 

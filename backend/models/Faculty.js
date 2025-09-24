@@ -10,6 +10,7 @@ const FacultySchema = new mongoose.Schema({
     courseType: { type: String, required: true },
     domain: { type: String, required: true }
   }],
+  willingness: { type: Boolean, default: false }, // New field for willingness
   // pg:{ type: String },
   // ug:{ type: String},
   pgspecialization:{ type: String},

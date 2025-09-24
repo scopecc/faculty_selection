@@ -65,8 +65,10 @@ router.get('/', async (req, res) => {
 
 // ✅ Submit selected courses for a faculty
 // ✅ Submit selected courses for a faculty
+
+// Accept willingness in the request body
 router.post('/submit-courses', async (req, res) => {
-  let { empId, name, facultyName, preference, selectedCourses, draftId } = req.body;
+  let { empId, name, facultyName, preference, selectedCourses, draftId, willingness } = req.body;
 
   console.log("Received course submission request:", req.body);
 
@@ -111,12 +113,13 @@ router.post('/submit-courses', async (req, res) => {
 
         faculty = new Faculty({
           name,
-        empId,
-        preference,
-        selectedCourses,
-        submittedAt: new Date(),
-        draftId
-      });
+          empId,
+          preference,
+          selectedCourses,
+          willingness: willingness, // Store willingness as sent (true/false)
+          submittedAt: new Date(),
+          draftId
+        });
 
       await faculty.save();
       console.log("✅ New faculty registered:", faculty);
@@ -124,9 +127,11 @@ router.post('/submit-courses', async (req, res) => {
     }
 
     // ✅ If faculty exists, update their selected courses
-    faculty.selectedCourses = selectedCourses;
-    faculty.submittedAt = new Date(); 
-    await faculty.save();
+
+  faculty.selectedCourses = selectedCourses;
+  faculty.willingness = willingness;
+  faculty.submittedAt = new Date(); 
+  await faculty.save();
 
     console.log("✅ Courses updated successfully for:", empId);
     res.status(200).json({ message: 'Courses updated successfully', faculty });

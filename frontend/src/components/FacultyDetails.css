@@ -282,6 +282,17 @@ button:not(:disabled):active {
   animation: spin 1s linear infinite;
 }
 
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  background-color: #fafafa;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

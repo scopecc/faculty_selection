@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Home.css";
 
-// Toast notification component
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -234,7 +233,7 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     return (
       <>
         <div className="home-container">
-          <h1>Faculty Registration</h1>
+          <h1></h1>
           <div className="registration-closed">
             <h2>Registration Closed</h2>
             <p>The registration period has ended. Please contact the administrator for assistance.</p>

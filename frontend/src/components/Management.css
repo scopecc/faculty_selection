@@ -134,6 +134,7 @@ body {
   padding: var(--spacing-xs);
   border-radius: var(--radius-sm);
   min-width: 20px;
+  top: 25%;
 }
 
 
@@ -504,7 +505,7 @@ input{
 
 .table-header {
   background-color: black;
-  color: white;
+  color: black;
   padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
   justify-content: space-between;
@@ -515,7 +516,7 @@ input{
   font-weight: 600;
   font-size: 1.2rem;
   margin: 0;
-  color: white;
+  color: black;
 }
 
 .table-actions {

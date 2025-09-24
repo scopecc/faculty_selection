@@ -395,13 +395,14 @@ const Management = () => {
       if (typeof idA === 'number' && typeof idB === 'number') {
         return idA - idB;
       }
+      return 0;
     });
 
     let sno = 1;
     sortedfacultyData.forEach(faculty => {
       faculty.selectedCourses.forEach((course, index) => {
         facultyExcelData.push({
-          "S.No": sno,
+          "S.No": sno++,
           "Faculty Name": faculty.name,
           "Empld": faculty.empId,
           "Course Name": course.courseName,
@@ -412,16 +413,23 @@ const Management = () => {
           "Submission Time": faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'
         });
       });
-      facultyExcelData.push({});
-      sno++;
+      facultyExcelData.push({
+        "Faculty Name": faculty.name,
+        "Empld": faculty.empId,
+        "Preference": faculty.preference,
+        "Selected Courses": faculty.selectedCourses.map(course => course.courseName).join(", "),
+        "UG SPL": faculty.ugspecialization,
+        "PG SPL": faculty.pgspecialization,
+        "RESEARCH DOMAIN": faculty.researchdomain,
+        "Willing to Take More?": faculty.willingness ? "Yes" : "No",
+        "Submission Time": faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'
+      });
     });
-
     const ws = XLSX.utils.json_to_sheet(facultyExcelData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Faculty Selection");
     XLSX.writeFile(wb, "faculty_course_selection.xlsx");
   };
-
   // Download course selection as Excel
   const handleDownloadCourseExcel = () => {
     const courseExcelData = [];
@@ -940,6 +948,7 @@ const Management = () => {
                     <th>UG Specialization</th>
                     <th>PG Specialization</th>
                     <th>Research Domain</th>
+                    <th>Willing to Take More?</th>
                     <th>Submission Time</th>
                   </tr>
                 </thead>
@@ -954,6 +963,7 @@ const Management = () => {
                       <td>{faculty.ugspecialization || "N/A"}</td>
                       <td>{faculty.pgspecialization || "N/A"}</td>
                       <td>{faculty.researchdomain || "N/A"}</td>
+                      <td>{faculty.willingness ? "Yes" : "No"}</td>
                       <td>{faculty.submittedAt ? new Date(faculty.submittedAt).toLocaleString() : 'Not Submitted'}</td>
                     </tr>
                   ))}
@@ -1054,9 +1064,12 @@ const Management = () => {
           )}
         </div>
       </div>
+
+
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </>
   );
-};
+    };
+  
 
 export default Management;

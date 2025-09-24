@@ -204,7 +204,7 @@ label[style*="display:flex"]:hover {
 /* Accordion title (group headers) - solid color */
 .accordion-title {
   background-color: var(--primary-color) !important;
-  color: #ffffff !important;
+  color: black !important;
   padding: var(--spacing-md) var(--spacing-lg) !important;
   margin: 0 !important;
   font-weight: 600 !important;
@@ -219,7 +219,7 @@ label[style*="display:flex"]:hover {
 
 .accordion-title:hover {
   background-color: var(--secondary-color) !important;
-  color: #ffffff !important;
+  color: black !important;
 }
 
 /* Accordion content */

@@ -531,7 +531,7 @@ const Management = () => {
     return (
       <>
         <div className="management-container">
-          <h1>Admin Login</h1>
+          <h1></h1>
           <div className="login-container">
             <form onSubmit={handleLogin} className="login-form">
               <h2>Admin Login</h2>
@@ -647,7 +647,6 @@ const Management = () => {
     <>
       <div className="management-container">
         <div className="dashboard-header" style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-          <h1 style={{ flex: 1 }}>Management Dashboard</h1>
           <div className="draft-select-container" style={{ minWidth: 420, display: 'flex', alignItems: 'center', gap: 8 }}>
             <label htmlFor="dashboard-draft-select" style={{ marginRight: 8 }}>Draft:</label>
             <select

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const emailService = require("../utils/emailService");
+const axios = require("axios");
 require("dotenv").config();
 
 // ✅ In-memory storage for OTPs
@@ -15,19 +15,50 @@ router.post("/send-otp", async (req, res) => {
     // ✅ Store OTP with expiry (5 mins)
     otpStorage[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
 
-    // ✅ Send email using email service
-    const result = await emailService.sendOTP(email, otp);
+    // ✅ Send OTP using n8n workflow
+    const n8nWebhookUrl = process.env.N8N_OTP_WEBHOOK_URL;
 
-    if (result.success) {
+    if (!n8nWebhookUrl) {
+      throw new Error("N8N webhook URL not configured");
+    }
+
+    const response = await axios.post(
+      n8nWebhookUrl,
+      {
+        email: email,
+        otp: otp,
+      },
+      {
+        timeout: 30000, // 30 second timeout
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      console.log("✅ OTP sent via n8n workflow successfully");
       res.status(200).json({ message: "OTP sent successfully" });
     } else {
-      throw new Error(result.error);
+      throw new Error(`n8n workflow returned status: ${response.status}`);
     }
   } catch (error) {
-    console.error("❌ [SEND OTP] Error:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to send OTP", error: error.message });
+    console.error("❌ [SEND OTP] Error:", error.message);
+
+    // Provide more specific error messages
+    if (error.code === "ECONNABORTED") {
+      res.status(500).json({
+        message: "Request timeout - n8n workflow took too long to respond",
+      });
+    } else if (error.code === "ECONNREFUSED") {
+      res.status(500).json({
+        message: "Cannot connect to n8n workflow - service unavailable",
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Failed to send OTP", error: error.message });
+    }
   }
 });
 

@@ -1,103 +1,282 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Mail, User, GraduationCap, Users } from "lucide-react";
+import { getRegistrationStatus, sendOTP, verifyOTP } from "@/lib/api";
+import { RegistrationStatus } from "@/lib/types";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { user } = useUser();
+  const router = useRouter();
+  const [registrationStatus, setRegistrationStatus] =
+    useState<RegistrationStatus["status"]>("closed");
+  const [facultyEmpid, setFacultyEmpid] = useState("");
+  const [facultyEmail, setFacultyEmail] = useState("");
+  const [preference, setPreference] = useState<"UG" | "PG" | "">("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const fetchRegistrationStatus = async () => {
+      try {
+        const response = await getRegistrationStatus();
+        setRegistrationStatus(response.status);
+      } catch (error) {
+        console.error("Error fetching registration status:", error);
+      }
+    };
+    fetchRegistrationStatus();
+  }, []);
+
+  const handleSendOtp = async () => {
+    if (!facultyEmpid.trim()) {
+      setError("Please enter your Employee ID");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await sendOTP(facultyEmpid);
+      if (response.success) {
+        setOtpSent(true);
+        setSuccess("OTP sent successfully to your registered email");
+      } else {
+        setError(response.message || "Failed to send OTP");
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Error sending OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      setError("Please enter the OTP");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await verifyOTP(facultyEmpid, otp);
+      if (response.success) {
+        setSuccess("OTP verified successfully!");
+        // Navigate to course selection
+        router.push(
+          `/course-selection?empId=${facultyEmpid}&email=${encodeURIComponent(
+            facultyEmail
+          )}&preference=${preference}`
+        );
+      } else {
+        setError(response.message || "Invalid OTP");
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Error verifying OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SignedOut>
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Welcome</CardTitle>
+              <CardDescription>
+                Please sign in to access the Faculty Selection Tool
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </SignedOut>
+
+      <SignedIn>
+        <div className="container mx-auto py-8 px-4">
+          {registrationStatus === "closed" ? (
+            <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+              <Card className="w-full max-w-lg">
+                <CardHeader className="text-center">
+                  <GraduationCap className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <CardTitle className="text-2xl">
+                    Registration Closed
+                  </CardTitle>
+                  <CardDescription>
+                    The faculty course selection registration is currently
+                    closed. Please check back later or contact the
+                    administrator.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+              <Card className="w-full max-w-lg">
+                <CardHeader className="text-center">
+                  <User className="w-12 h-12 mx-auto mb-4 text-primary" />
+                  <CardTitle className="text-2xl">
+                    Faculty Authentication
+                  </CardTitle>
+                  <CardDescription>
+                    Enter your details to access the course selection system
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  {success && (
+                    <Alert>
+                      <AlertDescription>{success}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="empId">Employee ID</Label>
+                      <Input
+                        id="empId"
+                        placeholder="Enter your Employee ID"
+                        value={facultyEmpid}
+                        onChange={(e) => setFacultyEmpid(e.target.value)}
+                        disabled={otpSent}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={facultyEmail}
+                        onChange={(e) => setFacultyEmail(e.target.value)}
+                        disabled={otpSent}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="preference">Course Preference</Label>
+                      <select
+                        id="preference"
+                        className="w-full p-2 border border-input rounded-md bg-background"
+                        value={preference}
+                        onChange={(e) =>
+                          setPreference(e.target.value as "UG" | "PG")
+                        }
+                        disabled={otpSent}
+                      >
+                        <option value="">Select your preference</option>
+                        <option value="UG">Undergraduate (UG)</option>
+                        <option value="PG">Postgraduate (PG)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {!otpSent ? (
+                    <Button
+                      onClick={handleSendOtp}
+                      className="w-full"
+                      disabled={
+                        loading || !facultyEmpid || !facultyEmail || !preference
+                      }
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Sending OTP...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Send OTP
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="otp">Enter OTP</Label>
+                        <Input
+                          id="otp"
+                          placeholder="Enter the OTP sent to your email"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          maxLength={6}
+                        />
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleVerifyOtp}
+                          className="flex-1"
+                          disabled={loading || !otp}
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Verifying...
+                            </>
+                          ) : (
+                            "Verify & Continue"
+                          )}
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setOtpSent(false);
+                            setOtp("");
+                            setError("");
+                            setSuccess("");
+                          }}
+                        >
+                          Back
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="link"
+                      onClick={() => router.push("/management")}
+                      className="text-sm"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Admin Management
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </SignedIn>
     </div>
   );
 }

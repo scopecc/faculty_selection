@@ -1,1 +1,0 @@
-1. admin is not able to set max registrations for courses which has / since its disturbing the api url

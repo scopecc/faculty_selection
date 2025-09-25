@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +19,6 @@ import { getRegistrationStatus, sendOTP, verifyOTP } from "@/lib/api";
 import { RegistrationStatus } from "@/lib/types";
 
 export default function Home() {
-  const { user } = useUser();
   const router = useRouter();
   const [registrationStatus, setRegistrationStatus] =
     useState<RegistrationStatus["status"]>("closed");
@@ -61,8 +60,11 @@ export default function Home() {
       } else {
         setError(response.message || "Failed to send OTP");
       }
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Error sending OTP");
+    } catch (error: unknown) {
+      setError(
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "Error sending OTP"
+      );
     } finally {
       setLoading(false);
     }
@@ -90,8 +92,11 @@ export default function Home() {
       } else {
         setError(response.message || "Invalid OTP");
       }
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Error verifying OTP");
+    } catch (error: unknown) {
+      setError(
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "Error verifying OTP"
+      );
     } finally {
       setLoading(false);
     }

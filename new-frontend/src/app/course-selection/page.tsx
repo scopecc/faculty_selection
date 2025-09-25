@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   BookOpen,
@@ -27,7 +26,7 @@ import {
 import { getCourses, getFacultyById, updateFaculty } from "@/lib/api";
 import { Course, Faculty } from "@/lib/types";
 
-export default function CourseSelection() {
+function CourseSelectionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const empId = searchParams.get("empId");
@@ -68,7 +67,7 @@ export default function CourseSelection() {
           setFaculty(facultyResponse.faculty);
           setSelectedCourses(facultyResponse.faculty.selectedCourses || []);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to load course data");
       } finally {
@@ -110,9 +109,10 @@ export default function CourseSelection() {
       setTimeout(() => {
         router.push(`/faculty/${empId}`);
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError(
-        error.response?.data?.message || "Failed to submit course selection"
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "Failed to submit course selection"
       );
     } finally {
       setSubmitting(false);
@@ -340,5 +340,13 @@ export default function CourseSelection() {
         </div>
       </SignedIn>
     </div>
+  );
+}
+
+export default function CourseSelection() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CourseSelectionContent />
+    </Suspense>
   );
 }

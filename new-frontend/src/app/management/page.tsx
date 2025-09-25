@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -24,14 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import {
   Users,
   BookOpen,
@@ -45,7 +36,6 @@ import {
   AlertCircle,
   Trash2,
   RefreshCw,
-  FileSpreadsheet,
   Lock,
   Unlock,
   UserCheck,
@@ -122,7 +112,7 @@ export default function Management() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Error during login. Please try again",
@@ -146,7 +136,7 @@ export default function Management() {
       setFacultyData(facultyResponse.faculties || []);
       setCourseData(coursesResponse.courses || []);
       setRegistrationStatus(statusResponse.status);
-    } catch (error: any) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to fetch data",
@@ -169,7 +159,7 @@ export default function Management() {
           newStatus === "open" ? "opened" : "closed"
         }!`,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to toggle registration status",
@@ -197,15 +187,29 @@ export default function Management() {
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            defval: "",
+          }) as Record<string, unknown>[];
 
           // Normalize and map faculty data
-          const normalizedData = jsonData.map((row: any) => ({
-            empId: row.empId || row["Emp ID"] || row.employeeId || "",
-            name: row.name || row["Name"] || row.facultyName || "",
-            email: row.email || row["Email"] || "",
-            department: row.department || row["Department"] || "",
-            designation: row.designation || row["Designation"] || "",
+          const normalizedData = jsonData.map((row) => ({
+            empId:
+              (row.empId as string) ||
+              (row["Emp ID"] as string) ||
+              (row.employeeId as string) ||
+              "",
+            name:
+              (row.name as string) ||
+              (row["Name"] as string) ||
+              (row.facultyName as string) ||
+              "",
+            email: (row.email as string) || (row["Email"] as string) || "",
+            department:
+              (row.department as string) || (row["Department"] as string) || "",
+            designation:
+              (row.designation as string) ||
+              (row["Designation"] as string) ||
+              "",
           }));
 
           await uploadFaculties(normalizedData);
@@ -214,7 +218,7 @@ export default function Management() {
             description: "Faculty data uploaded successfully!",
           });
           fetchAllData();
-        } catch (error) {
+        } catch {
           toast({
             title: "Error",
             description: "Failed to process faculty file",
@@ -223,7 +227,7 @@ export default function Management() {
         }
       };
       reader.readAsArrayBuffer(facultyFile);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to upload faculty file",
@@ -253,17 +257,34 @@ export default function Management() {
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            defval: "",
+          }) as Record<string, unknown>[];
 
           // Normalize and map course data
-          const normalizedData = jsonData.map((row: any) => ({
-            courseId: row.courseId || row["Course ID"] || row.course_id || "",
+          const normalizedData = jsonData.map((row) => ({
+            courseId:
+              (row.courseId as string) ||
+              (row["Course ID"] as string) ||
+              (row.course_id as string) ||
+              "",
             courseName:
-              row.courseName || row["Course Name"] || row.course_name || "",
-            type: row.type || row["Type"] || row.courseType || "UG",
-            credits: parseInt(row.credits || row["Credits"] || "3"),
-            department: row.department || row["Department"] || "",
-            semester: row.semester || row["Semester"] || "",
+              (row.courseName as string) ||
+              (row["Course Name"] as string) ||
+              (row.course_name as string) ||
+              "",
+            type:
+              (row.type as string) ||
+              (row["Type"] as string) ||
+              (row.courseType as string) ||
+              "UG",
+            credits: parseInt(
+              (row.credits as string) || (row["Credits"] as string) || "3"
+            ),
+            department:
+              (row.department as string) || (row["Department"] as string) || "",
+            semester:
+              (row.semester as string) || (row["Semester"] as string) || "",
           }));
 
           await uploadCourses(normalizedData);
@@ -272,7 +293,7 @@ export default function Management() {
             description: "Course data uploaded successfully!",
           });
           fetchAllData();
-        } catch (error) {
+        } catch {
           toast({
             title: "Error",
             description: "Failed to process course file",
@@ -281,7 +302,7 @@ export default function Management() {
         }
       };
       reader.readAsArrayBuffer(courseFile);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to upload course file",
@@ -308,7 +329,7 @@ export default function Management() {
         description: "All faculty data cleared successfully",
       });
       fetchAllData();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to clear faculty data",
@@ -333,7 +354,7 @@ export default function Management() {
         description: "All course data cleared successfully",
       });
       fetchAllData();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to clear course data",

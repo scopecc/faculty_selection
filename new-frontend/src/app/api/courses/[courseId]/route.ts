@@ -4,12 +4,13 @@ import Course from "@/lib/models/Course";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     await connectDB();
 
-    const course = await Course.findOne({ courseId: params.courseId });
+    const { courseId } = await params;
+    const course = await Course.findOne({ courseId });
 
     if (!course) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
@@ -27,15 +28,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     await connectDB();
 
+    const { courseId } = await params;
     const updateData = await request.json();
 
     const course = await Course.findOneAndUpdate(
-      { courseId: params.courseId },
+      { courseId },
       {
         ...updateData,
         updatedAt: new Date(),
@@ -64,13 +66,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { courseId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     await connectDB();
 
-    const course = await Course.findOneAndDelete({ courseId: params.courseId });
+    const { courseId } = await params;
+    const course = await Course.findOneAndDelete({ courseId });
 
     if (!course) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });

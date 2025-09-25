@@ -36,7 +36,10 @@ export const getAllFaculties = async () => {
   return response.data;
 };
 
-export const updateFaculty = async (empId: string, data: any) => {
+export const updateFaculty = async (
+  empId: string,
+  data: Record<string, unknown>
+) => {
   const response = await api.put(`/faculty/${empId}`, data);
   return response.data;
 };
@@ -52,7 +55,10 @@ export const getCourses = async () => {
   return response.data;
 };
 
-export const updateCourse = async (courseId: string, data: any) => {
+export const updateCourse = async (
+  courseId: string,
+  data: Record<string, unknown>
+) => {
   const response = await api.put(`/courses/${courseId}`, data);
   return response.data;
 };
@@ -63,12 +69,12 @@ export const deleteCourse = async (courseId: string) => {
 };
 
 // Admin operations
-export const uploadFaculties = async (faculties: any[]) => {
+export const uploadFaculties = async (faculties: Record<string, unknown>[]) => {
   const response = await api.post("/faculty", { faculties });
   return response.data;
 };
 
-export const uploadCourses = async (courses: any[]) => {
+export const uploadCourses = async (courses: Record<string, unknown>[]) => {
   const response = await api.post("/courses", { courses });
   return response.data;
 };

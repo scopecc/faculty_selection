@@ -35,7 +35,6 @@ export default function FacultyDetails() {
   const empId = params.empId as string;
 
   const [faculty, setFaculty] = useState<Faculty | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -67,12 +66,11 @@ export default function FacultyDetails() {
         } else {
           setError("Faculty not found");
         }
-
-        setCourses(coursesResponse.courses);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error fetching faculty data:", error);
         setError(
-          error.response?.data?.message || "Failed to load faculty data"
+          (error as { response?: { data?: { message?: string } } })?.response
+            ?.data?.message || "Failed to load faculty data"
         );
       } finally {
         setLoading(false);

@@ -3,13 +3,14 @@ import connectDB from "@/lib/db/connect";
 import Faculty from "@/lib/models/Faculty";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { empId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ empId: string }> }
 ) {
   try {
     await connectDB();
 
-    const faculty = await Faculty.findOne({ empId: params.empId });
+    const { empId } = await params;
+    const faculty = await Faculty.findOne({ empId });
 
     if (!faculty) {
       return NextResponse.json({ error: "Faculty not found" }, { status: 404 });
@@ -27,15 +28,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { empId: string } }
+  { params }: { params: Promise<{ empId: string }> }
 ) {
   try {
     await connectDB();
 
+    const { empId } = await params;
     const updateData = await request.json();
 
     const faculty = await Faculty.findOneAndUpdate(
-      { empId: params.empId },
+      { empId },
       {
         ...updateData,
         updatedAt: new Date(),
@@ -61,13 +63,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { empId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ empId: string }> }
 ) {
   try {
     await connectDB();
 
-    const faculty = await Faculty.findOneAndDelete({ empId: params.empId });
+    const { empId } = await params;
+    const faculty = await Faculty.findOneAndDelete({ empId });
 
     if (!faculty) {
       return NextResponse.json({ error: "Faculty not found" }, { status: 404 });

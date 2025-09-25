@@ -203,3 +203,8 @@ body {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
+
+.mobile-menu-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}

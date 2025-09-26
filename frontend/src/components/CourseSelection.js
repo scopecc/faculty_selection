@@ -33,9 +33,9 @@ const CourseSelection = () => {
   const [facultyName, setFacultyName] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
 
-  const [ug, setUg] = useState('');
+  #const [ug, setUg] = useState('');
   const [ugspecialization, setUgspecialization] = useState('');
-  const [pg, setPg] = useState('');
+  #const [pg, setPg] = useState('');
   const [pgspecialization, setPgspecialization] = useState('');
   const [researchDomain, setResearchDomain] = useState('');
   const [domainConstraints, setDomainConstraints] = useState({});
@@ -235,7 +235,7 @@ useEffect(() => {
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
-        empId, ug, ugspecialization, pg, pgspecialization, researchDomain, draftId
+        empId, ugspecialization, pgspecialization, researchDomain, draftId
       },{ headers: { 'Content-Type': 'application/json' } })
       alert("Courses submitted successfully!");
       navigate('/');
@@ -257,9 +257,35 @@ useEffect(() => {
       <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
-      <p className="faculty-details" style={{color:"red",textAlign:"left"}}><strong>1. You must select exactly {maxCourses} courses.<br></br><br></br>2. The selected courses will be displayed in the order in which you select the courses.<br></br><br></br>3. If you are more preferred to choose Theory only course, choose 5 Theory only courses and 2 Theory+Lab courses.
-      <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory+Lab courses  <br></br><br></br>    5. The number specified next to the course name in brackets is the number of slots available for that course.</strong></p>
-  
+      <p className="faculty-details" style={{ color: "red" }}>
+  <strong>
+    Please note:
+  </strong>
+</p>
+<ol
+  style={{
+    color: "red",
+    textAlign: "left",
+    fontWeight: "bold",
+    marginLeft: "20px",
+    fontSize: "16px",
+  }}
+>
+  <li>You must select exactly {maxCourses} courses.</li>
+  <li>The selected courses will be displayed in the order in which you select them.</li>
+  <li>
+    If you prefer Theory-only courses, choose 5 Theory-only courses and 2
+    Theory+Lab courses.
+  </li>
+  <li>
+    If you prefer Lab-oriented courses, choose at least 5 Theory+Lab courses.
+  </li>
+  <li>
+    The number in brackets next to the course name is the number of slots
+    available for that course.
+  </li>
+</ol>
+
       <div style={{margin:"auto", textAlign:"center"}}>
         <div className="input-fields" style={{ padding: "20px", display:"flex"}}>
           <div style={{ display: "flex", width: "100%" }}>
@@ -274,7 +300,7 @@ useEffect(() => {
               />
             </label>*/}
             <label style={{ width: "100%" }}>
-              UG specialization:
+              UG specialization:(B.E CSE/B.E ECE...)
                   <span style={{ color: "red", marginLeft: "4px" }}>*</span>
 
               <input
@@ -299,7 +325,7 @@ useEffect(() => {
               />
             </label>*/}
             <label style={{ width: "100%" }}>
-              PG specialization:
+              PG specialization:(M.E CSE/M.Tech ECE...)
                   <span style={{ color: "red", marginLeft: "4px" }}>*</span>
 
               <input
@@ -330,8 +356,8 @@ useEffect(() => {
       <p style={{textAlign:"center",color:"blue"}}>
         Course Code starts with BCSE - B.Tech Courses<br></br>
         Course Code starts with MCSE - M.Tech Courses<br></br>
-        Course Code starts with ISWE and SWE - Integrated M.Tech Courses<br></br>
-        Course Code starts with USCS - B.Sc Course<br></br></p>
+        Course Code starts with I/SWE/CSE - Integrated M.Tech Courses<br></br>
+        Course Code starts with UCSC - B.Sc Course<br></br></p>
         
       <p style={{textAlign:"center"}}>
         1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>

@@ -22,10 +22,10 @@ const FacultyDetails = () => {
     setDraftLoading(true);
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
       .then(res => {
-        setDrafts([res.data[2]]);
+        setDrafts([res.data[1]]);
         // Default to 'Default Draft' if present
         const defaultDraft = res.data.find(d => d.name === 'Default Draft');
-        setSelectedDraft(defaultDraft || res.data[2] || null);
+        setSelectedDraft(defaultDraft || res.data[1] || null);
         setDraftLoading(false);
       })
       .catch(() => {

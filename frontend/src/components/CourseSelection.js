@@ -300,7 +300,7 @@ useEffect(() => {
               />
             </label>*/}
             <label style={{ width: "100%" }}>
-              UG specialization:(B.E CSE/B.E ECE...)
+              UG specialization:
                   <span style={{ color: "red", marginLeft: "4px" }}>*</span>
 
               <input
@@ -308,6 +308,7 @@ useEffect(() => {
                 value={ugspecialization}
                 onChange={(e) => setUgspecialization(e.target.value)}
                 required
+                placeholder="B.E CSE/B.E ECE..."
                 style={{ width: "100%" }}
               />
             </label>
@@ -325,7 +326,7 @@ useEffect(() => {
               />
             </label>*/}
             <label style={{ width: "100%" }}>
-              PG specialization:(M.E CSE/M.Tech ECE...)
+              PG specialization:
                   <span style={{ color: "red", marginLeft: "4px" }}>*</span>
 
               <input
@@ -333,6 +334,7 @@ useEffect(() => {
                 value={pgspecialization}
                 onChange={(e) => setPgspecialization(e.target.value)}
                 required
+                placeholder="M.E CSE/M.Tech ECE..."
                 style={{ width: "100%" }}
               />
             </label>

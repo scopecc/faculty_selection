@@ -41,7 +41,7 @@ const CourseSelection = () => {
   const [domainConstraints, setDomainConstraints] = useState({});
 
   const [preference, setLocalPreference] = useState("");
-  const [willingness, setWillingness] = useState(false); // New state for willingness
+  const [willingness, setWillingness] = useState(null); // New state for willingness
 
   const moveCourseUp = (index) => {
     if (index === 0) return;
@@ -186,8 +186,12 @@ useEffect(() => {
     });
   };
   const handleSubmit = async () => {
+    if (willingness === null) {
+      alert("Please select Yes or No for willingness to take an extra course before submitting.");
+      return;
+    }
     if (!empId || !facultyName || selectedCourses.length !== maxCourses) {
-      alert("Error: Please ensure all selections are valid.");
+      alert("Error: Please ensure that you have selected 7 courses");
       return;
     }
 
@@ -221,7 +225,7 @@ useEffect(() => {
     }
 
     if( !pgspecialization || !ugspecialization || !researchDomain){
-      alert("Please fill all the fields");
+      alert("Please fill in the PG, UG, Research Domain details");
       return;
     }
 
@@ -254,7 +258,7 @@ useEffect(() => {
       <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p className="faculty-details" style={{color:"red",textAlign:"left"}}><strong>1. You must select exactly {maxCourses} courses.<br></br><br></br>2. The selected courses will be displayed in the order in which you select the courses.<br></br><br></br>3. If you are more preferred to choose Theory only course, choose 5 Theory only courses and 2 Theory+Lab courses.
-      <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory+Lab courses      </strong></p>
+      <br></br><br></br>4. If you are more preferred to choose Lab oriented courses, choose min 5 Theory+Lab courses  <br></br><br></br>    5. The number specified next to the course name in brackets is the number of slots available for that course.</strong></p>
   
       <div style={{margin:"auto", textAlign:"center"}}>
         <div className="input-fields" style={{ padding: "20px", display:"flex"}}>
@@ -271,6 +275,8 @@ useEffect(() => {
             </label>*/}
             <label style={{ width: "100%" }}>
               UG specialization:
+                  <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+
               <input
                 type="text"
                 value={ugspecialization}
@@ -294,6 +300,8 @@ useEffect(() => {
             </label>*/}
             <label style={{ width: "100%" }}>
               PG specialization:
+                  <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+
               <input
                 type="text"
                 value={pgspecialization}
@@ -306,6 +314,8 @@ useEffect(() => {
           
           <label style={{ width: "100%" }}>
             Research Domain:
+                <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+
             <input
               type="text"
               value={researchDomain}
@@ -350,18 +360,42 @@ useEffect(() => {
           />
           Theory + Lab
         </label>
+      </div>
+      <br></br>
 
-        {/* Willingness Checkbox */}
-        <label style={{display:"flex",alignItems:"center",marginLeft:"30px",fontWeight:600,fontSize:"16px"}}>
-          <input
-            type="checkbox"
-            checked={willingness}
-            onChange={e => setWillingness(e.target.checked)}
-            style={{marginRight:"8px"}}
-          />
-          Willingness to take more courses
+      <div style={{ width: "100%", display: "flex", gap: "20px", justifyContent: "center", alignItems: "center" }}>
+        {/* Willingness Radio */}
+        <label style={{ display: "flex", alignItems: "center", marginLeft: "30px", fontWeight: 600, fontSize: "16px" }}>
+          Willingness to take an extra course
+              <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+
+          <div style={{ marginLeft: "15px", display: "flex", gap: "15px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <input
+                type="radio"
+                name="willingness"
+                value="yes"
+                checked={willingness === true}
+                onChange={() => setWillingness(true)}
+                required
+              />
+              Yes
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <input
+                type="radio"
+                name="willingness"
+                value="no"
+                checked={willingness === false}
+                onChange={() => setWillingness(false)}
+                required
+              />
+              No
+            </label>
+          </div>
         </label>
       </div>
+
 
       <hr />
   

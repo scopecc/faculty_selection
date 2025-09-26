@@ -259,7 +259,7 @@ useEffect(() => {
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p className="faculty-details" style={{ color: "red" }}>
   <strong>
-    Please note:
+    Please read the instructions given below before proceeding with the registration process:
   </strong>
 </p>
 <ol

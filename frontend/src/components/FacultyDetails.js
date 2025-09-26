@@ -115,7 +115,7 @@ const FacultyDetails = () => {
           params: { draftId }
         });
         alert("Faculty record deleted successfully.");
-        navigate("/home");
+        navigate("/");
       } catch (error) {
         console.error("Error deleting faculty:", error);
         alert("Error deleting faculty.");

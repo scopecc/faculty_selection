@@ -33,9 +33,9 @@ const CourseSelection = () => {
   const [facultyName, setFacultyName] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
 
-  #const [ug, setUg] = useState('');
+  //const [ug, setUg] = useState('');
   const [ugspecialization, setUgspecialization] = useState('');
-  #const [pg, setPg] = useState('');
+  //const [pg, setPg] = useState('');
   const [pgspecialization, setPgspecialization] = useState('');
   const [researchDomain, setResearchDomain] = useState('');
   const [domainConstraints, setDomainConstraints] = useState({});

@@ -203,7 +203,7 @@ const FacultyDetails = () => {
           <strong>PG Specialization:</strong> {faculty.pgspecialization || "N/A"}
         </p>
         <p><strong>Research Domain:</strong> {faculty.researchdomain || "N/A"}</p>
-        <p><strong>Willingness to Mentor Projects:</strong> {faculty.willingness ? "Yes" : "No"}</p>
+        <p><strong>Willingness to take an extra course:</strong> {faculty.willingness ? "Yes" : "No"}</p>
       </div>
 
       <div className="courses-section">

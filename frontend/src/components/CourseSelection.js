@@ -532,7 +532,20 @@ useEffect(() => {
   .map(domain => (
     <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
       {theoryCoursesByDomain[domain].map(course => {
-        // your existing checkbox rendering
+        const regCount = courseRegCounts[course.courseId] || 0;
+                      const isFull = course.maxRegistrations > 0 && regCount >= course.maxRegistrations;
+                      return (
+                        <label key={course.courseId} style={isFull ? { color: '#aaa', textDecoration: 'line-through' } : {}}>
+                          <input
+                            type="checkbox"
+                            checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                            onChange={() => handleCourseSelect(course)}
+                            disabled={isFull && !selectedCourses.some(c => c.courseId === course.courseId)}
+                          />
+                          {course.courseName} ({course.courseType}) ({course.courseId})
+                          {isFull && !selectedCourses.some(c => c.courseId === course.courseId) && <span style={{color:'red',marginLeft:'5px'}}>(Full)</span>}
+                        </label>
+                      );
       })}
     </Accordion>
 ))}

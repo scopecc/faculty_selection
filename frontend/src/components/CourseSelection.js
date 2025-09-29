@@ -49,6 +49,26 @@ const CourseSelection = () => {
     [updatedCourses[index - 1], updatedCourses[index]] = [updatedCourses[index], updatedCourses[index - 1]];
     setSelectedCourses(updatedCourses);
   };
+
+  const [userDomain, setUserDomain] = useState(null); // ← new state
+
+useEffect(() => {
+  if (facultyEmail) {
+    axios.get('faculties.json')
+      .then(response => {
+        const faculty = response.data.find(fac => fac.email === facultyEmail);
+        if (faculty) {
+          setFacultyName(faculty.name);
+          setUserDomain(faculty.domain || null); // <-- store mapped domain
+        } else {
+          setFacultyName('Unknown Faculty');
+          setUserDomain(null);
+        }
+      })
+      .catch(error => console.error("Error fetching faculty data:", error));
+  }
+}, [facultyEmail]);
+
   
   const moveCourseDown = (index) => {
     if (index === selectedCourses.length - 1) return;
@@ -198,7 +218,7 @@ useEffect(() => {
     const theoryCount = selectedCourses.filter(c => c.courseType === "theory").length;
     const theoryLabCount = selectedCourses.filter(c => c.courseType === "theory+lab").length;
 
-    if (preference === "Theory" && theoryCount < 5) {
+    {/*if (preference === "Theory" && theoryCount < 5) {
       alert(`You must select at least 5 Theory courses.`);
       return;
     }
@@ -209,7 +229,7 @@ useEffect(() => {
     if (preference === "Theory+Lab" && theoryLabCount < 5) {
       alert(`You must select at least 5 Theory+Lab courses.`);
       return;
-    }
+    }*/}
 
     const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
       acc[course.domain] = (acc[course.domain] || 0) + 1;
@@ -273,13 +293,13 @@ useEffect(() => {
 >
   <li>You must select exactly {maxCourses} courses.</li>
   <li>The selected courses will be displayed in the order in which you select them.</li>
-  <li>
+  {/*<li>
     If you prefer Theory-only courses, choose 5 Theory-only courses and 2
     Theory+Lab courses.
   </li>
   <li>
     If you prefer Lab-oriented courses, choose at least 5 Theory+Lab courses.
-  </li>
+  </li>*/}
   <li>
     The number in brackets next to the course name is the number of slots
     available for that course.
@@ -361,10 +381,10 @@ useEffect(() => {
         Course Code starts with I/SWE/CSE - Integrated M.Tech Courses<br></br>
         Course Code starts with UCSC - B.Sc Course<br></br></p>
         
-      <p style={{textAlign:"center"}}>
+      {/*<p style={{textAlign:"center"}}>
         1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>
         2. If you are more preferred to choose <b>Lab oriented courses</b>, then select <strong>"Theory+Lab"</strong> and make your choices appropriately </p>
-
+       
 
       <div style={{width:"100%", display:"flex", gap:"20px" , justifyContent:"center", alignItems: "center"}}>
         <label style={{display:"flex",alignItems:"center",width:"105px"}}>
@@ -388,8 +408,8 @@ useEffect(() => {
           />
           Theory + Lab
         </label>
-      </div>
-      <br></br>
+      </div> 
+      <br></br> */}
 
       <div style={{ width: "100%", display: "flex", gap: "20px", justifyContent: "center", alignItems: "center" }}>
         {/* Willingness Radio */}
@@ -433,7 +453,7 @@ useEffect(() => {
             <div>
               <h2>Theory+Lab Courses</h2>
               <div className="course-list">
-                {Object.keys(theoryLabCoursesByDomain).map(domain => (
+                {/* {Object.keys(theoryLabCoursesByDomain).map(domain => (
                   <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
                     {theoryLabCoursesByDomain[domain].map(course => {
                       const regCount = courseRegCounts[course.courseId] || 0;
@@ -452,12 +472,25 @@ useEffect(() => {
                       );
                     })}
                   </Accordion>
-                ))}
+                ))} */}
+
+                {/* Theory+Lab */}
+{Object.keys(theoryLabCoursesByDomain)
+  .filter(domain => 
+     domain === 'Common' || (userDomain && domain === userDomain)
+  )
+  .map(domain => (
+    <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
+      {theoryLabCoursesByDomain[domain].map(course => {
+        // your existing checkbox rendering
+      })}
+    </Accordion>
+))}
               </div>
       
               <h2>Theory Courses</h2>
               <div className="course-list">
-                {Object.keys(theoryCoursesByDomain).map(domain => (
+                {/* {Object.keys(theoryCoursesByDomain).map(domain => (
                   <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
                     {theoryCoursesByDomain[domain].map(course => {
                       const regCount = courseRegCounts[course.courseId] || 0;
@@ -476,7 +509,20 @@ useEffect(() => {
                       );
                     })}
                   </Accordion>
-                ))}
+                ))}  */}
+
+                {/* Theory */}
+{Object.keys(theoryCoursesByDomain)
+  .filter(domain => 
+     domain === 'Common' || (userDomain && domain === userDomain)
+  )
+  .map(domain => (
+    <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
+      {theoryCoursesByDomain[domain].map(course => {
+        // your existing checkbox rendering
+      })}
+    </Accordion>
+))}
               </div>
             </div>
           ) : (

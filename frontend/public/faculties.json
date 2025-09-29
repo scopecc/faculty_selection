@@ -1642,7 +1642,20 @@
     {
         "empId": 1002,
         "name": "Dr. Verappan",
-        "email": "smverappan@gmail.com"
+        "email": "smverappan@gmail.com",
+        "domain": "Data Science"
+      },
+      {
+        "empId": 1004,
+        "name": "Verappan check",
+        "email": "smverappan@gmail.com",
+        "domain": "Common"
+      },
+      {
+        "empId": 1005,
+        "name": "VERappan aimml",
+        "email": "smverappan@gmail.com",
+        "domain": "AIML"
       },
       {
         "empId": 1001,

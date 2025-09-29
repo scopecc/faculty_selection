@@ -275,7 +275,7 @@ useEffect(() => {
     <div className="course-selection-container">
       <h1>Course Selection</h1>
       <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
-      <p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>
+      {/*<p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>*/}
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p className="faculty-details" style={{ color: "red" }}>
   <strong>
@@ -480,9 +480,22 @@ useEffect(() => {
      domain === 'Common' || (userDomain && domain === userDomain)
   )
   .map(domain => (
-    <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>
+    <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 7})`}>
       {theoryLabCoursesByDomain[domain].map(course => {
-        // your existing checkbox rendering
+        const regCount = courseRegCounts[course.courseId] || 0;
+                      const isFull = course.maxRegistrations > 0 && regCount >= course.maxRegistrations;
+                      return (
+                        <label key={course.courseId} style={isFull ? { color: '#aaa', textDecoration: 'line-through' } : {}}>
+                          <input
+                            type="checkbox"
+                            checked={selectedCourses.some(c => c.courseId === course.courseId)}
+                            onChange={() => handleCourseSelect(course)}
+                            disabled={isFull && !selectedCourses.some(c => c.courseId === course.courseId)}
+                          />
+                          {course.courseName} ({course.courseType}) ({course.courseId})
+                          {isFull && !selectedCourses.some(c => c.courseId === course.courseId) && <span style={{color:'red',marginLeft:'5px'}}>(Full)</span>}
+                        </label>
+                      );
       })}
     </Accordion>
 ))}

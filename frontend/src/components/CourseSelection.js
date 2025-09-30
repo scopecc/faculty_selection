@@ -478,10 +478,16 @@ useEffect(() => {
 {Object.keys(theoryLabCoursesByDomain)
   .filter(domain => {
     if (userDomain === "Common") {
-      // If teacher’s domain is "Common", include both groups
+      // Common user: only Common Group 1 and Common Group 2
       return domain === "Common Group 1" || domain === "Common Group 2";
+    } else {
+      // Other users: their domain + Common Group 1 + Common Group 2
+      return (
+        domain === userDomain ||
+        domain === "Common Group 1" ||
+        domain === "Common Group 2"
+      );
     }
-    return domain === "Common" || (userDomain && domain === userDomain);
   })
   .map(domain => (
     <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 7})`}>
@@ -532,10 +538,16 @@ useEffect(() => {
 {Object.keys(theoryCoursesByDomain)
   .filter(domain => {
     if (userDomain === "Common") {
-      // If teacher’s domain is "Common", include both groups
+      // Common user: only Common Group 1 and Common Group 2
       return domain === "Common Group 1" || domain === "Common Group 2";
+    } else {
+      // Other users: their domain + Common Group 1 + Common Group 2
+      return (
+        domain === userDomain ||
+        domain === "Common Group 1" ||
+        domain === "Common Group 2"
+      );
     }
-    return domain === "Common" || (userDomain && domain === userDomain);
   })
   .map(domain => (
     <Accordion key={domain} title={`${domain} (Min: ${domainConstraints[domain]?.minCount || 0}, Max: ${domainConstraints[domain]?.maxCount || 2})`}>

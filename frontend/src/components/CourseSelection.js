@@ -275,8 +275,13 @@ for (const domain of allowedDomains) {
     }
 
     try {
+      // Clean up courseId whitespace before submitting
+      const cleanedCourses = selectedCourses.map(course => ({
+        ...course,
+        courseId: course.courseId.trim()
+      }));
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name, selectedCourses, draftId, willingness },
+        { empId, name, selectedCourses: cleanedCourses, draftId, willingness },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{

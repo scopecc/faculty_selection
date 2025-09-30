@@ -276,9 +276,10 @@ for (const domain of allowedDomains) {
 
     try {
       // Clean up courseId whitespace before submitting
+      // Remove all whitespace (including non-breaking/invisible) from both ends of courseId
       const cleanedCourses = selectedCourses.map(course => ({
         ...course,
-        courseId: course.courseId.trim()
+        courseId: typeof course.courseId === 'string' ? course.courseId.replace(/\s+/g, '').trim() : course.courseId
       }));
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
         { empId, name, selectedCourses: cleanedCourses, draftId, willingness },

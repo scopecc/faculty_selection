@@ -268,7 +268,7 @@ for (const domain of allowedDomains) {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name: facultyName, facultyEmail, selectedCourses, draftId, willingness },
+        { empId, name: facultyName, selectedCourses, draftId, willingness },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{

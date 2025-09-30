@@ -31,13 +31,14 @@ router.post('/register', async (req, res) => {
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
+      // If maxRegistrations > 0, enforce limit; if 0, treat as unlimited
       if (courseDoc.maxRegistrations > 0) {
-        // Count current registrations for this course in this draft
         const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
         if (count >= courseDoc.maxRegistrations) {
           return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
         }
       }
+      // If maxRegistrations is 0, allow unlimited registrations (do nothing)
     }
 
   // ✅ Create new faculty entry
@@ -97,21 +98,21 @@ router.post('/submit-courses', async (req, res) => {
 
     // Check maxRegistrations for each selected course
     for (const course of selectedCourses) {
-  const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
+      const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
+      // If maxRegistrations > 0, enforce limit; if 0, treat as unlimited
       if (courseDoc.maxRegistrations > 0) {
-        // If faculty is already registered for this course, allow update
         const alreadyRegistered = faculty && faculty.selectedCourses.some(c => c.courseId === course.courseId);
         if (!alreadyRegistered) {
-          // Count current registrations for this course
           const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
           if (count >= courseDoc.maxRegistrations) {
             return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
           }
         }
       }
+      // If maxRegistrations is 0, allow unlimited registrations (do nothing)
     }
 
     if (!faculty) {

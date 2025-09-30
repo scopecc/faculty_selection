@@ -30,7 +30,7 @@ const CourseSelection = () => {
   const facultyEmail = location.state?.facultyEmail || storedFacultyEmail;
   const draftId = location.state?.draftId || storedDraftId || null;
 
-  const [facultyName, setFacultyName] = useState('');
+  const [name, setName] = useState('');
   const [selectedCourses, setSelectedCourses] = useState([]);
 
   //const [ug, setUg] = useState('');
@@ -58,10 +58,10 @@ useEffect(() => {
       .then(response => {
         const faculty = response.data.find(fac => fac.email === facultyEmail);
         if (faculty) {
-          setFacultyName(faculty.name);
+          setName(faculty.name);
           setUserDomain(faculty.domain || null); // <-- store mapped domain
         } else {
-          setFacultyName('Unknown Faculty');
+          setName('Unknown Faculty');
           setUserDomain(null);
         }
       })
@@ -87,9 +87,9 @@ useEffect(() => {
         .then(response => {
           const faculty = response.data.find(fac => fac.email === facultyEmail);
           if (faculty) {
-            setFacultyName(faculty.name);
+            setName(faculty.name);
           } else {
-            setFacultyName('Unknown Faculty');
+            setName('Unknown Faculty');
           }
         })
         .catch(error => console.error("Error fetching faculty data:", error));
@@ -207,12 +207,12 @@ useEffect(() => {
   };
   const handleSubmit = async () => {
   // Debug log to check values before submission
-  console.log('Submitting:', { empId, facultyName, selectedCourses, draftId, willingness });
+  console.log('Submitting:', { empId, name, selectedCourses, draftId, willingness });
     if (willingness === null) {
       alert("Please select Yes or No for willingness to take an extra course before submitting.");
       return;
     }
-    if (!empId || !facultyName || selectedCourses.length !== maxCourses) {
+    if (!empId || !name || selectedCourses.length !== maxCourses) {
       alert("Error: Please ensure that you have selected 7 courses");
       return;
     }
@@ -270,7 +270,7 @@ for (const domain of allowedDomains) {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name: facultyName, selectedCourses, draftId, willingness },
+        { empId, name, selectedCourses, draftId, willingness },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
@@ -293,7 +293,7 @@ for (const domain of allowedDomains) {
   return (
     <div className="course-selection-container">
       <h1>Course Selection</h1>
-      <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{facultyName || "N/A"}</strong></p>
+  <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{name || "N/A"}</strong></p>
       {/*<p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>*/}
       <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
       <p className="faculty-details" style={{ color: "red" }}>

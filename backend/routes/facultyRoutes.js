@@ -8,7 +8,7 @@ router.get('/test', (req, res) => {
 
 // ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
-  const { name, empId, preference, selectedCourses = [], draftId } = req.body;
+  const { name, empId, selectedCourses = [], draftId } = req.body;
   const Course = require('../models/Course');
 
   try {
@@ -20,8 +20,8 @@ router.post('/register', async (req, res) => {
     }
 
     // ✅ Ensure required fields are present
-    if (!name || !empId || !preference) {
-      return res.status(400).json({ message: 'Name, Employee ID, and Preference are required.' });
+    if (!name || !empId) {
+      return res.status(400).json({ message: 'Name and Employee ID are required.' });
     }
 
 
@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
     }
 
   // ✅ Create new faculty entry
-  const faculty = new Faculty({ name, empId, preference, selectedCourses, draftId });
+  const faculty = new Faculty({ name, empId, selectedCourses, draftId });
     await faculty.save();
     res.status(201).json({ message: 'Faculty registered successfully.', faculty });
 
@@ -68,15 +68,15 @@ router.get('/', async (req, res) => {
 
 // Accept willingness in the request body
 router.post('/submit-courses', async (req, res) => {
-  let { empId, name, facultyName, preference, selectedCourses, draftId, willingness } = req.body;
+  let { empId, name, facultyName, selectedCourses, draftId, willingness } = req.body;
 
   console.log("Received course submission request:", req.body);
 
   if (!draftId) return res.status(400).json({ message: 'draftId required' });
   // ✅ Validate required fields
-    if (!name || !empId || !preference || !Array.isArray(selectedCourses)) {
+    if (!name || !empId || !Array.isArray(selectedCourses)) {
       console.error("Invalid data received:", req.body);
-      return res.status(400).json({ message: "Invalid request. Ensure name, empId, preference, and courses are provided correctly." });
+      return res.status(400).json({ message: "Invalid request. Ensure name, empId and courses are provided correctly." });
   }
 
   // ✅ Ensure `courseType` exists in each selected course
@@ -114,7 +114,6 @@ router.post('/submit-courses', async (req, res) => {
         faculty = new Faculty({
           name,
           empId,
-          preference,
           selectedCourses,
           willingness: willingness, // Store willingness as sent (true/false)
           submittedAt: new Date(),

@@ -23,7 +23,7 @@ const CourseSelection = () => {
   // Get data from location state or fallback to localStorage
   const storedEmpId = localStorage.getItem('empId');
   const storedFacultyEmail = localStorage.getItem('facultyEmail');
-  const storedPreference = localStorage.getItem('preference');
+  //const storedPreference = localStorage.getItem('preference');
   const storedDraftId = localStorage.getItem('draftId');
 
   const empId = location.state?.empId || storedEmpId;
@@ -40,7 +40,7 @@ const CourseSelection = () => {
   const [researchDomain, setResearchDomain] = useState('');
   const [domainConstraints, setDomainConstraints] = useState({});
 
-  const [preference, setLocalPreference] = useState("");
+  //const [preference, setLocalPreference] = useState("");
   const [willingness, setWillingness] = useState(null); // New state for willingness
 
   const moveCourseUp = (index) => {
@@ -77,9 +77,9 @@ useEffect(() => {
     setSelectedCourses(updatedCourses);
   };
 
-  useEffect(()=>{
-    localStorage.setItem("preference",preference)
-  },[preference])
+  //useEffect(()=>{
+    //localStorage.setItem("preference",preference)
+  //},[preference])
   // Fetch faculty name based on email
   useEffect(() => {
     if (facultyEmail) {
@@ -251,7 +251,7 @@ useEffect(() => {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name: facultyName, facultyEmail, preference, selectedCourses, draftId, willingness },
+        { empId, name: facultyName, facultyEmail, selectedCourses, draftId, willingness },
         { headers: { 'Content-Type': 'application/json' } }
       );
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{

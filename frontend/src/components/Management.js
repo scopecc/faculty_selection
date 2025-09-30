@@ -416,7 +416,6 @@ const Management = () => {
       facultyExcelData.push({
         "Faculty Name": faculty.name,
         "Empld": faculty.empId,
-        "Preference": faculty.preference,
         "Selected Courses": faculty.selectedCourses.map(course => course.courseName).join(", "),
         "UG SPL": faculty.ugspecialization,
         "PG SPL": faculty.pgspecialization,
@@ -943,7 +942,7 @@ const Management = () => {
                     <th>S.No</th>
                     <th>Faculty Name</th>
                     <th>Employee ID</th>
-                    <th>Preference</th>
+                    {/*<th>Preference</th>*/}
                     <th>Selected Courses</th>
                     <th>UG Specialization</th>
                     <th>PG Specialization</th>
@@ -958,7 +957,7 @@ const Management = () => {
                       <td>{index + 1}</td>
                       <td>{faculty.name}</td>
                       <td>{faculty.empId}</td>
-                      <td>{faculty.preference}</td>
+                      {/*<td>{faculty.preference}</td>*/}
                       <td>{faculty.selectedCourses.map(course => course.courseName).join(", ")}</td>
                       <td>{faculty.ugspecialization || "N/A"}</td>
                       <td>{faculty.pgspecialization || "N/A"}</td>

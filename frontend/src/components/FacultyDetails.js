@@ -195,7 +195,7 @@ const FacultyDetails = () => {
       <div className="faculty-info">
         <p><strong>Name:</strong> {faculty.name}</p>
         <p><strong>Employee ID:</strong> {faculty.empId}</p>
-        <p><strong>Preference:</strong> {faculty.preference}</p>
+        {/*<p><strong>Preference:</strong> {faculty.preference}</p>*/}
         <p>
           <strong>UG Specialization:</strong> {faculty.ugspecialization || "N/A"}
         </p>

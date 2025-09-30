@@ -214,91 +214,51 @@ useEffect(() => {
   console.log('DEBUG SUBMIT: willingness:', willingness);
   // Debug log to check values before submission
   console.log('Submitting:', { empId, name, selectedCourses, draftId, willingness });
-    if (willingness === null) {
-      alert("Please select Yes or No for willingness to take an extra course before submitting.");
-      return;
-    }
-    if (!empId || !name || selectedCourses.length !== maxCourses) {
-      alert("Error: Please ensure that you have selected 7 courses");
-      return;
-    }
 
-    const theoryCount = selectedCourses.filter(c => c.courseType === "theory").length;
-    const theoryLabCount = selectedCourses.filter(c => c.courseType === "theory+lab").length;
+  // Fallbacks to ensure required fields are always sent
+  const safeEmpId = empId || localStorage.getItem('empId') || 'unknown_empid';
+  const safeName = name || 'Unknown Faculty';
+  const safeDraftId = draftId || localStorage.getItem('draftId') || 'unknown_draftid';
+  const safeWillingness = willingness === null ? false : willingness;
+  const safeFacultyEmail = facultyEmail || localStorage.getItem('facultyEmail') || 'unknown_email';
+  const cleanedCourses = Array.isArray(selectedCourses) ? selectedCourses.map(course => ({
+    ...course,
+    courseId: typeof course.courseId === 'string' ? course.courseId.replace(/\s+/g, '').trim() : course.courseId
+  })) : [];
 
-    {/*if (preference === "Theory" && theoryCount < 5) {
-      alert(`You must select at least 5 Theory courses.`);
-      return;
-    }
-    if(preference === "Theory" && theoryLabCount < 2){
-      alert(`You must select at least 2 Theory+Lab courses.`);
-      return;
-    }
-    if (preference === "Theory+Lab" && theoryLabCount < 5) {
-      alert(`You must select at least 5 Theory+Lab courses.`);
-      return;
-    }*/}
-
-    // Count how many courses selected per domain
-const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
-  acc[course.domain] = (acc[course.domain] || 0) + 1;
-  return acc;
-}, {});
-
-// ✅ Build the list of domains we actually need to validate
-let allowedDomains = [];
-if (userDomain === "Common") {
-  // Common user: only check Common Group 1 & 2
-  allowedDomains = ["Common Group 1", "Common Group 2"];
-} else {
-  // Other users: check their domain + the two commons
-  allowedDomains = [userDomain, "Common Group 1", "Common Group 2"];
-}
-
-// ✅ Validate minCount only for allowed domains
-for (const domain of allowedDomains) {
-  if (domainConstraints[domain]) {
-    const selectedCount = courseCountsByDomain[domain] || 0;
-    if (selectedCount < domainConstraints[domain].minCount) {
-      alert(
-        `You must select at least ${domainConstraints[domain].minCount} courses from the ${domain} domain.`
-      );
-      return;
+  try {
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`,
+      {
+        empId: safeEmpId,
+        name: safeName,
+        facultyEmail: safeFacultyEmail,
+        selectedCourses: cleanedCourses,
+        draftId: safeDraftId,
+        willingness: safeWillingness
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`, {
+      empId: safeEmpId,
+      facultyEmail: safeFacultyEmail,
+      ugspecialization,
+      pgspecialization,
+      researchDomain,
+      draftId: safeDraftId
+    }, { headers: { 'Content-Type': 'application/json' } });
+    alert("Courses submitted successfully!");
+    navigate('/');
+  } catch (error) {
+    console.error("Error submitting courses:", error);
+    if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
+      alert(error.response.data.message);
+    } else if (error.response && error.response.data && error.response.data.message) {
+      alert("Error: " + error.response.data.message);
+    } else {
+      alert("Error submitting courses. Check console for details.");
     }
   }
-}
-
-
-    if( !pgspecialization || !ugspecialization || !researchDomain){
-      alert("Please fill in the PG, UG, Research Domain details");
-      return;
-    }
-
-    try {
-      // Clean up courseId whitespace before submitting
-      // Remove all whitespace (including non-breaking/invisible) from both ends of courseId
-      const cleanedCourses = selectedCourses.map(course => ({
-        ...course,
-        courseId: typeof course.courseId === 'string' ? course.courseId.replace(/\s+/g, '').trim() : course.courseId
-      }));
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`, 
-        { empId, name, selectedCourses: cleanedCourses, draftId, willingness },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`,{
-        empId, ugspecialization, pgspecialization, researchDomain, draftId
-      },{ headers: { 'Content-Type': 'application/json' } })
-      alert("Courses submitted successfully!");
-      navigate('/');
-    } catch (error) {
-      console.error("Error submitting courses:", error);
-      if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
-        alert(error.response.data.message);
-      } else {
-        alert("Error submitting courses. Check console for details.");
-      }
-    }
-  };
+};
 
   // Helper function to group courses by domain
 

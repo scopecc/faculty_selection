@@ -206,54 +206,92 @@ useEffect(() => {
     });
   };
   const handleSubmit = async () => {
-
-
-  // Fallbacks to ensure required fields are always sent
-  const safeEmpId = empId || localStorage.getItem('empId') || 'unknown_empid';
-  const safeName = name || 'Unknown Faculty';
-  const safeDraftId = draftId || localStorage.getItem('draftId') || 'unknown_draftid';
-  const safeWillingness = willingness === null ? false : willingness;
-  const safeFacultyEmail = facultyEmail || localStorage.getItem('facultyEmail') || 'unknown_email';
-  const cleanedCourses = Array.isArray(selectedCourses) ? selectedCourses.map(course => ({
-    ...course,
-    courseId: typeof course.courseId === 'string' ? course.courseId.replace(/\s+/g, '').trim() : course.courseId
-  })) : [];
-
-  try {
-    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`,
-      {
-        empId: safeEmpId,
-        name: safeName,
-        facultyEmail: safeFacultyEmail,
-        selectedCourses: cleanedCourses,
-        draftId: safeDraftId,
-        willingness: safeWillingness,
-        preference: 'NA'
-      },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`, {
-      empId: safeEmpId,
-      facultyEmail: safeFacultyEmail,
-      ugspecialization,
-      pgspecialization,
-      researchDomain,
-      draftId: safeDraftId,
-      preference: 'NA'
-    }, { headers: { 'Content-Type': 'application/json' } });
-    alert("Courses submitted successfully!");
-    navigate('/');
-  } catch (error) {
-    console.error("Error submitting courses:", error);
-    if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
-      alert(error.response.data.message);
-    } else if (error.response && error.response.data && error.response.data.message) {
-      alert("Error: " + error.response.data.message);
-    } else {
-      alert("Error submitting courses. Check console for details.");
+    // 1. Willingness must be selected
+    if (willingness === null) {
+      alert("Please select Yes or No for willingness to take an extra course before submitting.");
+      return;
     }
-  }
-};
+
+    // 2. Must select exactly maxCourses courses
+    if (!empId || !name || selectedCourses.length !== maxCourses) {
+      alert(`Error: Please ensure that you have selected ${maxCourses} courses`);
+      return;
+    }
+
+    // 3. Validate minCount for each allowed domain
+    const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
+      acc[course.domain] = (acc[course.domain] || 0) + 1;
+      return acc;
+    }, {});
+
+    let allowedDomains = [];
+    if (userDomain === "Common") {
+      allowedDomains = ["Common Group 1", "Common Group 2"];
+    } else {
+      allowedDomains = [userDomain, "Common Group 1", "Common Group 2"];
+    }
+
+    for (const domain of allowedDomains) {
+      if (domainConstraints[domain]) {
+        const selectedCount = courseCountsByDomain[domain] || 0;
+        if (selectedCount < domainConstraints[domain].minCount) {
+          alert(
+            `You must select at least ${domainConstraints[domain].minCount} courses from the ${domain} domain.`
+          );
+          return;
+        }
+      }
+    }
+
+    // 4. UG, PG, Research Domain fields required
+    if (!pgspecialization || !ugspecialization || !researchDomain) {
+      alert("Please fill in the PG, UG, Research Domain details");
+      return;
+    }
+
+    // 5. Clean courseIds before submit
+    const cleanedCourses = Array.isArray(selectedCourses)
+      ? selectedCourses.map(course => ({
+          ...course,
+          courseId: typeof course.courseId === 'string' ? course.courseId.replace(/\s+/g, '').trim() : course.courseId
+        }))
+      : [];
+
+    try {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/submit-courses`,
+        {
+          empId,
+          name,
+          facultyEmail,
+          selectedCourses: cleanedCourses,
+          draftId,
+          willingness,
+          preference: 'NA'
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/faculty/storeugpg`, {
+        empId,
+        facultyEmail,
+        ugspecialization,
+        pgspecialization,
+        researchDomain,
+        draftId,
+        preference: 'NA'
+      }, { headers: { 'Content-Type': 'application/json' } });
+      alert("Courses submitted successfully!");
+      navigate('/');
+    } catch (error) {
+      console.error("Error submitting courses:", error);
+      if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
+        alert(error.response.data.message);
+      } else if (error.response && error.response.data && error.response.data.message) {
+        alert("Error: " + error.response.data.message);
+      } else {
+        alert("Error submitting courses. Check console for details.");
+      }
+    }
+  };
 
   // Helper function to group courses by domain
 

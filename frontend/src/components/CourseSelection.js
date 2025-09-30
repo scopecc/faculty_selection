@@ -231,18 +231,35 @@ useEffect(() => {
       return;
     }*/}
 
-    const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
-      acc[course.domain] = (acc[course.domain] || 0) + 1;
-      return acc;
-    }, {});
+    // Count how many courses selected per domain
+const courseCountsByDomain = selectedCourses.reduce((acc, course) => {
+  acc[course.domain] = (acc[course.domain] || 0) + 1;
+  return acc;
+}, {});
 
-    for (const domain in domainConstraints) {
-      const selectedCount = courseCountsByDomain[domain] || 0;
-      if (selectedCount < domainConstraints[domain].minCount) {
-        alert(`You must select at least ${domainConstraints[domain].minCount} courses from the ${domain} domain.`);
-        return;
-      }
+// ✅ Build the list of domains we actually need to validate
+let allowedDomains = [];
+if (userDomain === "Common") {
+  // Common user: only check Common Group 1 & 2
+  allowedDomains = ["Common Group 1", "Common Group 2"];
+} else {
+  // Other users: check their domain + the two commons
+  allowedDomains = [userDomain, "Common Group 1", "Common Group 2"];
+}
+
+// ✅ Validate minCount only for allowed domains
+for (const domain of allowedDomains) {
+  if (domainConstraints[domain]) {
+    const selectedCount = courseCountsByDomain[domain] || 0;
+    if (selectedCount < domainConstraints[domain].minCount) {
+      alert(
+        `You must select at least ${domainConstraints[domain].minCount} courses from the ${domain} domain.`
+      );
+      return;
     }
+  }
+}
+
 
     if( !pgspecialization || !ugspecialization || !researchDomain){
       alert("Please fill in the PG, UG, Research Domain details");

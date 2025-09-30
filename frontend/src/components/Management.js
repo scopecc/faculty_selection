@@ -285,7 +285,6 @@ const Management = () => {
     try {
       if (!selectedDraft) return;
       // Debug log for draftId
-      console.log('Fetching faculty data for draftId:', selectedDraft._id, 'draft name:', selectedDraft.name);
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/faculty`, { params: { draftId: selectedDraft._id } });
       setFacultyData(response.data);
       await loadMissingFacultyData(response.data);

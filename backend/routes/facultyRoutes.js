@@ -68,21 +68,15 @@ router.get('/', async (req, res) => {
 
 // Accept willingness in the request body
 router.post('/submit-courses', async (req, res) => {
-  let { empId, name, facultyName, selectedCourses, draftId, willingness } = req.body;
+  let { empId, name, selectedCourses, draftId, willingness } = req.body;
 
-  // Debug: log the received body
   console.log("Received course submission request:", req.body);
-
-  // Allow either 'name' or 'facultyName' from frontend
-  if (!name && facultyName) {
-    name = facultyName;
-  }
 
   if (!draftId) return res.status(400).json({ message: 'draftId required' });
   // ✅ Validate required fields
-  if (!name || !empId || !Array.isArray(selectedCourses)) {
-    console.error("Invalid data received:", req.body);
-    return res.status(400).json({ message: "Invalid request. Ensure name, empId and courses are provided correctly." });
+    if (!name || !empId || !Array.isArray(selectedCourses)) {
+      console.error("Invalid data received:", req.body);
+      return res.status(400).json({ message: "Invalid request. Ensure name, empId and courses are provided correctly." });
   }
 
   // ✅ Ensure `courseType` exists in each selected course

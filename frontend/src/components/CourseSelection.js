@@ -206,6 +206,12 @@ useEffect(() => {
     });
   };
   const handleSubmit = async () => {
+  // Debug: log all relevant values before submission
+  console.log('DEBUG SUBMIT: empId:', empId);
+  console.log('DEBUG SUBMIT: name:', name);
+  console.log('DEBUG SUBMIT: selectedCourses:', selectedCourses);
+  console.log('DEBUG SUBMIT: draftId:', draftId);
+  console.log('DEBUG SUBMIT: willingness:', willingness);
   // Debug log to check values before submission
   console.log('Submitting:', { empId, name, selectedCourses, draftId, willingness });
     if (willingness === null) {

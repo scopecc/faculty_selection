@@ -79,11 +79,25 @@ router.post('/submit-courses', async (req, res) => {
   console.log("[DEBUG] willingness:", willingness);
 
   if (!draftId) return res.status(400).json({ message: 'draftId required' });
-  // ✅ Validate required fields
-    if (!name || !empId || !Array.isArray(selectedCourses)) {
-    console.error("[DEBUG] Invalid data received:", req.body);
-    console.error("[DEBUG] name:", name, "empId:", empId, "selectedCourses:", selectedCourses);
-    return res.status(400).json({ message: "Invalid request. Ensure name, empId and courses are provided correctly.", debug: { name, empId, selectedCourses, draftId, willingness, body: req.body } });
+  // Enhanced debug logs for validation
+  console.log('[DEBUG] typeof name:', typeof name, '| value:', name);
+  console.log('[DEBUG] typeof empId:', typeof empId, '| value:', empId);
+  console.log('[DEBUG] typeof selectedCourses:', typeof selectedCourses, '| isArray:', Array.isArray(selectedCourses), '| value:', selectedCourses);
+  if (!name) {
+    console.error('[DEBUG] name is missing or empty:', name);
+    return res.status(400).json({ message: "Invalid request: name is required.", debug: { name, empId, selectedCourses, draftId, willingness, body: req.body } });
+  }
+  if (!empId) {
+    console.error('[DEBUG] empId is missing or empty:', empId);
+    return res.status(400).json({ message: "Invalid request: empId is required.", debug: { name, empId, selectedCourses, draftId, willingness, body: req.body } });
+  }
+  if (!Array.isArray(selectedCourses)) {
+    console.error('[DEBUG] selectedCourses is not an array:', selectedCourses);
+    return res.status(400).json({ message: "Invalid request: selectedCourses must be an array.", debug: { name, empId, selectedCourses, draftId, willingness, body: req.body } });
+  }
+  if (selectedCourses.length === 0) {
+    console.error('[DEBUG] selectedCourses array is empty:', selectedCourses);
+    return res.status(400).json({ message: "Invalid request: selectedCourses array is empty.", debug: { name, empId, selectedCourses, draftId, willingness, body: req.body } });
   }
 
   // ✅ Ensure `courseType` exists in each selected course

@@ -234,7 +234,8 @@ useEffect(() => {
         facultyEmail: safeFacultyEmail,
         selectedCourses: cleanedCourses,
         draftId: safeDraftId,
-        willingness: safeWillingness
+        willingness: safeWillingness,
+        preference: 'NA'
       },
       { headers: { 'Content-Type': 'application/json' } }
     );
@@ -244,7 +245,8 @@ useEffect(() => {
       ugspecialization,
       pgspecialization,
       researchDomain,
-      draftId: safeDraftId
+      draftId: safeDraftId,
+      preference: 'NA'
     }, { headers: { 'Content-Type': 'application/json' } });
     alert("Courses submitted successfully!");
     navigate('/');

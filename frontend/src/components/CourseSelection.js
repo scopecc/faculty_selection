@@ -206,6 +206,8 @@ useEffect(() => {
     });
   };
   const handleSubmit = async () => {
+  // Debug log to check values before submission
+  console.log('Submitting:', { empId, facultyName, selectedCourses, draftId, willingness });
     if (willingness === null) {
       alert("Please select Yes or No for willingness to take an extra course before submitting.");
       return;

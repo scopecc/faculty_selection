@@ -6,6 +6,24 @@
         "domain": "Image Processing"
     },
     {
+        "empId": 52792,
+        "name": "Vijayaprabakaran K",
+        "email": "vijayaprabakaran.k@vit.ac.in",
+        "domain": "Artificial Intelligence"
+    },
+    {
+        "empId": 52833,
+        "name": "Ilavendhan A",
+        "email": "ilavendhan.a@vit.ac.in",
+        "domain": "Cyber Security"
+    },
+    {
+        "empId": 53647,
+        "name": "Kshma Trivedi",
+        "email": "kshma.trivedi@vit.ac.in",
+        "domain": "Q-TCS"
+    },
+    {
         "empId": 52777,
         "name": "Sendhil R",
         "email": "sendhil.r@vit.ac.in",
@@ -183,7 +201,7 @@
         "empId": 50266,
         "name": "Shridevi S",
         "email": "shridevi.s@vit.ac.in",
-        "domain": "Q-TCS"
+        "domain": "Artificial Intelligence"
     },
     {
         "empId": 50270,
@@ -1017,7 +1035,7 @@
         "empId": 52342,
         "name": "Saraswathi D",
         "email": "saraswathi.d@vit.ac.in",
-        "domain": "Robotics"
+        "domain": "Image Processing"
     },
     {
         "empId": 52343,
@@ -1695,7 +1713,7 @@
         "empId": 53623,
         "name": "Saranyaraj D",
         "email": "saranyaraj.d@vit.ac.in",
-        "domain": "Cyber-Physical Systems"
+        "domain": "Robotics"
     },
     {
         "empId": 53624,

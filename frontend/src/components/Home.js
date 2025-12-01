@@ -69,10 +69,10 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     setDraftLoading(true);
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
       .then(res => {
-        setDrafts([res.data[1]]);
+        setDrafts(res.data || []);
         // Default to 'Default Draft' if present
         const defaultDraft = res.data.find(d => d.name === 'Default Draft');
-        setSelectedDraft(defaultDraft || res.data[1] || null);
+        setSelectedDraft(defaultDraft || res.data[0] || null);
         setDraftLoading(false);
       })
       .catch(() => {

@@ -385,3 +385,25 @@ button:not(:disabled):active {
     font-size: 1.6rem;
   }
 }
+
+/* Registration closed notice */
+.registration-closed-notice {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid var(--danger-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  color: #7f1d1d;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.registration-closed-notice strong {
+  color: var(--danger-color);
+  font-weight: 700;
+}
+

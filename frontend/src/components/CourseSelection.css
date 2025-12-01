@@ -427,3 +427,45 @@ hr {
   background: transparent;
   min-width: 30px;
 }
+
+/* Registration Closed Alert */
+.registration-closed-alert {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin: var(--spacing-lg) 0;
+  text-align: center;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.registration-closed-alert h2 {
+  color: #991b1b;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.registration-closed-alert p {
+  color: #7f1d1d;
+  font-weight: 500;
+  margin: var(--spacing-sm) 0;
+  font-size: 1rem;
+}
+
+.link-button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.link-button:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}

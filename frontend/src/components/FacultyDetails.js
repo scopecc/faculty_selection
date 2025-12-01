@@ -17,6 +17,8 @@ const FacultyDetails = () => {
   const [drafts, setDrafts] = useState([]);
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [draftLoading, setDraftLoading] = useState(false);
+  // Registration status state
+  const [registrationStatus, setRegistrationStatus] = useState(null);
   // Fetch drafts on mount
   useEffect(() => {
     setDraftLoading(true);
@@ -33,6 +35,23 @@ const FacultyDetails = () => {
         setDraftLoading(false);
       });
   }, []);
+
+  // Fetch registration status when draft changes
+  useEffect(() => {
+    if (!selectedDraft) {
+      setRegistrationStatus(null);
+      return;
+    }
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { 
+      params: { draftId: selectedDraft._id } 
+    })
+      .then(res => {
+        setRegistrationStatus(res.data.status || "CLOSED");
+      })
+      .catch(() => {
+        setRegistrationStatus("CLOSED");
+      });
+  }, [selectedDraft]);
 
   useEffect(() => {
     const fetchFacultyEmail = async () => {
@@ -145,7 +164,11 @@ const FacultyDetails = () => {
       <div className="faculty-details-print">
         <div className="otp-section">
           <h2>Registration Already Done</h2>
-          <p>To view or delete your registration, please verify with OTP sent to your registered email.</p>
+          <p>
+            {registrationStatus === "CLOSED" 
+              ? "Registration is now closed. You can view your registration details below by verifying with OTP sent to your registered email." 
+              : "To view, edit or delete your registration, please verify with OTP sent to your registered email."}
+          </p>
           <div className="draft-dropdown-container">
             <label htmlFor="draft-select"><strong>Select Draft:</strong></label>
             {draftLoading ? (
@@ -192,6 +215,12 @@ const FacultyDetails = () => {
     <div className="faculty-details-print">
       <h2>Faculty Registration Details</h2>
       
+      {registrationStatus === "CLOSED" && (
+        <div className="registration-closed-notice">
+          <strong>⚠️ Registration is Closed</strong> - You can view your registration but cannot edit or delete it.
+        </div>
+      )}
+      
       <div className="faculty-info">
         <p><strong>Name:</strong> {faculty.name}</p>
         <p><strong>Employee ID:</strong> {faculty.empId}</p>
@@ -223,7 +252,9 @@ const FacultyDetails = () => {
 
       <div className="button-container">
         <button onClick={handlePrint} className="btn-primary">Print Details</button>
-        <button onClick={handleDelete} className="btn-danger">Delete Registration</button>
+        {registrationStatus === "OPEN" && (
+          <button onClick={handleDelete} className="btn-danger">Delete Registration</button>
+        )}
       </div>
     </div>
   );

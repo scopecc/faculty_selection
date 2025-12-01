@@ -1,357 +1,188 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import {
-  ArrowLeft,
-  User,
-  Mail,
-  BookOpen,
-  Clock,
-  Edit,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  GraduationCap,
-} from "lucide-react";
-import { getFacultyById, getCourses } from "@/lib/api";
-import { Faculty, Course } from "@/lib/types";
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import axios from "axios";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Toaster, toast } from "sonner";
 
-export default function FacultyDetails() {
-  const router = useRouter();
+interface IFaculty {
+  name: string;
+  empId: number;
+  ugspecialization?: string;
+  pgspecialization?: string;
+  researchdomain?: string;
+  willingness: boolean;
+  selectedCourses: {
+    courseName: string;
+    courseType: string;
+    domain: string;
+  }[];
+}
+
+interface IDraft {
+  _id: string;
+  name: string;
+}
+
+const FacultyDetails = () => {
   const params = useParams();
   const empId = params.empId as string;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const draftId = searchParams.get('draftId');
 
-  const [faculty, setFaculty] = useState<Faculty | null>(null);
-  const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
+  const [faculty, setFaculty] = useState<IFaculty | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!empId) {
-      router.push("/");
+    if (!empId || !draftId) {
+      toast.error("Employee ID or Draft ID not found.");
+      router.replace('/');
       return;
     }
 
-    const fetchData = async () => {
+    const fetchFacultyData = async () => {
       try {
-        setLoading(true);
-
-        const [facultyResponse, coursesResponse] = await Promise.all([
-          getFacultyById(empId),
-          getCourses(),
-        ]);
-
-        if (facultyResponse.faculty) {
-          setFaculty(facultyResponse.faculty);
-
-          // Get the actual course objects for selected courses
-          const facultySelectedCourses = coursesResponse.courses.filter(
-            (course: Course) =>
-              facultyResponse.faculty.selectedCourses?.includes(course._id)
-          );
-          setSelectedCourses(facultySelectedCourses);
+        const response = await axios.get(`/api/faculty/check/${empId}`, { params: { draftId } });
+        if (response.data.exists) {
+          setFaculty(response.data.faculty);
         } else {
-          setError("Faculty not found");
+          setFaculty(null);
         }
-      } catch (error: unknown) {
+      } catch (error) {
         console.error("Error fetching faculty data:", error);
-        setError(
-          (error as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message || "Failed to load faculty data"
-        );
+        toast.error("Failed to fetch faculty data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [empId, router]);
+    fetchFacultyData();
+  }, [empId, draftId, router]);
 
-  const handleEditCourses = () => {
-    if (!faculty) return;
-    router.push(
-      `/course-selection?empId=${empId}&email=${encodeURIComponent(
-        faculty.email
-      )}&preference=${faculty.preference}`
-    );
+  const handleDelete = async () => {
+    if (!draftId) {
+      toast.error("Draft ID not found.");
+      return;
+    }
+    if (window.confirm("Are you sure you want to delete this faculty record for the selected draft?")) {
+      try {
+        await axios.delete(`/api/faculty/delete/${empId}`, {
+          params: { draftId }
+        });
+        toast.success("Faculty record deleted successfully.");
+        router.push(`/faculty/draft-selection?empId=${empId}`); // Redirect back to draft selection
+      } catch (error) {
+        console.error("Error deleting faculty:", error);
+        toast.error("Error deleting faculty.");
+      }
+    }
   };
 
-  if (!empId) {
-    return null;
+  const handlePrint = () => {
+    window.print();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-6">
+        <div className="flex flex-col items-center space-y-2 text-center">
+          <div className="w-14 h-14 border-4 border-dashed rounded-full animate-spin border-accent/70"></div>
+          <p className="text-sm text-muted-foreground">Loading faculty details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!faculty) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-6">
+        <Card className="w-full max-w-md bg-card/60 backdrop-blur border border-border/40 rounded-2xl">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-2xl font-semibold tracking-tight">No Registration Found</CardTitle>
+            <CardDescription className="text-muted-foreground">No registration found for Employee ID: {empId} in the selected draft.</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button onClick={() => router.push(`/faculty/draft-selection?empId=${empId}`)} className="transition-transform duration-200 hover:scale-[1.02]">
+              Select another Draft
+            </Button>
+          </CardContent>
+        </Card>
+        <Toaster richColors />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <SignedOut>
-        <div className="flex items-center justify-center min-h-screen">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <CardTitle>Access Denied</CardTitle>
-              <CardDescription>
-                Please sign in to access this page
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </SignedOut>
+    <div className="flex items-center justify-center min-h-screen p-6 bg-gray-100">
+      <Card className="w-full max-w-3xl shadow-xl rounded-lg bg-white text-gray-900">
+        <CardHeader className="px-6 py-4 border-b border-gray-200">
+          <CardTitle className="text-2xl font-bold tracking-tight">Faculty Registration Details</CardTitle>
+          <CardDescription className="text-sm text-gray-600">Details for Employee ID: {empId} in the selected draft.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 space-y-6">
+          {faculty ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-500">Name</p>
+                  <p className="text-lg font-semibold">{faculty.name}</p>
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-500">Employee ID</p>
+                  <p className="text-lg font-semibold">{faculty.empId}</p>
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-500">UG Specialization</p>
+                  <p className="text-lg">{faculty.ugspecialization || "N/A"}</p>
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-500">PG Specialization</p>
+                  <p className="text-lg">{faculty.pgspecialization || "N/A"}</p>
+                </div>
+                <div className="flex flex-col md:col-span-2">
+                  <p className="text-sm font-medium text-gray-500">Research Domain</p>
+                  <p className="text-lg">{faculty.researchdomain || "N/A"}</p>
+                </div>
+                <div className="flex flex-col md:col-span-2">
+                  <p className="text-sm font-medium text-gray-500">Willingness to take an extra course</p>
+                  <p className="text-lg">{faculty.willingness ? "Yes" : "No"}</p>
+                </div>
+              </div>
 
-      <SignedIn>
-        <div className="container mx-auto py-8 px-4 max-w-4xl">
-          <div className="mb-6">
-            <Button
-              variant="outline"
-              onClick={() => router.push("/")}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-
-            <div className="flex items-center gap-4 mb-4">
-              <User className="w-8 h-8 text-primary" />
               <div>
-                <h1 className="text-3xl font-bold">Faculty Details</h1>
-                <p className="text-muted-foreground">Employee ID: {empId}</p>
+                <h3 className="text-xl font-bold mb-4 border-b pb-2 border-gray-200">Selected Courses</h3>
+                {faculty.selectedCourses.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {faculty.selectedCourses.map((course, index: number) => (
+                      <Card key={index} className="p-4 bg-gray-50 rounded-md shadow-sm">
+                        <p className="text-base font-semibold">{course.courseName}</p>
+                        <p className="text-sm text-gray-600">Type: {course.courseType}</p>
+                        <p className="text-sm text-gray-600">Domain: {course.domain}</p>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No courses selected for this registration.</p>
+                )}
               </div>
             </div>
-          </div>
-
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {loading ? (
-            <Card>
-              <CardContent className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin mr-3" />
-                <p>Loading faculty details...</p>
-              </CardContent>
-            </Card>
-          ) : faculty ? (
-            <div className="space-y-6">
-              {/* Faculty Information Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5" />
-                    Faculty Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Name
-                      </p>
-                      <p className="text-lg">
-                        {faculty.name || "Not provided"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Employee ID
-                      </p>
-                      <p className="text-lg font-mono">{faculty.empId}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Email
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <p>{faculty.email}</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Course Preference
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                        <Badge
-                          variant={
-                            faculty.preference === "UG"
-                              ? "default"
-                              : "secondary"
-                          }
-                        >
-                          {faculty.preference}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  {faculty.submissionTime && (
-                    <>
-                      <Separator />
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        <span>
-                          Last updated:{" "}
-                          {new Date(faculty.submissionTime).toLocaleString()}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Selected Courses Card */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Selected Courses
-                    </CardTitle>
-                    <CardDescription>
-                      Courses selected for teaching
-                    </CardDescription>
-                  </div>
-                  <Button
-                    onClick={handleEditCourses}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Selection
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {selectedCourses.length === 0 ? (
-                    <div className="text-center py-8">
-                      <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground mb-4">
-                        No courses selected yet
-                      </p>
-                      <Button onClick={handleEditCourses}>
-                        Select Courses
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {selectedCourses.map((course) => (
-                        <div
-                          key={course._id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium">
-                                {course.courseName}
-                              </h3>
-                              <Badge variant="secondary">
-                                {course.courseId}
-                              </Badge>
-                              <Badge variant="outline">
-                                {course.credits} Credits
-                              </Badge>
-                              <Badge
-                                variant={
-                                  course.type === "UG" ? "default" : "secondary"
-                                }
-                              >
-                                {course.type}
-                              </Badge>
-                            </div>
-                            {course.facultyName &&
-                              course.facultyEmpId !== faculty.empId && (
-                                <p className="text-sm text-muted-foreground">
-                                  Also requested by: {course.facultyName}
-                                </p>
-                              )}
-                          </div>
-                          <CheckCircle className="w-5 h-5 text-green-600" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Summary Card */}
-              {selectedCourses.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Selection Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                      <div>
-                        <p className="text-2xl font-bold text-primary">
-                          {selectedCourses.length}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Courses Selected
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-primary">
-                          {selectedCourses.reduce(
-                            (total, course) => total + course.credits,
-                            0
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Total Credits
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-primary">
-                          {
-                            selectedCourses.filter((c) => c.type === "UG")
-                              .length
-                          }
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          UG Courses
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-primary">
-                          {
-                            selectedCourses.filter((c) => c.type === "PG")
-                              .length
-                          }
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          PG Courses
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
           ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">Faculty not found</p>
-              </CardContent>
-            </Card>
+            <p className="text-center text-gray-600">No registration data available.</p>
           )}
+        </CardContent>
+        <div className="flex justify-end p-6 space-x-3 border-t border-gray-200">
+          <Button onClick={handlePrint} variant="outline" className="transition-transform duration-200 hover:scale-[1.02]">Print Details</Button>
+          <Button onClick={handleDelete} variant="destructive" className="transition-transform duration-200 hover:scale-[1.02]">Delete Registration</Button>
         </div>
-      </SignedIn>
+      </Card>
+      <Toaster richColors />
     </div>
   );
-}
+};
+
+export default FacultyDetails;

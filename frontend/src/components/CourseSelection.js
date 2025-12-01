@@ -42,6 +42,7 @@ const CourseSelection = () => {
 
   //const [preference, setLocalPreference] = useState("");
   const [willingness, setWillingness] = useState(null); // New state for willingness
+  const [registrationStatus, setRegistrationStatus] = useState(null); // Registration status state
 
   const moveCourseUp = (index) => {
     if (index === 0) return;
@@ -102,6 +103,23 @@ const [theoryLabCoursesByDomain, setTheoryLabCoursesByDomain] = useState({});
 const [courses, setCourses] = useState([]);
 const [isCoursesFetched, setIsCoursesFetched] = useState(false);
 const [courseRegCounts, setCourseRegCounts] = useState({});
+
+// Fetch registration status when component mounts or draftId changes
+useEffect(() => {
+  if (!draftId) {
+    setRegistrationStatus("CLOSED");
+    return;
+  }
+  axios.get(`${process.env.REACT_APP_BACKEND_URL}/registration-status`, { 
+    params: { draftId } 
+  })
+    .then(res => {
+      setRegistrationStatus(res.data.status || "CLOSED");
+    })
+    .catch(() => {
+      setRegistrationStatus("CLOSED");
+    });
+}, [draftId]);
 
 // Fetch course data and registration counts
 useEffect(() => {
@@ -294,6 +312,20 @@ useEffect(() => {
   };
 
   // Helper function to group courses by domain
+
+  // If registration is closed, prevent access
+  if (registrationStatus === "CLOSED") {
+    return (
+      <div className="course-selection-container">
+        <h1>Course Selection</h1>
+        <div className="registration-closed-alert">
+          <h2>⛔ Registration Closed</h2>
+          <p>The registration period has ended. No new course submissions are allowed.</p>
+          <p>Please navigate to the home page or <button onClick={() => navigate("/")} className="link-button">click here</button> to view your existing registration.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="course-selection-container">

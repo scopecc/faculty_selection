@@ -228,15 +228,71 @@ const Home = ({ setEmpId, setFacultyEmail, setPreference }) => {
     );
   }
 
-  // Registration closed state
+  // Registration closed state - allow viewing existing registrations
   if (registrationStatus !== "OPEN") {
     return (
       <>
         <div className="home-container">
-          <h1></h1>
+          <h1>Faculty Registration</h1>
           <div className="registration-closed">
-            <h2>Registration Closed</h2>
-            <p>The registration period has ended. Please contact the administrator for assistance.</p>
+            <h2>📋 Registration Period Closed</h2>
+            <p>The registration period has ended. New registrations are not allowed.</p>
+            <p><strong>However, you can still view your existing registration by entering your Employee ID below.</strong></p>
+            
+            <form onSubmit={handleSubmit} className="home-form">
+              <div className="form-group">
+                <label htmlFor="draft-select">Select Draft</label>
+                <select
+                  id="draft-select"
+                  value={selectedDraft ? selectedDraft._id : ''}
+                  onChange={e => {
+                    const found = drafts.find(d => d._id === e.target.value);
+                    setSelectedDraft(found || null);
+                  }}
+                  disabled={draftLoading || drafts.length === 0}
+                  required
+                >
+                  <option value="">-- Select Draft --</option>
+                  {drafts.map(draft => (
+                    <option key={draft._id} value={draft._id}>{draft.name}</option>
+                  ))}
+                </select>
+              </div>
+              <input
+                type="number"
+                placeholder="Enter Faculty Employee ID"
+                value={facultyEmpid}
+                onChange={(e) => setLocalFacultyEmpid(e.target.value)}
+                required
+              />
+
+              {!otpSent && (
+                <button type="button" onClick={sendOtp} disabled={loading || !facultyEmpid || !selectedDraft}>
+                  {loading ? "Sending OTP..." : "View My Registration"}
+                </button>
+              )}
+
+              {otpSent && (
+                <>
+                  <div className="success-notification">
+                    OTP has been sent to your registered email address
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    maxLength="6"
+                    required
+                  />
+
+                  <button type="submit" disabled={loading || otp.length !== 6}>
+                    {loading ? "Verifying..." : "View Registration"}
+                  </button>
+                </>
+              )}
+            </form>
           </div>
         </div>
         <ToastContainer toasts={toasts} removeToast={removeToast} />

@@ -8,7 +8,7 @@ router.get('/test', (req, res) => {
 
 // ✅ Register a new faculty (Prevents duplicate registration)
 router.post('/register', async (req, res) => {
-  const { name, empId, selectedCourses = [], draftId } = req.body;
+  const { name, empId, selectedCourses = [], draftId, preference = "NA" } = req.body;
   const Course = require('../models/Course');
 
   try {
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
     }
 
   // ✅ Create new faculty entry
-  const faculty = new Faculty({ name, empId, selectedCourses, draftId });
+  const faculty = new Faculty({ name, empId, selectedCourses, draftId, preference });
     await faculty.save();
     res.status(201).json({ message: 'Faculty registered successfully.', faculty });
 
@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
 
 // Accept willingness in the request body
 router.post('/submit-courses', async (req, res) => {
-  let { empId, name, selectedCourses, draftId, willingness } = req.body;
+  let { empId, name, selectedCourses, draftId, willingness, preference } = req.body;
 
   console.log("[DEBUG] Received course submission request:", req.body);
   console.log("[DEBUG] empId:", empId);
@@ -77,6 +77,7 @@ router.post('/submit-courses', async (req, res) => {
   console.log("[DEBUG] selectedCourses:", selectedCourses);
   console.log("[DEBUG] draftId:", draftId);
   console.log("[DEBUG] willingness:", willingness);
+  console.log("[DEBUG] preference:", preference);
 
   if (!draftId) return res.status(400).json({ message: 'draftId required' });
   // Enhanced debug logs for validation
@@ -137,6 +138,7 @@ router.post('/submit-courses', async (req, res) => {
           empId,
           selectedCourses,
           willingness: willingness, // Store willingness as sent (true/false)
+          preference: preference || "NA", // Add preference
           submittedAt: new Date(),
           draftId
         });
@@ -150,7 +152,8 @@ router.post('/submit-courses', async (req, res) => {
 
   faculty.selectedCourses = selectedCourses;
   faculty.willingness = willingness;
-  faculty.submittedAt = new Date(); 
+  faculty.preference = preference || "NA";
+  faculty.submittedAt = new Date();
   await faculty.save();
 
     console.log("✅ Courses updated successfully for:", empId);

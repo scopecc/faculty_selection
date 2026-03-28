@@ -1,26 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-:root {
-  --primary-color: #000000;
-  --secondary-color: #333333;
-  --background-color: #ffffff;
-  --card-background: #ffffff;
-  --text-primary: #000000;
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  --border-light: #e5e7eb;
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 20px;
-  --spacing-lg: 32px;
-  --spacing-xl: 48px;
-}
-
-/* Navbar */
+/* Navbar Styling */
 .navbar {
   position: fixed;
   top: 0;
@@ -29,98 +7,91 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--card-background);
-  border-bottom: 1px solid var(--border-light);
-  padding: var(--spacing-md) var(--spacing-xl);
-  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 1.5rem;
   height: 70px;
-  box-shadow: var(--shadow-sm);
   z-index: 1000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px); /* Required by Apple/Safari for minimal frost, not heavy glass */
 }
 
-/* Add space for fixed navbar */
-body {
-  padding-top: 70px;
-}
-
-/* Brand/Logo Section */
 .navbar-brand {
   display: flex;
   align-items: center;
 }
 
 .navbar-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
-/* Navigation Links */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 1.5rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .nav-link {
-  font-family: 'Poppins', sans-serif;
   text-decoration: none;
-  color: var(--text-secondary);
-  font-size: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
   font-weight: 500;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .nav-link:hover {
-  color: var(--primary-color);
-  background-color: #f5f5f5;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-subtle);
 }
 
 .nav-link.active {
-  color: var(--primary-color);
+  color: var(--color-primary);
   font-weight: 600;
-  background-color: #f0f0f0;
+  background-color: rgba(79, 70, 229, 0.05); /* very soft primary background */
 }
 
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
   display: none;
-  background: none;
+  background: transparent;
   border: none;
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: var(--radius-sm);
+  box-shadow: none;
+  padding: 0.5rem;
+  color: var(--color-text-primary);
 }
 
 .mobile-menu-toggle:hover {
-  background-color: #f5f5f5;
+  background-color: var(--color-bg-subtle);
+  transform: none;
+  box-shadow: none;
 }
 
 .hamburger {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .hamburger span {
-  width: 24px;
+  width: 20px;
   height: 2px;
-  background-color: var(--text-primary);
-  border-radius: 1px;
-  transition: all 0.2s ease;
+  background-color: currentColor;
+  border-radius: 2px;
+  transition: all var(--transition-base);
 }
 
 .hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
+  transform: translateY(6px) rotate(45deg);
 }
 
 .hamburger.open span:nth-child(2) {
@@ -128,7 +99,7 @@ body {
 }
 
 .hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* Mobile Menu */
@@ -137,69 +108,50 @@ body {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: var(--card-background);
-  border-bottom: 1px solid var(--border-light);
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-md);
-  display: none;
+  display: flex;
   flex-direction: column;
-  padding: var(--spacing-md);
-  gap: var(--spacing-sm);
+  padding: 0;
+  
+  /* Smooth Slide Down Animation */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all var(--transition-base);
 }
 
 .mobile-menu.open {
-  display: flex;
+  max-height: 200px;
+  padding: 1rem 1.5rem;
+  opacity: 1;
 }
 
 .mobile-menu .nav-link {
   width: 100%;
-  text-align: center;
-  padding: var(--spacing-md);
+  text-align: left;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
-  background-color: #f9f9f9;
-  border: 1px solid var(--border-light);
+  margin-bottom: 0.5rem;
+  border: none;
 }
 
-.mobile-menu .nav-link:hover {
-  background-color: #f0f0f0;
+.mobile-menu .nav-link:last-child {
+  margin-bottom: 0;
 }
 
-.mobile-menu .nav-link.active {
-  background-color: #e5e5e5;
-  border-color: var(--primary-color);
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
-  .navbar {
-    padding: var(--spacing-md) var(--spacing-lg);
-  }
-
-  .navbar-title {
-    font-size: 1.3rem;
-  }
-
   .nav-links {
     display: none;
   }
-
   .mobile-menu-toggle {
-    display: block;
+    display: flex;
   }
 }
 
-@media (max-width: 480px) {
-  .navbar {
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .navbar-title {
-    font-size: 1.2rem;
-  }
-}
-
-/* Focus states for accessibility */
-.nav-link:focus,
-.mobile-menu-toggle:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+.nav-link:focus-visible,
+.mobile-menu-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }

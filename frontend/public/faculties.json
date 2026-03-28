@@ -48,10 +48,10 @@
         "domain": "Cyber-Physical Systems"
     },
     {
-      "empId": 1000,
-      "name": "Test mail",
-      "email": "scopecc.wat@vit.ac.in",
-      "domain": "Q-TCS"
+        "empId": 1000,
+        "name": "Test mail",
+        "email": "scopecc.wat@vit.ac.in",
+        "domain": "Q-TCS"
     },
     {
         "empId": 1002,
@@ -1954,5 +1954,41 @@
         "name": "Akkilesh",
         "email": "akkilesh.a2022@vitstudent.ac.in",
         "domain": "Cyber Security"
+    },
+    {
+        "empId": 54510,
+        "name": "Sindhu Ravindran",
+        "email": "sindhu.ravindran@vit.ac.in",
+        "domain": "Artificial Intelligence - G1"
+    },
+    {
+        "empId": 54517,
+        "name": "Srinivasan B",
+        "email": "srinivasan.b@vit.ac.in",
+        "domain": "Image Processing"
+    },
+    {
+        "empId": 54527,
+        "name": "Rajkumar R",
+        "email": "rajkumar.r@vit.ac.in",
+        "domain": "Cyber-Physical Systems"
+    },
+    {
+        "empId": 54652,
+        "name": "Preetha Evangeline D",
+        "email": "preethaevangeline.d@vit.ac.in",
+        "domain": "Data Science"
+    },
+    {
+        "empId": 54680,
+        "name": "Radhika R",
+        "email": "radhika.r@vit.ac.in",
+        "domain": "Image Processing"
+    },
+    {
+        "empId": 54508,
+        "name": "Suhail K",
+        "email": "suhail.k@vit.ac.in",
+        "domain": "Robotics"
     }
 ]

@@ -24,10 +24,14 @@ const FacultyDetails = () => {
     setDraftLoading(true);
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/drafts/list`)
       .then(res => {
-        setDrafts(res.data || []);
-        // Default to 'Default Draft' if present
-        const defaultDraft = res.data.find(d => d.name === 'Default Draft');
-        setSelectedDraft(defaultDraft || res.data[0] || null);
+        let sortedDrafts = [...(res.data || [])].sort((a, b) => {
+          if (a.createdAt && b.createdAt) {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }
+          return (b._id || '').localeCompare(a._id || '');
+        });
+        setDrafts(sortedDrafts);
+        setSelectedDraft(sortedDrafts[0] || null);
         setDraftLoading(false);
       })
       .catch(() => {

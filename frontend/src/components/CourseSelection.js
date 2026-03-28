@@ -21,67 +21,96 @@ const CourseSelection = () => {
   const navigate = useNavigate();
 
   // Get data from location state or fallback to localStorage
-  const storedEmpId = localStorage.getItem('empId');
-  const storedFacultyEmail = localStorage.getItem('facultyEmail');
-  //const storedPreference = localStorage.getItem('preference');
-  const storedDraftId = localStorage.getItem('draftId');
+  const storedEmpId = sessionStorage.getItem('empId') || localStorage.getItem('empId');
+  const storedFacultyEmail = sessionStorage.getItem('facultyEmail') || localStorage.getItem('facultyEmail');
+  const storedDraftId = sessionStorage.getItem('draftId') || localStorage.getItem('draftId');
 
   const empId = location.state?.empId || storedEmpId;
   const facultyEmail = location.state?.facultyEmail || storedFacultyEmail;
   const draftId = location.state?.draftId || storedDraftId || null;
 
+  // Session state restoration
   const [name, setName] = useState('');
-  const [selectedCourses, setSelectedCourses] = useState([]);
-
-  //const [ug, setUg] = useState('');
-  const [ugspecialization, setUgspecialization] = useState('');
-  //const [pg, setPg] = useState('');
-  const [pgspecialization, setPgspecialization] = useState('');
-  const [researchDomain, setResearchDomain] = useState('');
+  const [selectedCourses, setSelectedCourses] = useState(() => JSON.parse(sessionStorage.getItem('selectedCourses')) || []);
+  const [ugspecialization, setUgspecialization] = useState(() => sessionStorage.getItem('ugspecialization') || '');
+  const [pgspecialization, setPgspecialization] = useState(() => sessionStorage.getItem('pgspecialization') || '');
+  const [researchDomain, setResearchDomain] = useState(() => sessionStorage.getItem('researchDomain') || '');
   const [domainConstraints, setDomainConstraints] = useState({});
+  const [willingness, setWillingness] = useState(() => {
+    const w = sessionStorage.getItem('willingness');
+    return w !== null ? JSON.parse(w) : null;
+  });
+  const [registrationStatus, setRegistrationStatus] = useState(null);
 
-  //const [preference, setLocalPreference] = useState("");
-  const [willingness, setWillingness] = useState(null); // New state for willingness
-  const [registrationStatus, setRegistrationStatus] = useState(null); // Registration status state
+  // Route protection
+  useEffect(() => {
+    if (!empId || !facultyEmail) {
+      navigate('/');
+    } else {
+      sessionStorage.setItem('empId', empId);
+      sessionStorage.setItem('facultyEmail', facultyEmail);
+      if (draftId) sessionStorage.setItem('draftId', draftId);
+    }
+  }, [empId, facultyEmail, draftId, navigate]);
 
-  const moveCourseUp = (index) => {
-    if (index === 0) return;
-    const updatedCourses = [...selectedCourses];
-    [updatedCourses[index - 1], updatedCourses[index]] = [updatedCourses[index], updatedCourses[index - 1]];
-    setSelectedCourses(updatedCourses);
+  // Persist form state
+  useEffect(() => {
+    sessionStorage.setItem('selectedCourses', JSON.stringify(selectedCourses));
+    sessionStorage.setItem('ugspecialization', ugspecialization);
+    sessionStorage.setItem('pgspecialization', pgspecialization);
+    sessionStorage.setItem('researchDomain', researchDomain);
+    sessionStorage.setItem('willingness', JSON.stringify(willingness));
+  }, [selectedCourses, ugspecialization, pgspecialization, researchDomain, willingness]);
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.replace('/');
   };
 
-  const [userDomain, setUserDomain] = useState(null); // ← new state
+  const [draggedCourseIndex, setDraggedCourseIndex] = useState(null);
+  const [dragOverCourseIndex, setDragOverCourseIndex] = useState(null);
 
-useEffect(() => {
-  if (facultyEmail) {
-    axios.get('faculties.json')
-      .then(response => {
-        const faculty = response.data.find(fac => fac.email === facultyEmail);
-        if (faculty) {
-          setName(faculty.name);
-          setUserDomain(faculty.domain || null); // <-- store mapped domain
-        } else {
-          setName('Unknown Faculty');
-          setUserDomain(null);
-        }
-      })
-      .catch(error => console.error("Error fetching faculty data:", error));
-  }
-}, [facultyEmail]);
-
-  
-  const moveCourseDown = (index) => {
-    if (index === selectedCourses.length - 1) return;
-    const updatedCourses = [...selectedCourses];
-    [updatedCourses[index + 1], updatedCourses[index]] = [updatedCourses[index], updatedCourses[index + 1]];
-    setSelectedCourses(updatedCourses);
+  const handleDragStart = (e, index) => {
+    setDraggedCourseIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => {
+      e.target.classList.add('dragging');
+    }, 0);
   };
 
-  //useEffect(()=>{
-    //localStorage.setItem("preference",preference)
-  //},[preference])
-  // Fetch faculty name based on email
+  const handleDragEnter = (e, index) => {
+    e.preventDefault();
+    setDragOverCourseIndex(index);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, index) => {
+    e.preventDefault();
+    if (draggedCourseIndex !== null && draggedCourseIndex !== index) {
+      const updatedCourses = [...selectedCourses];
+      const draggedCourse = updatedCourses[draggedCourseIndex];
+      updatedCourses.splice(draggedCourseIndex, 1);
+      updatedCourses.splice(index, 0, draggedCourse);
+      setSelectedCourses(updatedCourses);
+    }
+    setDraggedCourseIndex(null);
+    setDragOverCourseIndex(null);
+    e.target.classList.remove('dragging');
+  };
+
+  const handleDragEnd = (e) => {
+    setDraggedCourseIndex(null);
+    setDragOverCourseIndex(null);
+    e.target.classList.remove('dragging');
+  };
+
+  const [userDomain, setUserDomain] = useState(null);
+
   useEffect(() => {
     if (facultyEmail) {
       axios.get('faculties.json')
@@ -89,15 +118,17 @@ useEffect(() => {
           const faculty = response.data.find(fac => fac.email === facultyEmail);
           if (faculty) {
             setName(faculty.name);
+            setUserDomain(faculty.domain || null);
           } else {
             setName('Unknown Faculty');
+            setUserDomain(null);
           }
         })
         .catch(error => console.error("Error fetching faculty data:", error));
     }
   }, [facultyEmail]);
 
-
+  // Cleanup old useEffects as we merged them above.
 const [theoryCoursesByDomain, setTheoryCoursesByDomain] = useState({});
 const [theoryLabCoursesByDomain, setTheoryLabCoursesByDomain] = useState({});
 const [courses, setCourses] = useState([]);
@@ -298,7 +329,7 @@ useEffect(() => {
         preference: 'NA'
       }, { headers: { 'Content-Type': 'application/json' } });
       alert("Courses submitted successfully!");
-      navigate('/');
+      handleLogout();
     } catch (error) {
       console.error("Error submitting courses:", error);
       if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes('Registration full')) {
@@ -328,42 +359,28 @@ useEffect(() => {
   }
 
   return (
-    <div className="course-selection-container">
-      <h1>Course Selection</h1>
-  <p className="faculty-details" style={{fontSize:"45px"}}>Welcome, <strong style={{fontSize:"45px"}}>{name || "N/A"}</strong></p>
-      {/*<p className="faculty-details">Preference: <strong>{preference || "N/A"}</strong></p>*/}
-      <p className="faculty-details">Employee ID: <strong>{empId || "N/A"}</strong></p>
-      <p className="faculty-details" style={{ color: "red" }}>
-  <strong>
-    Please read the instructions given below before proceeding with the registration process:
-  </strong>
-</p>
-<ol
-  style={{
-    color: "red",
-    textAlign: "left",
-    fontWeight: "bold",
-    marginLeft: "20px",
-    fontSize: "16px",
-  }}
->
-  <li>You must select exactly {maxCourses} courses.</li>
-  <li>The selected courses will be displayed in the order in which you select them.</li>
-  {/*<li>
-    If you prefer Theory-only courses, choose 5 Theory-only courses and 2
-    Theory+Lab courses.
-  </li>
-  <li>
-    If you prefer Lab-oriented courses, choose at least 5 Theory+Lab courses.
-  </li>*/}
-  <li>
-    The number in brackets next to the course name is the number of slots
-    available for that course.
-  </li>
-</ol>
+      <div className="course-selection-container">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Course Selection</h1>
+        <button className="logout-button" onClick={handleLogout} style={{
+          backgroundColor: '#ef4444', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', border: 'none', fontWeight: 'bold', cursor: 'pointer'
+        }}>Log Out</button>
+      </div>
+      <div className="faculty-details">
+        <span>Welcome, <strong>{name || "N/A"}</strong></span>
+        <span>Employee ID: <strong>{empId || "N/A"}</strong></span>
+      </div>
+      
+      <p style={{ color: "red" }}>
+        <strong>Please read the instructions given below before proceeding with the registration process:</strong>
+      </p>
+      <ol style={{ color: "red", textAlign: "left", fontWeight: "bold", marginLeft: "20px", fontSize: "16px" }}>
+        <li>You must select exactly {maxCourses} courses.</li>
+        <li>The selected courses will be displayed in the order in which you select them.</li>
+        <li>The number in brackets next to the course name is the number of slots available for that course.</li>
+      </ol>
 
-      <div style={{margin:"auto", textAlign:"center"}}>
-        <div className="input-fields" style={{ padding: "20px", display:"flex"}}>
+      <div className="input-fields">
           <div style={{ display: "flex", width: "100%" }}>
             {/*<label style={{ width: "50%" }}>
               Your UG Degree:
@@ -425,13 +442,11 @@ useEffect(() => {
               value={researchDomain}
               onChange={(e) => setResearchDomain(e.target.value)}
               required
-              style={{ width: "100%" }}
             />
           </label>
         </div> 
-      </div>
 
-      <p style={{textAlign:"center",color:"blue"}}>
+      <p className="course-code-info">
         Course Code starts with BCSE - B.Tech Courses<br></br>
         Course Code starts with MCSE - M.Tech Courses<br></br>
         Course Code starts with I/SWE/CSE - Integrated M.Tech Courses<br></br>
@@ -467,13 +482,11 @@ useEffect(() => {
       </div> 
       <br></br> */}
 
-      <div style={{ width: "100%", display: "flex", gap: "20px", justifyContent: "center", alignItems: "center" }}>
-        {/* Willingness Radio */}
-        <label style={{ display: "flex", alignItems: "center", marginLeft: "30px", fontWeight: 600, fontSize: "16px" }}>
+      <div className="input-fields" style={{ justifyContent: "center" }}>
+        <label style={{ display: "flex", alignItems: "center", fontWeight: 600, fontSize: "16px" }}>
           Willingness to take an extra course
-              <span style={{ color: "red", marginLeft: "4px" }}>*</span>
-
-          <div style={{ marginLeft: "15px", display: "flex", gap: "15px" }}>
+          <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+          <div style={{ display: "flex", gap: "15px", marginLeft: "15px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <input
                 type="radio"
@@ -502,9 +515,9 @@ useEffect(() => {
 
 
       <hr />
-  
-      <div className="selection-view" style={{display:"flex", gap:"30px"}}>
-        <div style={{width:"60%"}}>
+      
+      <div className="selection-view">
+        <div className="course-list-main">
           {Array.isArray(courses) && courses.length > 0 ? (
             <div>
               <h2>Theory+Lab Courses</h2>
@@ -631,53 +644,34 @@ useEffect(() => {
             <p>Loading courses...</p>
           )}
         </div>
-        <div style={{width:"40%",position:"sticky",top:"30px",backgroundColor:"#D2E3FC",padding:"30px"}} className="selected-courses">
-          <div style={{display:"flex",minHeight:"70vh",flexDirection:"column",justifyContent:"space-between",alignItems:"between"}}>
-            <div>
-              <h2>Selected Courses</h2>
-              <ol>
-                {selectedCourses.map((course,index) => (
-                  <li 
-                  key={course.courseId} 
-                  style={{ 
-                    display: "flex", 
-                    justifyContent: "space-between", 
-                    alignItems: "center", 
-                    background: "#f5f5f5", 
-                    padding: "10px", 
-                    marginBottom: "10px", 
-                    borderRadius: "5px" 
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: "500"}}>{index + 1})&nbsp;&nbsp;
-          {course.courseName} ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
-        </div>
-                  </div>
-                  <span style={{ display: "flex" }}>
-                    <button 
-                      onClick={() => moveCourseUp(index)} 
-                      title="Move Up"
-                      className="move-button"
-                    >
-                      ⬆️
-                    </button>
-                    <button 
-                      onClick={() => moveCourseDown(index)} 
-                      title="Move Down"
-                      className="move-button"
-                    >
-                      ⬇️
-                    </button>
+        <div className="selected-courses">
+          <h2>Selected Courses</h2>
+          <ol>
+            {selectedCourses.map((course, index) => (
+              <li 
+                key={course.courseId}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragEnter={(e) => handleDragEnter(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={dragOverCourseIndex === index ? 'drag-over' : ''}
+              >
+                <div className="drag-handle" title="Drag to reorder">⋮⋮</div>
+                <div className="course-text-wrapper">
+                  <span className="course-index">{index + 1}.</span>
+                  <span>
+                    {course.courseName}
+                    <div className="course-meta">
+                      ({course.courseType}) ({course.courseId}) - <strong>{course.domain}</strong>
+                    </div>
                   </span>
-                </li>
-              ))}
-              </ol>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
-            </div>  
-          </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <button className="submit-button" onClick={handleSubmit}>Submit Courses</button>
         </div>
       </div>
       

@@ -27,13 +27,14 @@ router.post('/register', async (req, res) => {
 
     // Check maxRegistrations for each selected course in this draft
     for (const course of selectedCourses) {
-      const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
+      const courseIdRegex = new RegExp(`^\\s*${course.courseId.trim()}\\s*$`, 'i');
+      const courseDoc = await Course.findOne({ courseId: courseIdRegex, draftId });
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
       // If maxRegistrations > 0, enforce limit; if 0, treat as unlimited
       if (courseDoc.maxRegistrations > 0) {
-        const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
+        const count = await Faculty.countDocuments({ 'selectedCourses.courseId': courseIdRegex, draftId });
         if (count >= courseDoc.maxRegistrations) {
           return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
         }
@@ -113,7 +114,8 @@ router.post('/submit-courses', async (req, res) => {
 
     // Check maxRegistrations for each selected course
     for (const course of selectedCourses) {
-      const courseDoc = await Course.findOne({ courseId: course.courseId, draftId });
+      const courseIdRegex = new RegExp(`^\\s*${course.courseId.trim()}\\s*$`, 'i');
+      const courseDoc = await Course.findOne({ courseId: courseIdRegex, draftId });
       if (!courseDoc) {
         return res.status(400).json({ message: `Course not found: ${course.courseName}` });
       }
@@ -121,7 +123,7 @@ router.post('/submit-courses', async (req, res) => {
       if (courseDoc.maxRegistrations > 0) {
         const alreadyRegistered = faculty && faculty.selectedCourses.some(c => c.courseId === course.courseId);
         if (!alreadyRegistered) {
-          const count = await Faculty.countDocuments({ 'selectedCourses.courseId': course.courseId, draftId });
+          const count = await Faculty.countDocuments({ 'selectedCourses.courseId': courseIdRegex, draftId });
           if (count >= courseDoc.maxRegistrations) {
             return res.status(400).json({ message: `Registration full for course: ${course.courseName}` });
           }

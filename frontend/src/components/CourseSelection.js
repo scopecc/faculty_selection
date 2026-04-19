@@ -275,9 +275,9 @@ useEffect(() => {
 
     let allowedDomains = [];
     if (userDomain === "Common") {
-      allowedDomains = ["Common Group 1", "Common Group 2"];
+      allowedDomains = ["Common Group 1", "Common Group 2", "Common Group 3"];
     } else {
-      allowedDomains = [userDomain, "Common Group 1", "Common Group 2"];
+      allowedDomains = [userDomain, "Common Group 1", "Common Group 2", "Common Group 3"];
     }
 
     for (const domain of allowedDomains) {

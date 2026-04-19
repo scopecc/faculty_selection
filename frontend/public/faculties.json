@@ -1990,5 +1990,47 @@
         "name": "Suhail K",
         "email": "suhail.k@vit.ac.in",
         "domain": "Robotics"
+    },
+    {
+        "empId": 90001,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Artificial Intelligence"
+    },
+    {
+        "empId": 90002,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Cyber-Physical Systems"
+    },
+    {
+        "empId": 90003,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Data Science"
+    },
+    {
+        "empId": 90004,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Image Processing"
+    },
+    {
+        "empId": 90005,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Robotics"
+    },
+    {
+        "empId": 90006,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Software Engineering"
+    },
+    {
+        "empId": 90007,
+        "name": "V. KARTHIKA",
+        "email": "karthika.v@vit.ac.in",
+        "domain": "Q-TCS"
     }
 ]

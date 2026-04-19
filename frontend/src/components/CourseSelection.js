@@ -548,13 +548,14 @@ useEffect(() => {
   .filter(domain => {
     if (userDomain === "Common") {
       // Common user: only Common Group 1 and Common Group 2
-      return domain === "Common Group 1" || domain === "Common Group 2";
+      return domain === "Common Group 1" || domain === "Common Group 2"|| domain === "Common Group 2";
     } else {
-      // Other users: their domain + Common Group 1 + Common Group 2
+      // Other users: their domain + Common Group 1 + Common Group 2 + Common Group 3
       return (
         domain === userDomain ||
         domain === "Common Group 1" ||
-        domain === "Common Group 2"
+        domain === "Common Group 2" ||
+        domain === "Common Group 3"
       );
     }
   })

@@ -1993,44 +1993,44 @@
     },
     {
         "empId": 90001,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test AI",
+        "email": "testai@vit.ac.in",
         "domain": "Artificial Intelligence"
     },
     {
         "empId": 90002,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test CPS",
+        "email": "testcps@vit.ac.in",
         "domain": "Cyber-Physical Systems"
     },
     {
         "empId": 90003,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test DS",
+        "email": "testds@vit.ac.in",
         "domain": "Data Science"
     },
     {
         "empId": 90004,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test IP",
+        "email": "testip@vit.ac.in",
         "domain": "Image Processing"
     },
     {
         "empId": 90005,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test Robo",
+        "email": "testrobo@vit.ac.in",
         "domain": "Robotics"
     },
     {
         "empId": 90006,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test SE",
+        "email": "testse@vit.ac.in",
         "domain": "Software Engineering"
     },
     {
         "empId": 90007,
-        "name": "V. KARTHIKA",
-        "email": "karthika.v@vit.ac.in",
+        "name": "Test Quantum",
+        "email": "testq@vit.ac.in",
         "domain": "Q-TCS"
     }
 ]

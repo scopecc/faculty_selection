@@ -2032,5 +2032,11 @@
         "name": "Test Quantum",
         "email": "testq@vit.ac.in",
         "domain": "Q-TCS"
+    },
+    {
+        "empId": 50370,
+        "name": "Rajesh Kumar",
+        "email": "rajesh.kumar@vit.ac.in",
+        "domain": "Artificial Intelligence"
     }
 ]

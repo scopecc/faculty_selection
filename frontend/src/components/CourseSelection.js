@@ -377,7 +377,6 @@ useEffect(() => {
       <ol style={{ color: "red", textAlign: "left", fontWeight: "bold", marginLeft: "20px", fontSize: "16px" }}>
         <li>You must select exactly {maxCourses} courses.</li>
         <li>The selected courses will be displayed in the order in which you select them.</li>
-        <li>The number in brackets next to the course name is the number of slots available for that course.</li>
       </ol>
 
       <div className="input-fields">

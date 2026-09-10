@@ -375,7 +375,7 @@ useEffect(() => {
         <strong>Please read the instructions given below before proceeding with the registration process:</strong>
       </p>
       <ol style={{ color: "red", textAlign: "left", fontWeight: "bold", marginLeft: "20px", fontSize: "16px" }}>
-        <li>You must select exactly {maxCourses} courses in any combination from both sections(Theory+Lab and Theory)</li>
+        <li>You must select exactly {maxCourses} courses.</li>
         <li>The selected courses will be displayed in the order in which you select them.</li>
       </ol>
 

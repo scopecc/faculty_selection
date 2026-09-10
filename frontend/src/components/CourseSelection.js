@@ -375,7 +375,7 @@ useEffect(() => {
         <strong>Please read the instructions given below before proceeding with the registration process:</strong>
       </p>
       <ol style={{ color: "red", textAlign: "left", fontWeight: "bold", marginLeft: "20px", fontSize: "16px" }}>
-        <li>You must select exactly {maxCourses} courses.</li>
+        <li>You must select exactly {maxCourses} courses in any combination from both sections(Theory+Lab and Theory)</li>
         <li>The selected courses will be displayed in the order in which you select them.</li>
       </ol>
 
@@ -446,10 +446,11 @@ useEffect(() => {
         </div> 
 
       <p className="course-code-info">
-        Course Code starts with BCSE - B.Tech Courses<br></br>
-        Course Code starts with MCSE - M.Tech Courses<br></br>
-        Course Code starts with I/SWE/CSE - Integrated M.Tech Courses<br></br>
-        Course Code starts with UCSC - B.Sc Course<br></br></p>
+        Course Code starts with BCSE/BACSE - B.Tech Courses<br></br>
+        Course Code starts with MCSE/MACSE - M.Tech Courses<br></br>
+        Course Code starts with I/SWE/CSE/IA - Integrated M.Tech Courses<br></br>
+        Course Code starts with UCSC/UAC - B.Sc Course<br></br></p>
+        Course Code starts with PAMC - MCA Course<br></br></p>
         
       {/*<p style={{textAlign:"center"}}>
         1. If you are more preferred to choose <b>Theory only course</b>, then select <strong>"Theory"</strong> and make your choices appropriately <br></br>

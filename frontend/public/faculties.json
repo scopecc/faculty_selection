@@ -2152,6 +2152,12 @@
     "name": "Mathiarasi B",
     "email": "mathiarasi.b@vit.ac.in",
     "Research Group": "Artificial Intelligence"
+  },
+  {
+    "empId": 90010,
+    "name": "Test New Faculty",
+    "email": "testnew@vit.ac.in",
+    "Research Group": "Artificial Intelligence"
   }
 
 ]

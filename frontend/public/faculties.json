@@ -2049,115 +2049,115 @@
     "empId": 54758,
     "name": "Lakshmanan K",
     "email": "klakshma@vit.ac.in",
-    "Research Group": "Q-TCS"
+    "domain": "Q-TCS"
   },
   {
     "empId": 54759,
     "name": "Srimathi C",
     "email": "csrimathi@vit.ac.in",
-    "Research Group": "Cyber-Physical Systems"
+    "domain": "Cyber-Physical Systems"
   },
   {
     "empId": 54767,
     "name": "Akkarapakam Suneesh Jacob",
     "email": "suneesh.jacob@vit.ac.in",
-    "Research Group": "Robotics"
+    "domain": "Robotics"
   },
   {
     "empId": 54770,
     "name": "Maheswari P",
     "email": "maheswari.p@vit.ac.in",
-    "Research Group": "Artificial Intelligence"
+    "domain": "Artificial Intelligence"
   },
   {
     "empId": 54775,
     "name": "Dharini R",
     "email": "dharini.r@vit.ac.in",
-    "Research Group": "Data Science"
+    "domain": "Data Science"
   },
   {
     "empId": 54776,
     "name": "Bhulakshmi Bonthu",
     "email": "bhulakshmi.b@vit.ac.in",
-    "Research Group": "Cyber Security"
+    "domain": "Cyber Security"
   },
   {
     "empId": 54783,
     "name": "Saranya M",
     "email": "saranya.mu@vit.ac.in",
-    "Research Group": "Data Science"
+    "domain": "Data Science"
   },
   {
     "empId": 54785,
     "name": "Kulandai Josephine Julina J",
     "email": "josephinejulina.jk@vit.ac.in",
-    "Research Group": "Data Science"
+    "domain": "Data Science"
   },
   {
     "empId": 54786,
     "name": "Meignanamoorthi D",
     "email": "meignanamoorthi.d@vit.ac.in",
-    "Research Group": "Robotics"
+    "domain": "Robotics"
   },
   {
     "empId": 54789,
     "name": "Ravichandran M",
     "email": "m.ravichandran@vit.ac.in",
-    "Research Group": "Cyber-Physical Systems"
+    "domain": "Cyber-Physical Systems"
   },
   {
     "empId": 54799,
     "name": "Vijayaraj J",
     "email": "vijayaraj.j@vit.ac.in",
-    "Research Group": "Data Science"
+    "domain": "Data Science"
   },
   {
     "empId": 54821,
     "name": "Rajalakshmi V",
     "email": "v.rajalakshmi@vit.ac.in",
-    "Research Group": "Artificial Intelligence"
+    "domain": "Artificial Intelligence"
   },
   {
     "empId": 54827,
     "name": "Dhivya R",
     "email": "dhivya.r@vit.ac.in",
-    "Research Group": "Q-TCS"
+    "domain": "Q-TCS"
   },
   {
     "empId": 54828,
     "name": "Ranjith R",
     "email": "ranjith.rajendran@vit.ac.in",
-    "Research Group": "Artificial Intelligence"
+    "domain": "Artificial Intelligence"
   },
   {
     "empId": 54830,
     "name": "Vasanthakumar S",
     "email": "vasanthakumar.s@vit.ac.in",
-    "Research Group": "Robotics"
+    "domain": "Robotics"
   },
   {
     "empId": 54834,
     "name": "Kumar K",
     "email": "kkumar@vit.ac.in",
-    "Research Group": "Software Engineering"
+    "domain": "Software Engineering"
   },
   {
     "empId": 54969,
     "name": "Aarthi D",
     "email": "aarthi.d@vit.ac.in",
-    "Research Group": "Data Science"
+    "domain": "Data Science"
   },
   {
     "empId": 54978,
     "name": "Mathiarasi B",
     "email": "mathiarasi.b@vit.ac.in",
-    "Research Group": "Artificial Intelligence"
+    "domain": "Artificial Intelligence"
   },
   {
     "empId": 90010,
     "name": "Test New Faculty",
     "email": "testnew@vit.ac.in",
-    "Research Group": "Artificial Intelligence"
+    "domain": "Artificial Intelligence"
   }
 
 ]
